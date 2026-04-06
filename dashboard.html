@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orientación Vocacional</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:              #F9F8F6;
+      --card:            #FFFFFF;
+      --text:            #1A1918;
+      --text-secondary:  #7A7570;
+      --text-muted:      #B2ADA6;
+      --border:          #EDE8E1;
+
+      --done-bg:         #EEF3EC;
+      --done-text:       #3E6E39;
+
+      --shadow-sm:       0 1px 3px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.03);
+      --shadow-cta:      0 2px 10px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+      --shadow-hover:    0 8px 24px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,0,0,0.04);
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Phone container ─────────────────────────────── */
+    .screen {
+      max-width: 400px;
+      min-height: 100svh;
+      margin: 0 auto;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ──────────────────────────────────────── */
+    .header {
+      padding: 52px 24px 28px;
+    }
+
+    .greeting {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.6px;
+      line-height: 1.15;
+    }
+
+    .header-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 8px;
+    }
+
+    .header-sub {
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 400;
+    }
+
+    .header-pct {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .progress-track {
+      height: 3px;
+      background: var(--border);
+      border-radius: 99px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--text);
+      border-radius: 99px;
+      width: 0%;
+    }
+
+
+    /* ── Section label ───────────────────────────────── */
+    .modules {
+      padding: 4px 24px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .section-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      color: var(--text-muted);
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      padding-top: 4px;
+    }
+
+    /* ── Cards ───────────────────────────────────────── */
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      padding: 20px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      box-shadow: var(--shadow-sm);
+      transition: transform 0.22s ease, box-shadow 0.22s ease;
+      text-decoration: none;
+      color: inherit;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Active cards: hover lifts */
+    .card--active:hover,
+    .card--cta:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-hover);
+      cursor: pointer;
+    }
+
+    /* CTA card: slightly elevated at rest */
+    .card--cta {
+      box-shadow: var(--shadow-cta);
+    }
+
+    /* Locked cards: muted text, no pointer */
+    .card--locked {
+      cursor: default;
+    }
+    .card--locked .card-title {
+      color: var(--text-secondary);
+    }
+    .card--locked .card-subtitle {
+      color: var(--text-muted);
+    }
+
+    /* ── Card content ────────────────────────────────── */
+    .card-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-title {
+      font-size: 17px;
+      font-weight: 600;
+      color: var(--text);
+      letter-spacing: -0.2px;
+      line-height: 1.3;
+    }
+
+    .card-subtitle {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-top: 4px;
+      line-height: 1.45;
+    }
+
+    /* ── Badges ──────────────────────────────────────── */
+    .badge {
+      flex-shrink: 0;
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 600;
+      border-radius: 99px;
+      padding: 6px 13px;
+      white-space: nowrap;
+      letter-spacing: 0.1px;
+    }
+
+    /* Completado — pale green */
+    .badge--done {
+      background: var(--done-bg);
+      color: var(--done-text);
+    }
+
+    /* Empezar — dark pill, main CTA */
+    .badge--start {
+      background: var(--text);
+      color: #FFFFFF;
+      font-size: 12.5px;
+      padding: 8px 16px;
+    }
+
+    /* Pendiente — outlined, recessed */
+    .badge--pending {
+      background: transparent;
+      color: var(--text-muted);
+      border: 1.5px solid var(--border);
+      font-weight: 500;
+    }
+
+    /* ── Footer note ─────────────────────────────────── */
+    .footer-note {
+      text-align: center;
+      font-size: 12px;
+      color: var(--text-muted);
+      padding: 0 24px 36px;
+      line-height: 1.5;
+    }
+
+    /* ── Web nav (oculto en mobile) ── */
+    .web-nav {
+      display: none;
+    }
+
+    /* ── Tablet (≥ 640px) ─────────────────────────────── */
+    @media (min-width: 640px) {
+      html, body {
+        background: #DDD9D1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 48px 24px 64px;
+        min-height: 100svh;
+      }
+
+      .web-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 820px;
+        padding: 0 4px;
+        margin-bottom: 16px;
+      }
+
+      .web-nav-brand {
+        font-size: 15px;
+        font-weight: 700;
+        color: rgba(249,248,246,0.9);
+        letter-spacing: -0.04em;
+      }
+
+      .web-nav-tag {
+        font-size: 11px;
+        font-weight: 500;
+        color: rgba(249,248,246,0.45);
+        text-transform: uppercase;
+        letter-spacing: 1.2px;
+      }
+
+      .screen {
+        max-width: 820px;
+        min-height: auto;
+        border-radius: 24px;
+        box-shadow: 0 12px 56px rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.05);
+        overflow: hidden;
+      }
+
+      .header {
+        padding: 52px 44px 32px;
+      }
+
+      .greeting {
+        font-size: 44px;
+      }
+
+      .modules {
+        padding: 8px 44px 52px;
+        gap: 12px;
+      }
+
+      .cards-area {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+      }
+
+      /* Último card en posición impar → ocupa todo el ancho */
+      .cards-area > *:last-child:nth-child(odd) {
+        grid-column: 1 / -1;
+      }
+
+      .card {
+        padding: 22px 24px;
+      }
+    }
+
+    /* ── Desktop (≥ 1024px) ────────────────────────────── */
+    @media (min-width: 1024px) {
+      html, body {
+        padding: 64px 24px 80px;
+      }
+
+      .web-nav {
+        max-width: 960px;
+      }
+
+      .screen {
+        max-width: 960px;
+      }
+
+      .header {
+        padding: 64px 56px 40px;
+      }
+
+      .greeting {
+        font-size: 54px;
+        letter-spacing: -1.2px;
+      }
+
+      .header-sub, .header-pct {
+        font-size: 14px;
+      }
+
+      .modules {
+        padding: 8px 56px 64px;
+        gap: 14px;
+      }
+
+      .card {
+        padding: 26px 28px;
+      }
+
+      .card-title {
+        font-size: 18px;
+      }
+
+      .card-subtitle {
+        font-size: 14px;
+      }
+
+      .badge--start {
+        font-size: 13px;
+        padding: 9px 20px;
+      }
+
+      .footer-note {
+        padding: 0 56px 52px;
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Nav visible solo en tablet/desktop -->
+<nav class="web-nav">
+  <span class="web-nav-brand">Timón ✦</span>
+  <span class="web-nav-tag" id="nav-salir" onclick="cerrarSesion()" style="cursor:pointer">Cerrar sesión</span>
+</nav>
+
+<div class="screen">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="greeting" id="greeting-name">Hola</div>
+    <div class="header-meta">
+      <span class="header-sub">Tu perfil está al</span>
+      <span class="header-pct">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill"></div>
+    </div>
+  </header>
+
+  <!-- Módulos -->
+  <section class="modules">
+    <div class="section-label">Módulos</div>
+    <div class="cards-area">
+
+      <!-- 1 · Charla Inicial -->
+      <a class="card card--cta" href="orientacion-vocacional.html">
+        <div class="card-body">
+          <div class="card-title">Charla Inicial</div>
+          <div class="card-subtitle">Un ping-pong rápido para romper el hielo.</div>
+        </div>
+        <span class="badge badge--start">Empezar</span>
+      </a>
+
+      <!-- 2 · Termómetro -->
+      <a class="card card--cta" href="termometro.html">
+        <div class="card-body">
+          <div class="card-title">Termómetro</div>
+          <div class="card-subtitle">Medí la intensidad de lo que te gusta.</div>
+        </div>
+        <span class="badge badge--start">Empezar</span>
+      </a>
+
+      <!-- 3 · RIASEC Holland -->
+      <a class="card card--cta" href="sobrevivientes.html">
+        <div class="card-body">
+          <div class="card-title">RIASEC Holland</div>
+          <div class="card-subtitle">Descubrí tu perfil vocacional con el test de Holland.</div>
+        </div>
+        <span class="badge badge--start">Empezar</span>
+      </a>
+
+      <!-- 5 · Autobiografía -->
+      <a class="card card--cta" href="autobiografia.html" id="card-autobiografia">
+        <div class="card-body">
+          <div class="card-title">Autobiografía</div>
+          <div class="card-subtitle">Yo Soy · Conceptos · Historia Vital · Tu historia en tus palabras.</div>
+        </div>
+        <span class="badge badge--start" id="badge-autobiografia">Empezar</span>
+      </a>
+
+      <!-- 6 · Contexto Familiar -->
+      <a class="card card--cta" href="familia.html" id="card-familia">
+        <div class="card-body">
+          <div class="card-title">Contexto Familiar</div>
+          <div class="card-subtitle">Construí tu red familiar y descubrí patrones de estudio y trabajo.</div>
+        </div>
+        <span class="badge badge--start" id="badge-familia">Empezar</span>
+      </a>
+
+      <!-- 7 · Universidad -->
+      <a class="card card--cta" href="universidad.html" id="card-universidad">
+        <div class="card-body">
+          <div class="card-title">Universidad</div>
+          <div class="card-subtitle">¿Qué pesa más en tu decisión? Armá tu podio de prioridades.</div>
+        </div>
+        <span class="badge badge--start" id="badge-universidad">Empezar</span>
+      </a>
+
+      <!-- 4 · Hablemos con Profesionales -->
+      <a class="card card--cta" href="profesionales.html" id="card-profesionales">
+        <div class="card-body">
+          <div class="card-title">Hablemos con Profesionales</div>
+          <div class="card-subtitle">9 industrias. Investigá tus talentos con quienes trabajan en cada área.</div>
+        </div>
+        <span class="badge badge--start" id="badge-profesionales">Empezar</span>
+      </a>
+
+    </div>
+  </section>
+
+  <p class="footer-note">Los módulos se desbloquean a medida que avanzás.</p>
+
+</div>
+<script>
+// ── Sesión ──
+(function() {
+  const raw = localStorage.getItem('timon_session');
+  if (!raw) { window.location.replace('login.html'); return; }
+  try {
+    const user = JSON.parse(raw);
+    const firstName = (user.nombre || '').split(' ')[0] || 'Hola';
+    document.getElementById('greeting-name').textContent = 'Hola, ' + firstName;
+  } catch(e) {
+    window.location.replace('login.html');
+  }
+})();
+
+function cerrarSesion() {
+  localStorage.removeItem('timon_session');
+  window.location.href = 'login.html';
+}
+
+// Badge dinámico para "Contexto Familiar"
+(function() {
+  const badge = document.getElementById('badge-familia');
+  if (!badge) return;
+  const done  = localStorage.getItem('familia_done') === 'done';
+  const count = parseInt(localStorage.getItem('familia_count') || '0', 10);
+  if (done) {
+    badge.className = 'badge badge--done'; badge.textContent = 'Completado';
+    document.getElementById('card-familia').classList.replace('card--cta','card--active');
+  } else if (count > 0) {
+    badge.className = 'badge badge--pending';
+    badge.textContent = count + (count === 1 ? ' familiar' : ' familiares');
+  }
+})();
+
+// Badge dinámico para "Autobiografía"
+(function() {
+  const done = parseInt(localStorage.getItem('autobiografia_progress') || '0', 10);
+  const badge = document.getElementById('badge-autobiografia');
+  if (!badge) return;
+  if (done === 4) {
+    badge.className = 'badge badge--done'; badge.textContent = 'Completado';
+    document.getElementById('card-autobiografia').classList.replace('card--cta','card--active');
+  } else if (done > 0) {
+    badge.className = 'badge badge--pending'; badge.textContent = done + ' / 4';
+  }
+})();
+
+// Badge dinámico para "Universidad"
+(function() {
+  const badge = document.getElementById('badge-universidad');
+  if (!badge) return;
+  const done = localStorage.getItem('universidad_done') === 'done';
+  if (done) {
+    badge.className = 'badge badge--done'; badge.textContent = 'Completado';
+    document.getElementById('card-universidad').classList.replace('card--cta','card--active');
+  } else {
+    const data = localStorage.getItem('universidad_data');
+    if (data) {
+      badge.className = 'badge badge--pending'; badge.textContent = 'En progreso';
+    }
+  }
+})();
+
+// Badge dinámico para "Hablemos con Profesionales"
+(function() {
+  const ids = ['negocios','sociales','humanidades','salud','juridicas','ecologia','exactas','comunicacion','arte'];
+  const done = ids.filter(id => localStorage.getItem('prof_' + id) === 'done').length;
+  const badge = document.getElementById('badge-profesionales');
+  if (!badge) return;
+  if (done === 9) {
+    badge.className = 'badge badge--done'; badge.textContent = 'Completado';
+    document.getElementById('card-profesionales').classList.replace('card--cta','card--active');
+  } else if (done > 0) {
+    badge.className = 'badge badge--pending'; badge.textContent = done + ' / 9';
+  }
+})();
+</script>
+</body>
+</html>

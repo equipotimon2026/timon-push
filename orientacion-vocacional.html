@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Orientación Vocacional</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:          #F9F8F6;
+      --bot-bubble:  #FFFFFF;
+      --user-bubble: #EDE8DF;
+      --text:        #2D2D2D;
+      --text-soft:   #9A9590;
+      --border:      #E8E3DC;
+      --shadow:      0 1px 6px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.03);
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .chat-wrapper   { display: flex; justify-content: center; height: 100%; }
+    .chat-container { width: 100%; max-width: 600px; height: 100%; display: flex; flex-direction: column; }
+
+    /* ── Header ── */
+    .chat-header {
+      padding: 18px 20px 14px;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+    }
+    .bot-avatar {
+      width: 38px; height: 38px; background: var(--text); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; flex-shrink: 0;
+    }
+    .header-info h1 { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; }
+    .header-info p  { font-size: 12px; color: var(--text-soft); margin-top: 1px; }
+    .online-dot {
+      width: 7px; height: 7px; background: #6BCB77;
+      border-radius: 50%; display: inline-block; margin-right: 3px;
+    }
+
+    /* ── Progress ── */
+    .progress-track { height: 2px; background: var(--border); flex-shrink: 0; }
+    .progress-fill  { height: 100%; background: var(--text); width: 0%; transition: width 0.35s cubic-bezier(0.4,0,0.2,1); }
+
+    /* ── Messages ── */
+    .messages-area {
+      flex: 1; overflow-y: auto;
+      padding: 22px 16px 12px;
+      display: flex; flex-direction: column; gap: 8px;
+      scroll-behavior: smooth;
+    }
+    .messages-area::-webkit-scrollbar { width: 3px; }
+    .messages-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* ── Bubbles ── */
+    .msg {
+      display: flex; max-width: 82%;
+      animation: popIn 0.22s ease-out forwards;
+      opacity: 0;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .msg.bot  { align-self: flex-start; }
+    .msg.user { align-self: flex-end; }
+
+    .bubble {
+      padding: 11px 15px; font-size: 15px;
+      line-height: 1.6; border-radius: 20px;
+    }
+    .msg.bot .bubble  { background: var(--bot-bubble); box-shadow: var(--shadow); border-top-left-radius: 5px; }
+    .msg.user .bubble { background: var(--user-bubble); border-top-right-radius: 5px; }
+
+    /* ── Section divider ── */
+    .section-divider {
+      display: flex; align-items: center; gap: 10px;
+      margin: 8px 0;
+      animation: popIn 0.25s ease forwards; opacity: 0;
+    }
+    .section-divider span {
+      font-size: 11px; font-weight: 600; color: var(--text-soft);
+      letter-spacing: 0.8px; text-transform: uppercase; white-space: nowrap;
+    }
+    .section-divider::before,
+    .section-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ── Typing indicator ── */
+    .typing-wrap { align-self: flex-start; animation: popIn 0.2s ease forwards; opacity: 0; }
+    .typing-bubble {
+      background: var(--bot-bubble); box-shadow: var(--shadow);
+      border-radius: 20px; border-top-left-radius: 5px;
+      padding: 12px 16px; display: flex; align-items: center; gap: 5px;
+    }
+    .dot { width: 6px; height: 6px; background: #C8C2BB; border-radius: 50%; animation: bounce 1.1s ease-in-out infinite; }
+    .dot:nth-child(2) { animation-delay: 0.18s; }
+    .dot:nth-child(3) { animation-delay: 0.36s; }
+    @keyframes bounce {
+      0%,60%,100% { transform: translateY(0); }
+      30%          { transform: translateY(-3px); }
+    }
+
+    /* ── Input area ── */
+    .input-area {
+      padding: 14px 16px max(14px, env(safe-area-inset-bottom));
+      background: var(--bg); border-top: 1px solid var(--border);
+      flex-shrink: 0; min-height: 74px;
+      display: flex; align-items: center;
+    }
+    .quick-replies { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+    .qr-btn {
+      padding: 10px 20px;
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 999px; font-size: 14px; font-family: inherit;
+      font-weight: 500; color: var(--text); cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+      user-select: none;
+    }
+    .qr-btn:hover  { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .qr-btn:active { transform: scale(0.96); }
+
+    .text-form { display: flex; align-items: flex-end; gap: 10px; width: 100%; }
+    .text-input {
+      flex: 1; padding: 12px 16px;
+      background: #FFFFFF; border: 1.5px solid var(--border);
+      border-radius: 24px; font-size: 15px; font-family: inherit;
+      color: var(--text); outline: none; resize: none; overflow-y: hidden;
+      line-height: 1.5; min-height: 46px; max-height: 112px;
+      transition: border-color 0.2s;
+    }
+    .text-input::placeholder { color: #B8B2AB; }
+    .text-input:focus { border-color: #AAA49D; }
+
+    .send-btn {
+      width: 46px; height: 46px; flex-shrink: 0;
+      background: var(--text); border: none; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .send-btn:hover  { background: #444; }
+    .send-btn:active { transform: scale(0.94); }
+
+    .end-state { width: 100%; text-align: center; font-size: 13px; color: var(--text-soft); }
+
+    /* ── Header: back link (solo web) ── */
+    .header-back { display: none; }
+
+    /* ── Tablet / Desktop (≥ 640px) ── */
+    @media (min-width: 640px) {
+      html, body {
+        height: auto;
+        min-height: 100svh;
+        background: #DDD9D1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 24px;
+      }
+
+      .chat-wrapper {
+        width: 100%;
+        max-width: 720px;
+        height: min(720px, calc(100svh - 80px));
+        border-radius: 24px;
+        box-shadow: 0 12px 56px rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.05);
+        overflow: hidden;
+      }
+
+      .chat-container {
+        max-width: 100%;
+        height: 100%;
+      }
+
+      .chat-header {
+        padding: 20px 28px 16px;
+      }
+
+      .header-back {
+        display: block;
+        margin-left: auto;
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--text-soft);
+        text-decoration: none;
+        transition: color 0.15s;
+      }
+
+      .header-back:hover { color: var(--text); }
+
+      .messages-area {
+        padding: 24px 28px 12px;
+      }
+
+      .input-area {
+        padding: 14px 28px 20px;
+      }
+
+      .bubble {
+        font-size: 15px;
+      }
+    }
+
+    /* ── Desktop (≥ 1024px) ── */
+    @media (min-width: 1024px) {
+      .chat-wrapper {
+        max-width: 800px;
+        height: min(760px, calc(100svh - 80px));
+      }
+
+      .chat-header {
+        padding: 22px 36px 18px;
+      }
+
+      .messages-area {
+        padding: 28px 36px 12px;
+      }
+
+      .input-area {
+        padding: 16px 36px 24px;
+      }
+
+      .bubble {
+        font-size: 16px;
+        padding: 12px 18px;
+      }
+
+      .msg { max-width: 75%; }
+    }
+  </style>
+</head>
+<body>
+<div class="chat-wrapper">
+  <div class="chat-container">
+
+    <div class="chat-header">
+      <div class="bot-avatar">✦</div>
+      <div class="header-info">
+        <h1>Orientación Vocacional</h1>
+        <p><span class="online-dot"></span>En línea</p>
+      </div>
+      <a href="dashboard.html" class="header-back">← Dashboard</a>
+    </div>
+
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="messages-area" id="messagesArea"></div>
+    <div class="input-area" id="inputArea"></div>
+
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// ACKNOWLEDGMENTS — aparecen solo 1 de cada 4 respuestas
+// ═══════════════════════════════════════════════════════════
+const ACK_POOL = [
+  'Interesante.', 'Bien pensado.', 'Qué buena respuesta.', 'Me gusta eso.',
+  'Tiene sentido.', 'Qué bueno.', 'Me lo imagino.', 'Muy interesante eso.',
+  'Gracias por la sinceridad.', 'Eso dice mucho.', 'Qué bueno saberlo.',
+  'Tiene mucho sentido.', 'Bueno saberlo.',
+];
+
+function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function pickAck() { return rnd(ACK_POOL); }
+
+// ═══════════════════════════════════════════════════════════
+// FLUJO DE CONVERSACIÓN
+// ═══════════════════════════════════════════════════════════
+const OPTS_3 = ['Sí, me define', 'A veces', 'No me define'];
+
+const flow = [
+
+  // ── INTRO ────────────────────────────────────────────────
+  { text: '¡Hola! ¿Cómo estás? 👋', inputType: 'none', delay: 900 },
+  { text: 'Me alegra que estés por acá.', inputType: 'none', delay: 1000 },
+  { text: '¿Arrancamos?', inputType: 'options',
+    options: ['¡Dale, empecemos!', 'Listo/a'],
+    isIcebreaker: true, ackText: 'Buenísimo. Vamos.',
+    delay: 900 },
+
+  // ── SECCIÓN 1 · PARA EMPEZAR ────────────────────────────
+  // Preguntas fáciles y positivas para romper el hielo real.
+  // El usuario habla de lo que le gusta antes de que le pregunten quién es.
+  { isDivider: true, label: 'Sección 1 · Para empezar', sectionNum: 1, inputType: 'none', delay: 300 },
+  { text: 'Empezamos con algo simple. Sin presión.', inputType: 'none', delay: 900 },
+
+  { text: 'Hacé una lista de las 10 cosas que más te gusta hacer. Pueden ser actividades, sensaciones, cualquier cosa.',
+    inputType: 'text', placeholder: 'Enumeralas como quieras...', delay: 1200 },
+  { text: 'Lo que más me atrae de un trabajo es...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  { text: 'Si pudieras pasar un día entero en una gran biblioteca estudiando lo que quisieras, ¿qué elegirías?',
+    inputType: 'text', placeholder: 'Cualquier tema...', delay: 1300 },
+  { text: '¿Qué es lo que más te estresa actualmente?',
+    inputType: 'text', placeholder: 'Sin filtros...', delay: 1100 },
+  { text: 'Para trabajar es importante...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+
+  // Icebreaker 1
+  { text: '¿Perro o gato?',
+    inputType: 'options', options: ['Perro 🐶', 'Gato 🐱', 'Ninguno de los dos'],
+    isIcebreaker: true, ackText: 'Fundamental saberlo.',
+    delay: 900 },
+
+  { text: 'Para mí, lo ideal sería trabajar con ideas creativas.',
+    inputType: 'options', options: OPTS_3, delay: 1200 },
+  { text: 'Me gusta conocer gente nueva y saber cosas sobre sus vidas.',
+    inputType: 'options', options: OPTS_3, delay: 1200 },
+  { text: 'Me gusta ser popular y participar en muchas actividades sociales.',
+    inputType: 'options', options: OPTS_3, delay: 1200 },
+  { text: 'Si yo fuera rico/a podría...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+
+  // ── SECCIÓN 2 · TU MANERA DE SER ────────────────────────
+  // Con el contexto de lo que les gusta, ahora tiene sentido explorar estilo y personalidad.
+  { isDivider: true, label: 'Sección 2 · Tu manera de ser', sectionNum: 2, inputType: 'none', delay: 300 },
+  { text: 'Te voy a mostrar una serie de afirmaciones. Elegí la que mejor te represente. Sin pensarlo demasiado.', inputType: 'none', delay: 1100 },
+
+  { text: 'Uso más la cabeza que el corazón para tomar decisiones.',
+    inputType: 'options', options: OPTS_3, delay: 1200 },
+  { text: 'Mi corazón suele ganarle la pulseada a mi cabeza.',
+    inputType: 'options', options: OPTS_3, delay: 1200 },
+  { text: 'Planifico y organizo con cuidado antes de empezar cualquier tarea.',
+    inputType: 'options', options: OPTS_3, delay: 1200 },
+  { text: 'Me gusta organizar todo hasta en sus mínimos detalles.',
+    inputType: 'options', options: OPTS_3, delay: 1200 },
+  { text: 'Actúo según el momento, dependiendo de las circunstancias.',
+    inputType: 'options', options: OPTS_3, delay: 1200 },
+  { text: 'Prefiero aprender a usar algo antes que entender cómo funciona por dentro.',
+    inputType: 'options', options: OPTS_3, delay: 1200 },
+  { text: 'Soy imparcial y objetivo/a al momento de resolver un problema.',
+    inputType: 'options', options: OPTS_3, delay: 1200 },
+  { text: 'Soy una persona realista a la que no le gustan demasiado las especulaciones.',
+    inputType: 'options', options: OPTS_3, delay: 1300 },
+  { text: 'Disfruto más de la imaginación y las fantasías que de la rutina cotidiana.',
+    inputType: 'options', options: OPTS_3, delay: 1300 },
+  { text: 'Al tomar decisiones, lo más importante para mí es el bienestar de todos los involucrados.',
+    inputType: 'options', options: OPTS_3, delay: 1300 },
+
+  // Icebreaker 2
+  { text: 'Antes de continuar, algo urgente: ¿helado de menta granizada, sí o no?',
+    inputType: 'options', options: ['Sí, el mejor 🍦', 'No, horrible'],
+    isIcebreaker: true, ackText: 'Dato guardado. Muy importante.',
+    delay: 950 },
+
+  // Con la base de estilo establecida, ahora tienen sentido las preguntas de control y consecuencias.
+  { text: 'Me gusta ser la persona que asume el control de las cosas.',
+    inputType: 'options', options: OPTS_3, delay: 1200 },
+  { text: 'Preferiría ser un seguidor más que un líder.',
+    inputType: 'options', options: OPTS_3, delay: 1200 },
+  { text: 'No espero que las cosas pasen — hago que sucedan como yo quiero.',
+    inputType: 'options', options: OPTS_3, delay: 1300 },
+  { text: 'Siempre hice lo que quise y acepté las consecuencias.',
+    inputType: 'options', options: OPTS_3, delay: 1200 },
+  { text: 'Necesito bastante tiempo a solas para ordenar mis pensamientos.',
+    inputType: 'options', options: OPTS_3, delay: 1200 },
+  { text: 'Me pone bastante nervioso/a tener que conocer y conversar con gente nueva.',
+    inputType: 'options', options: OPTS_3, delay: 1300 },
+  { text: 'Cuando siento que no puedo hacer mucho, prefiero esperar y ver qué pasa.',
+    inputType: 'options', options: OPTS_3, delay: 1300 },
+
+  { text: 'Segunda parte, lista.', inputType: 'none', delay: 900 },
+
+  // ── SECCIÓN 3 · TU MUNDO Y LO QUE CREÉS ─────────────────
+  // Frases proyectivas: primero las creencias sobre el mundo externo (trabajo, sociedad),
+  // después las presiones familiares, y al final los miedos y bloqueos internos.
+  { isDivider: true, label: 'Sección 3 · Tu mundo y lo que creés', sectionNum: 3, inputType: 'none', delay: 300 },
+  { text: 'Ahora cambiamos de modalidad. Te muestro frases incompletas para que las termines. Escribí lo primero que se te venga a la mente — sin editarte. Eso es lo valioso.', inputType: 'none', delay: 1400 },
+
+  { text: 'Conseguir trabajo hoy...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  { text: 'Sin un título...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  { text: 'Las carreras largas...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  { text: 'En esta sociedad, más vale la pena ganar plata que...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1200 },
+  { text: 'La sociedad espera que uno sea una persona...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1200 },
+  { text: 'Una persona adulta...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  { text: 'Mis padres quisieran que yo...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+
+  // Icebreaker 3
+  { text: '¿Pizza con ananá: exquisitez o crimen de lesa humanidad?',
+    inputType: 'options', options: ['Exquisitez total 🍕', 'Crimen. Sin dudas.'],
+    isIcebreaker: true, ackText: 'Posición tomada. Lo anotamos.',
+    delay: 950 },
+
+  { text: 'A veces me da miedo...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  { text: 'Me da miedo equivocarme...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  { text: 'Si se me presenta una dificultad...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  { text: 'Puedo intentar un cambio, pero...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  { text: 'Lo difícil de tomar una decisión es...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  { text: 'Yo soy...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+
+  { text: 'Tercera parte, lista.', inputType: 'none', delay: 900 },
+
+  // ── SECCIÓN 4 · TU FUTURO ────────────────────────────────
+  // Primero anclamos el presente (¿estás donde querías estar?),
+  // después construimos la visión: corto, mediano, largo plazo,
+  // y finalmente el ejercicio de los espacios como puente hacia lo concreto.
+  { isDivider: true, label: 'Sección 4 · Tu futuro', sectionNum: 3, inputType: 'none', delay: 300 },
+  { text: 'Esta parte es diferente. Primero, una pregunta directa.', inputType: 'none', delay: 1000 },
+
+  { text: '¿Estás donde querías estar en este momento de tu vida?',
+    inputType: 'options', options: ['Sí, bastante', 'Más o menos', 'No todavía'],
+    customAck: {
+      'Sí, bastante': 'Me alegra escuchar eso.',
+      'Más o menos':  'Honestidad pura.',
+      'No todavía':   'Y está bien saberlo.',
+    },
+    delay: 1300 },
+  { text: 'En la vida quiero llegar a ser...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  { text: 'Dentro de diez años...',
+    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  { text: 'Si le preguntáramos a tu versión de la infancia qué trabajo le gustaría hacer, ¿qué respondería?',
+    inputType: 'text', placeholder: 'Lo que diría el vos de antes...', delay: 1400 },
+  { text: 'Pensá en un lugar en el que te sentís genuinamente a gusto — puede ser cualquiera. Describilo.',
+    inputType: 'text', placeholder: 'Describí el lugar...', delay: 1200 },
+  { text: 'Ahora imaginá cómo sería tu lugar de trabajo ideal — más allá de la actividad en sí. ¿Cómo es el entorno físico?',
+    inputType: 'text', placeholder: 'Describí el espacio...', delay: 1300 },
+  { text: 'Y en ese lugar ideal, ¿qué podrías estar haciendo?',
+    inputType: 'text', placeholder: 'Describilo...', delay: 1100 },
+  { text: '🎬 La escena. Imaginá una escena de tu futuro (a 3, 5 o 10 años). ¿Qué está pasando? ¿Dónde estás? ¿Qué hacés?',
+    inputType: 'text', placeholder: 'Describí la escena...', delay: 1400 },
+  { text: '📅 Veinte años. Imaginá que estás a 20 años de hoy, rodeado/a de las personas más importantes de tu vida. ¿Quiénes son y qué están haciendo?',
+    inputType: 'text', placeholder: 'Describilo...', delay: 1400 },
+
+  // Icebreaker 4
+  { text: '¿Mate o café?',
+    inputType: 'options', options: ['Mate 🧉', 'Café ☕', 'Ninguno de los dos'],
+    isIcebreaker: true, ackText: 'Lo tenemos en cuenta para el informe final.',
+    delay: 900 },
+
+  { text: '🗞️ El artículo. Dentro de 7 años, un diario publica un artículo sobre vos. Entrevistan a uno de tus padres, a un hermano/a y a un amigo/a. ¿Qué te gustaría que dijeran?',
+    inputType: 'text', placeholder: 'Describí lo que dirían...', delay: 1400 },
+  { text: '🏆 El legado. Dentro de muchos años, alguien escribe una nota sobre vos basada en entrevistas a toda la gente con la que interactuaste. ¿Cómo te gustaría ser recordado/a?',
+    inputType: 'text', placeholder: 'Escribí cómo querés que te recuerden...', delay: 1400 },
+
+  { text: 'Cuarta parte, lista.', inputType: 'none', delay: 900 },
+
+  // ── SECCIÓN 5 · LO QUE TE MUEVE ─────────────────────────
+  // Con toda la base construida, ahora tiene sentido ir a las preguntas de propósito profundo.
+  // El usuario ya confió en la plataforma; las preguntas fuertes no caen de la nada.
+  { isDivider: true, label: 'Sección 5 · Lo que te mueve', sectionNum: 4, inputType: 'none', delay: 300 },
+  { text: 'Llegamos a la última parte. Son preguntas más personales — algunas pueden sorprenderte un poco.', inputType: 'none', delay: 1200 },
+  { text: 'Acá no hay respuestas acertadas. Solo las tuyas.', inputType: 'none', delay: 900 },
+
+  { text: 'Todos tenemos uno o más talentos. ¿Cuáles son los tuyos? No hace falta que sean convencionales.',
+    inputType: 'text', placeholder: 'Escribí los que se te ocurran...', delay: 1400 },
+  { text: '¿En qué áreas de tu vida te satisface ser "lo suficientemente bueno/a", sin necesidad de ser el mejor?',
+    inputType: 'text', placeholder: 'Escribí lo que se te ocurra...', delay: 1400 },
+  { text: 'Pensá en alguien que haya producido una diferencia positiva en tu vida. ¿Qué cualidades tiene esa persona que te gustaría desarrollar en vos?',
+    inputType: 'text', placeholder: 'Describí esa persona y sus cualidades...', delay: 1500 },
+  { text: '¿A qué personas te gustaría parecerte y en qué aspectos? Si no hay nadie en particular, ¿cómo te gustaría ser y a qué dedicarías tu vida si pudieras elegir sin restricciones?',
+    inputType: 'text', placeholder: 'Respondé con sinceridad...', delay: 1500 },
+  { text: 'Si pudieras pasar una hora con cualquier persona que haya existido — de cualquier época o lugar — ¿quién sería y qué le preguntarías?',
+    inputType: 'text', placeholder: 'Cualquier persona de la historia...', delay: 1500 },
+  { text: 'Pensá en un objeto o símbolo que te represente. ¿Cuál sería y por qué?',
+    inputType: 'text', placeholder: 'El primero que se te venga...', delay: 1300 },
+  { text: 'Si estuvieras a cargo de una fundación importante y pudieras abordar solo una problemática del mundo, ¿cuál elegirías?',
+    inputType: 'text', placeholder: 'Una sola...', delay: 1400 },
+  { text: '🏗️ La viga de acero. Si pusieran una viga de 15 cm de ancho entre dos rascacielos, ¿qué es lo único que te haría cruzarla?',
+    inputType: 'text', placeholder: 'Pensalo con calma...', delay: 1400 },
+  { text: '🎰 Una clásica, pero sigue siendo buena: si ganás la lotería mañana, ¿cuál es lo primero que harías?',
+    inputType: 'text', placeholder: 'Lo primero que se te venga...', delay: 1300 },
+  { text: '¿Por qué tenés las ambiciones que tenés?',
+    inputType: 'text', placeholder: 'Respondé con honestidad...', delay: 1200 },
+  { text: 'Te dicen que tenés un año más de vida. ¿Qué harías los próximos 12 meses?',
+    inputType: 'text', placeholder: 'Lo que se te venga a la mente...', delay: 1300 },
+  { text: 'Por último: describí un momento en el que te hayas sentido profundamente inspirado/a. ¿Qué pasó? ¿Dónde estabas?',
+    inputType: 'text', placeholder: 'Describí ese momento...', delay: 1500 },
+  { text: 'Una pregunta que puede sonar fuerte al principio, pero tiene mucho sentido en este contexto: ¿cómo sería, para vos, una buena muerte? (¿Habiendo hecho qué? ¿Rodeado/a de quién?)',
+    inputType: 'text', placeholder: 'Tomá tu tiempo...', delay: 1600 },
+
+  // ── CIERRE ───────────────────────────────────────────────
+  { text: 'Listo. Eso es todo.', inputType: 'none', delay: 900 },
+  { text: 'Guardamos todo lo que compartiste. A partir de esto vamos a trabajar para ayudarte a clarificar tu camino. Gracias por la sinceridad — eso es lo más valioso que podías aportar. 🎯',
+    inputType: 'end', delay: 1600 },
+];
+
+// ═══════════════════════════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════════════════════════
+let currentSection = 0;
+const responses    = [];
+const totalAnswerable = flow.filter(s =>
+  (s.inputType === 'options' || s.inputType === 'text') && !s.isIcebreaker
+).length;
+let answered = 0;
+
+// ═══════════════════════════════════════════════════════════
+// DOM
+// ═══════════════════════════════════════════════════════════
+const messagesArea = document.getElementById('messagesArea');
+const inputArea    = document.getElementById('inputArea');
+const progressFill = document.getElementById('progressFill');
+
+// ═══════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════
+function scrollBottom() {
+  requestAnimationFrame(() => { messagesArea.scrollTop = messagesArea.scrollHeight; });
+}
+
+function updateProgress() {
+  progressFill.style.width = ((answered / totalAnswerable) * 100) + '%';
+}
+
+function showTyping() {
+  const el = document.createElement('div');
+  el.className = 'typing-wrap';
+  el.id = 'typing';
+  el.innerHTML = `<div class="typing-bubble">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>`;
+  messagesArea.appendChild(el);
+  scrollBottom();
+}
+
+function hideTyping() { document.getElementById('typing')?.remove(); }
+
+function appendBotMsg(text) {
+  const el = document.createElement('div');
+  el.className = 'msg bot';
+  el.innerHTML = `<div class="bubble">${text}</div>`;
+  messagesArea.appendChild(el);
+  scrollBottom();
+}
+
+function appendUserMsg(text) {
+  const el = document.createElement('div');
+  el.className = 'msg user';
+  el.innerHTML = `<div class="bubble">${escapeHtml(text)}</div>`;
+  messagesArea.appendChild(el);
+  scrollBottom();
+}
+
+function appendDivider(label) {
+  const el = document.createElement('div');
+  el.className = 'section-divider';
+  el.innerHTML = `<span>${label}</span>`;
+  messagesArea.appendChild(el);
+  scrollBottom();
+}
+
+function escapeHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function clearInput() { inputArea.innerHTML = ''; }
+
+// ═══════════════════════════════════════════════════════════
+// SISTEMA DE ACKNOWLEDGMENTS
+// Simula que el bot leyó la respuesta antes de avanzar
+// ═══════════════════════════════════════════════════════════
+function showAckThenAdvance(ackText, nextIdx) {
+  showTyping();
+  // 700ms de "escritura" para que se sienta como que leyó y está respondiendo
+  setTimeout(() => {
+    hideTyping();
+    appendBotMsg(ackText);
+    // pausa antes de la siguiente pregunta
+    setTimeout(() => processStep(nextIdx), 500);
+  }, 700);
+}
+
+// ═══════════════════════════════════════════════════════════
+// INPUT RENDERERS
+// ═══════════════════════════════════════════════════════════
+function renderOptions(options, onAnswer) {
+  clearInput();
+  const wrap = document.createElement('div');
+  wrap.className = 'quick-replies';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'qr-btn';
+    btn.textContent = opt;
+    btn.addEventListener('click', () => {
+      wrap.querySelectorAll('button').forEach(b => b.disabled = true);
+      onAnswer(opt);
+    });
+    wrap.appendChild(btn);
+  });
+  inputArea.appendChild(wrap);
+}
+
+function renderTextInput(placeholder, onAnswer) {
+  clearInput();
+  const form = document.createElement('div');
+  form.className = 'text-form';
+
+  const ta = document.createElement('textarea');
+  ta.className = 'text-input';
+  ta.placeholder = placeholder || 'Escribí lo que se te venga a la mente...';
+  ta.rows = 1;
+
+  const btn = document.createElement('button');
+  btn.className = 'send-btn';
+  btn.type = 'button';
+  btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+    <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"
+      stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+
+  function submit() {
+    const val = ta.value.trim();
+    if (!val) return;
+    ta.disabled = true;
+    btn.disabled = true;
+    onAnswer(val);
+  }
+
+  ta.addEventListener('input', () => {
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 112) + 'px';
+  });
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); }
+  });
+  btn.addEventListener('click', submit);
+
+  form.appendChild(ta);
+  form.appendChild(btn);
+  inputArea.appendChild(form);
+  setTimeout(() => ta.focus(), 80);
+}
+
+function renderEnd() {
+  localStorage.setItem('orientacion_data', JSON.stringify(responses));
+  clearInput();
+  const el = document.createElement('div');
+  el.className = 'end-state';
+  el.textContent = '✓ Respuestas guardadas';
+  inputArea.appendChild(el);
+}
+
+// ═══════════════════════════════════════════════════════════
+// MOTOR DEL FLUJO
+// ═══════════════════════════════════════════════════════════
+function saveAndAdvance(idx, question, value) {
+  const step = flow[idx];
+  const isIcebreaker = !!step.isIcebreaker;
+
+  if (!isIcebreaker) {
+    responses.push({ question, answer: value });
+    answered++;
+    updateProgress();
+  }
+
+  appendUserMsg(value);
+
+  if (isIcebreaker) {
+    // Icebreakers: siempre responde
+    showAckThenAdvance(step.ackText || 'Bien.', idx + 1);
+  } else if (step.customAck && step.customAck[value]) {
+    // Respuestas con ack personalizado: siempre responde
+    showAckThenAdvance(step.customAck[value], idx + 1);
+  } else if (Math.random() < 0.25) {
+    // Preguntas regulares: ack solo 1 de cada 4
+    showAckThenAdvance(pickAck(), idx + 1);
+  } else {
+    // La mayoría de las veces: pasa directo a la siguiente pregunta
+    setTimeout(() => processStep(idx + 1), 480);
+  }
+}
+
+function processStep(idx) {
+  if (idx >= flow.length) return;
+  const step = flow[idx];
+  clearInput();
+
+  if (step.isDivider) {
+    if (step.sectionNum !== undefined) currentSection = step.sectionNum;
+    setTimeout(() => {
+      appendDivider(step.label);
+      setTimeout(() => processStep(idx + 1), 420);
+    }, step.delay || 300);
+    return;
+  }
+
+  showTyping();
+
+  setTimeout(() => {
+    hideTyping();
+    appendBotMsg(step.text);
+
+    if (step.inputType === 'none') {
+      setTimeout(() => processStep(idx + 1), 520);
+    } else if (step.inputType === 'options') {
+      renderOptions(step.options, value => saveAndAdvance(idx, step.text, value));
+    } else if (step.inputType === 'text') {
+      renderTextInput(step.placeholder, value => saveAndAdvance(idx, step.text, value));
+    } else if (step.inputType === 'end') {
+      renderEnd();
+    }
+  }, step.delay);
+}
+
+// ── ARRANQUE
+processStep(0);
+</script>
+</body>
+</html>

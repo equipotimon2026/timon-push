@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timón · Ingresá</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:             #F9F8F6;
+      --card:           #FFFFFF;
+      --text:           #1A1918;
+      --text-secondary: #7A7570;
+      --text-muted:     #B2ADA6;
+      --border:         #EDE8E1;
+      --shadow-sm:      0 1px 3px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.03);
+      --shadow-cta:     0 2px 10px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.04);
+      --error:          #C0392B;
+      --error-bg:       #FDF0EF;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .screen {
+      max-width: 400px;
+      min-height: 100svh;
+      margin: 0 auto;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      padding: 52px 24px 48px;
+    }
+
+    .brand { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: var(--text); margin-bottom: 40px; }
+    .heading { font-size: 30px; font-weight: 700; letter-spacing: -0.6px; line-height: 1.15; color: var(--text); }
+    .subheading { font-size: 14px; color: var(--text-secondary); margin-top: 6px; line-height: 1.5; }
+
+    .tabs { display: flex; background: var(--border); border-radius: 12px; padding: 3px; margin-top: 32px; margin-bottom: 28px; }
+    .tab { flex: 1; text-align: center; padding: 9px 0; font-size: 14px; font-weight: 600; border-radius: 10px; cursor: pointer; color: var(--text-muted); transition: background 0.18s ease, color 0.18s ease, box-shadow 0.18s ease; user-select: none; }
+    .tab.active { background: var(--card); color: var(--text); box-shadow: var(--shadow-sm); }
+
+    .form { display: flex; flex-direction: column; gap: 14px; }
+    .form-row { display: flex; gap: 12px; }
+    .form-row .field { flex: 1; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+
+    label { font-size: 12px; font-weight: 600; color: var(--text-secondary); letter-spacing: 0.3px; text-transform: uppercase; }
+    input, select { width: 100%; padding: 13px 15px; border-radius: 12px; border: 1.5px solid var(--border); background: var(--card); font-family: inherit; font-size: 15px; color: var(--text); outline: none; transition: border-color 0.15s ease, box-shadow 0.15s ease; -webkit-appearance: none; appearance: none; }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23B2ADA6' stroke-width='1.5' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 38px; }
+    input::placeholder { color: var(--text-muted); }
+    input:focus, select:focus { border-color: var(--text); box-shadow: 0 0 0 3px rgba(26,25,24,0.07); }
+
+    .error-msg { display: none; background: var(--error-bg); color: var(--error); border-radius: 10px; padding: 11px 14px; font-size: 13px; font-weight: 500; line-height: 1.4; }
+    .error-msg.visible { display: block; }
+
+    .btn-submit { margin-top: 6px; width: 100%; padding: 15px; border-radius: 14px; border: none; background: var(--text); color: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 600; cursor: pointer; transition: opacity 0.15s ease, transform 0.15s ease; letter-spacing: -0.1px; }
+    .btn-submit:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-submit:active { opacity: 1; transform: translateY(0); }
+    .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    @media (min-width: 640px) {
+      html, body { background: #DDD9D1; display: flex; flex-direction: column; align-items: center; padding: 48px 24px 64px; min-height: 100svh; }
+      .web-nav { display: flex; align-items: center; justify-content: space-between; width: 100%; max-width: 480px; margin-bottom: 16px; }
+      .web-nav-brand { font-size: 15px; font-weight: 700; color: rgba(249,248,246,0.9); letter-spacing: -0.04em; }
+      .web-nav-tag { font-size: 11px; font-weight: 500; color: rgba(249,248,246,0.45); text-transform: uppercase; letter-spacing: 1.2px; }
+      .screen { max-width: 480px; min-height: auto; border-radius: 24px; box-shadow: 0 12px 56px rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.05); padding: 48px 44px 52px; }
+      .brand { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="web-nav" style="display:none">
+  <span class="web-nav-brand">Timón ✦</span>
+  <span class="web-nav-tag">Acceso</span>
+</nav>
+
+<div class="screen">
+  <div class="brand">Timón ✦</div>
+  <div class="heading" id="heading-text">Bienvenido</div>
+  <div class="subheading" id="subheading-text">Ingresá para continuar con tu proceso.</div>
+
+  <div class="tabs">
+    <div class="tab active" id="tab-login" onclick="switchTab('login')">Ingresar</div>
+    <div class="tab" id="tab-register" onclick="switchTab('register')">Registrarse</div>
+  </div>
+
+  <div class="panel active" id="panel-login">
+    <form class="form" id="login-form">
+      <div class="field">
+        <label for="login-email">Email</label>
+        <input id="login-email" type="email" placeholder="tu@email.com" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label for="login-password">Contraseña</label>
+        <input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password" required>
+      </div>
+      <div class="error-msg" id="login-error">Email o contraseña incorrectos.</div>
+      <button type="submit" class="btn-submit" id="btn-login">Ingresar</button>
+    </form>
+  </div>
+
+  <div class="panel" id="panel-register">
+    <form class="form" id="register-form">
+      <div class="field">
+        <label for="reg-nombre">Nombre completo</label>
+        <input id="reg-nombre" type="text" placeholder="María González" autocomplete="name" required>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="reg-edad">Edad</label>
+          <input id="reg-edad" type="number" placeholder="17" min="13" max="25" required>
+        </div>
+        <div class="field">
+          <label for="reg-telefono">Teléfono</label>
+          <input id="reg-telefono" type="tel" placeholder="+54 9 11 0000-0000" autocomplete="tel">
+        </div>
+      </div>
+      <div class="field">
+        <label for="reg-colegio">Colegio</label>
+        <input id="reg-colegio" type="text" placeholder="Nombre del colegio" required>
+      </div>
+      <div class="field">
+        <label for="reg-anio">Año</label>
+        <select id="reg-anio" required>
+          <option value="" disabled selected>Seleccioná tu año</option>
+          <option value="1">1° año</option>
+          <option value="2">2° año</option>
+          <option value="3">3° año</option>
+          <option value="4">4° año</option>
+          <option value="5">5° año</option>
+          <option value="6">6° año</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="reg-email">Email</label>
+        <input id="reg-email" type="email" placeholder="tu@email.com" autocomplete="email" required>
+      </div>
+      <div class="field">
+        <label for="reg-password">Contraseña</label>
+        <input id="reg-password" type="password" placeholder="Mínimo 6 caracteres" autocomplete="new-password" minlength="6" required>
+      </div>
+      <div class="error-msg" id="register-error"></div>
+      <button type="submit" class="btn-submit" id="btn-register">Crear cuenta</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  // ── INICIALIZAR SUPABASE ──
+  const { createClient } = supabase;
+  const supabaseUrl = 'https://gikgvepgfbktwmnfneea.supabase.co';
+  const supabaseKey = 'sb_publishable_QyJp-FerhnZwt0iAgofGyA_bfmi4n88';
+  const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+  // ── UI Helpers ──
+  if (window.innerWidth >= 640) document.querySelector('.web-nav').style.display = 'flex';
+
+  function switchTab(tab) {
+    document.getElementById('tab-login').classList.toggle('active', tab === 'login');
+    document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+    document.getElementById('panel-login').classList.toggle('active', tab === 'login');
+    document.getElementById('panel-register').classList.toggle('active', tab === 'register');
+
+    if (tab === 'login') {
+      document.getElementById('heading-text').textContent = 'Bienvenido';
+      document.getElementById('subheading-text').textContent = 'Ingresá para continuar con tu proceso.';
+    } else {
+      document.getElementById('heading-text').textContent = 'Creá tu cuenta';
+      document.getElementById('subheading-text').textContent = 'Completá los datos para comenzar.';
+    }
+  }
+
+  function showError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.add('visible');
+  }
+
+  function hideError(id) { document.getElementById(id).classList.remove('visible'); }
+
+  // ── LOGIN ──
+  document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideError('login-error');
+    const btn = document.getElementById('btn-login');
+    btn.disabled = true;
+    btn.textContent = 'Ingresando...';
+
+    const email = document.getElementById('login-email').value.trim().toLowerCase();
+    const password = document.getElementById('login-password').value;
+
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: password,
+    });
+
+    if (error) {
+      showError('login-error', 'Email o contraseña incorrectos.');
+      btn.disabled = false;
+      btn.textContent = 'Ingresar';
+      return;
+    }
+
+    // Truco: Guardamos la sesión en localStorage para que los otros archivos sigan funcionando
+    const userMeta = data.user.user_metadata;
+    localStorage.setItem('timon_session', JSON.stringify({
+      nombre: userMeta.nombre || 'Usuario',
+      email: data.user.email,
+      colegio: userMeta.colegio || '',
+      anio: userMeta.anio || '',
+      edad: userMeta.edad || ''
+    }));
+
+    window.location.href = 'dashboard.html';
+  });
+
+  // ── REGISTER ──
+  document.getElementById('register-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    hideError('register-error');
+    const btn = document.getElementById('btn-register');
+    btn.disabled = true;
+    btn.textContent = 'Creando cuenta...';
+
+    const nombre = document.getElementById('reg-nombre').value.trim();
+    const edad = document.getElementById('reg-edad').value;
+    const telefono = document.getElementById('reg-telefono').value.trim();
+    const colegio = document.getElementById('reg-colegio').value.trim();
+    const anio = document.getElementById('reg-anio').value;
+    const email = document.getElementById('reg-email').value.trim().toLowerCase();
+    const password = document.getElementById('reg-password').value;
+
+    if (password.length < 6) {
+      showError('register-error', 'La contraseña debe tener al menos 6 caracteres.');
+      btn.disabled = false;
+      btn.textContent = 'Crear cuenta';
+      return;
+    }
+
+    const { data, error } = await supabaseClient.auth.signUp({
+      email: email,
+      password: password,
+      options: {
+        data: { nombre, edad, telefono, colegio, anio }
+      }
+    });
+
+    if (error) {
+      showError('register-error', 'Error al registrar: ' + (error.message.includes('already registered') ? 'Este email ya está en uso.' : error.message));
+      btn.disabled = false;
+      btn.textContent = 'Crear cuenta';
+      return;
+    }
+
+    // Truco: Guardamos la sesión en localStorage
+    localStorage.setItem('timon_session', JSON.stringify({
+      nombre: nombre, email: email, colegio: colegio, anio: anio, edad: edad
+    }));
+
+    window.location.href = 'dashboard.html';
+  });
+
+  // ── Si ya hay sesión en el navegador, ir directo al dashboard ──
+  if (localStorage.getItem('timon_session')) {
+    window.location.href = 'dashboard.html';
+  }
+</script>
+</body>
+</html>

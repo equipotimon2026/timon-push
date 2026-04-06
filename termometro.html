@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Termómetro · Inteligencias Múltiples</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #F9F8F6;
+      font-family: 'Inter', sans-serif;
+      min-height: 100svh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .phone-wrap {
+      width: 100%;
+      max-width: 400px;
+      min-height: 100svh;
+      background: #F9F8F6;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Progress bar ── */
+    .progress-bar-track {
+      position: fixed;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 400px;
+      height: 2px;
+      background: #E8E6E1;
+      z-index: 100;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: #1A1918;
+      border-radius: 0 2px 2px 0;
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 0%;
+    }
+
+    /* ── Main content ── */
+    .content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 28px 48px;
+      gap: 44px;
+      transition: opacity 0.22s ease, transform 0.22s ease;
+    }
+
+    /* ── Badge row ── */
+    .badge-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      background: #EEECEA;
+      border-radius: 999px;
+      padding: 6px 14px 6px 10px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #3A3835;
+      letter-spacing: -0.01em;
+    }
+
+    /* Fun badge for cleansers */
+    .badge--fun {
+      background: #FFF0E6;
+      color: #C04818;
+    }
+
+    .badge-emoji { font-size: 15px; line-height: 1; }
+
+    .counter {
+      font-size: 12px;
+      font-weight: 500;
+      color: #A09D98;
+      letter-spacing: -0.01em;
+    }
+
+    /* ── Question text ── */
+    .question-text {
+      font-size: 22px;
+      font-weight: 600;
+      color: #1A1918;
+      line-height: 1.35;
+      letter-spacing: -0.03em;
+    }
+
+    /* ── Slider zone ── */
+    .slider-zone {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .float-label-wrap {
+      position: relative;
+      height: 28px;
+      margin-bottom: 14px;
+      pointer-events: none;
+    }
+
+    .float-label {
+      position: absolute;
+      top: 0;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      transform: translateX(-50%);
+      transition: color 0.12s ease;
+      left: 50%;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 10px;
+      border-radius: 99px;
+      background: linear-gradient(to right, #7BC8F0, #A8D8E8, #F5D060, #F08848, #E04838);
+      outline: none;
+      cursor: pointer;
+      display: block;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+      cursor: grab;
+      transition: transform 0.12s;
+    }
+
+    input[type="range"]:active::-webkit-slider-thumb {
+      transform: scale(1.18);
+      cursor: grabbing;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: white;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.22);
+      border: none;
+      cursor: grab;
+    }
+
+    input[type="range"]::-moz-range-track {
+      height: 10px;
+      border-radius: 99px;
+      background: linear-gradient(to right, #7BC8F0, #A8D8E8, #F5D060, #F08848, #E04838);
+    }
+
+    .slider-endpoints {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+
+    .slider-endpoints span {
+      font-size: 11px;
+      font-weight: 500;
+      color: #C0BDB8;
+      letter-spacing: -0.01em;
+    }
+
+    /* ── Special screens (checkpoint / teaser) ── */
+    .special-content {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 16px;
+    }
+
+    .special-content.visible { display: flex; }
+
+    .special-emoji {
+      font-size: 44px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .special-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #1A1918;
+      letter-spacing: -0.03em;
+      line-height: 1.3;
+      white-space: pre-line;
+    }
+
+    .special-sub {
+      font-size: 14px;
+      color: #7A7570;
+      font-weight: 400;
+      line-height: 1.55;
+      max-width: 280px;
+    }
+
+    .continue-btn {
+      margin-top: 12px;
+      background: #1A1918;
+      color: white;
+      padding: 13px 36px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: -0.01em;
+      transition: opacity 0.15s ease;
+    }
+
+    .continue-btn:hover { opacity: 0.82; }
+
+    /* ── Toast ── */
+    .toast {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: #1A1918;
+      color: white;
+      padding: 10px 22px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      white-space: nowrap;
+      opacity: 0;
+      transition: transform 0.25s ease-out, opacity 0.2s ease;
+      z-index: 200;
+      pointer-events: none;
+    }
+
+    .toast.visible {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .toast--warn { background: #C84818; }
+
+    /* ── Completion ── */
+    .completion {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      flex: 1;
+      padding: 60px 28px 40px;
+      min-height: 100svh;
+      animation: fadeIn 0.4s ease forwards;
+    }
+
+    .completion.visible { display: flex; }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .completion-symbol {
+      font-size: 48px;
+      line-height: 1;
+      margin-bottom: 28px;
+      color: #1A1918;
+    }
+
+    .completion-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: #1A1918;
+      letter-spacing: -0.04em;
+      margin-bottom: 10px;
+    }
+
+    .completion-sub {
+      font-size: 15px;
+      color: #A09D98;
+      margin-bottom: 40px;
+      line-height: 1.5;
+    }
+
+    .btn-back {
+      background: #1A1918;
+      color: white;
+      padding: 14px 32px;
+      border-radius: 999px;
+      font-size: 15px;
+      font-weight: 600;
+      text-decoration: none;
+      display: inline-block;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: -0.01em;
+      transition: opacity 0.15s ease;
+    }
+
+    .btn-back:hover { opacity: 0.85; }
+
+    /* ── Web nav ── */
+    .web-nav {
+      display: none;
+    }
+
+    /* ── Tablet (≥ 640px) ── */
+    @media (min-width: 640px) {
+      body {
+        flex-direction: column;
+        align-items: center;
+        background: #DDD9D1;
+        padding: 48px 24px 64px;
+        min-height: 100svh;
+      }
+
+      .web-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 760px;
+        padding: 0 4px;
+        margin-bottom: 16px;
+        flex-shrink: 0;
+      }
+
+      .web-nav-brand {
+        font-size: 15px;
+        font-weight: 700;
+        color: rgba(249,248,246,0.9);
+        letter-spacing: -0.04em;
+        text-decoration: none;
+      }
+
+      .web-nav-back {
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(249,248,246,0.5);
+        text-decoration: none;
+        transition: color 0.15s;
+      }
+
+      .web-nav-back:hover { color: rgba(249,248,246,0.85); }
+
+      .phone-wrap {
+        max-width: 760px;
+        min-height: auto;
+        border-radius: 24px;
+        box-shadow: 0 12px 56px rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.05);
+        overflow: hidden;
+        position: relative; /* para anclar progress bar y toast */
+      }
+
+      /* Progress bar: de fixed a absolute dentro del card */
+      .progress-bar-track {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        transform: none;
+        max-width: 100%;
+      }
+
+      /* Toast: de fixed a absolute dentro del card */
+      .toast {
+        position: absolute;
+        bottom: 28px;
+      }
+
+      .content {
+        padding: 68px 48px 52px;
+        gap: 48px;
+      }
+
+      .question-text {
+        font-size: 26px;
+      }
+
+      .completion {
+        min-height: auto;
+        padding: 72px 48px 60px;
+      }
+    }
+
+    /* ── Desktop (≥ 1024px) ── */
+    @media (min-width: 1024px) {
+      body {
+        padding: 64px 24px 80px;
+      }
+
+      .web-nav {
+        max-width: 860px;
+      }
+
+      .phone-wrap {
+        max-width: 860px;
+      }
+
+      .content {
+        padding: 80px 64px 64px;
+        gap: 56px;
+      }
+
+      .question-text {
+        font-size: 30px;
+        letter-spacing: -0.04em;
+      }
+
+      .badge {
+        font-size: 14px;
+        padding: 7px 16px 7px 12px;
+      }
+
+      .counter {
+        font-size: 13px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Nav visible solo en tablet/desktop -->
+  <nav class="web-nav">
+    <a href="dashboard.html" class="web-nav-brand">Timón ✦</a>
+    <a href="dashboard.html" class="web-nav-back">← Dashboard</a>
+  </nav>
+
+  <div class="phone-wrap" id="phoneWrap">
+
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progressFill"></div>
+    </div>
+
+    <div class="content" id="content">
+      <!-- Question / cleanser view -->
+      <div class="badge-row" id="badgeRow">
+        <div class="badge" id="badge">
+          <span class="badge-emoji" id="badgeEmoji"></span>
+          <span id="badgeName"></span>
+        </div>
+        <span class="counter" id="counter"></span>
+      </div>
+
+      <p class="question-text" id="questionText"></p>
+
+      <div class="slider-zone" id="sliderZone">
+        <div class="float-label-wrap">
+          <div class="float-label" id="floatLabel">A veces</div>
+        </div>
+        <input type="range" id="slider" min="1" max="5" step="0.01" value="3" />
+        <div class="slider-endpoints">
+          <span>Nunca</span>
+          <span>Siempre</span>
+        </div>
+      </div>
+
+      <!-- Checkpoint / teaser view -->
+      <div class="special-content" id="specialContent">
+        <div class="special-emoji" id="specialEmoji"></div>
+        <div class="special-title" id="specialTitle"></div>
+        <div class="special-sub"   id="specialSub"></div>
+        <button class="continue-btn" id="continueBtn">Continuar</button>
+      </div>
+    </div>
+
+    <!-- Completion screen -->
+    <div class="completion" id="completion">
+      <div class="completion-symbol">✦</div>
+      <h2 class="completion-title">Módulo completado</h2>
+      <p class="completion-sub">Registramos tus respuestas.<br>Ya casi tenemos tu perfil completo.</p>
+      <a href="dashboard.html" class="btn-back">Volver al inicio</a>
+    </div>
+
+    <!-- Toast notifications -->
+    <div class="toast" id="toast"></div>
+
+  </div>
+
+  <script>
+    // ── Data ──────────────────────────────────────────────────────────
+    const intelligences = [
+      { name: 'Lógico-Matemática', emoji: '🔬', questions: [
+        'Puedo calcular números mentalmente con facilidad.',
+        'Las matemáticas y/o ciencias estaban entre mis materias favoritas.',
+        'Me gusta jugar juegos o resolver problemas de pensamiento lógico.',
+        'Me gusta armar experimentos de ¿qué pasaría si...?',
+        'Mi mente busca los patrones, las regularidades o secuencias lógicas.',
+        'Me interesan los nuevos desarrollos de las ciencias.',
+        'Creo que casi todo tiene una explicación racional.',
+        'A veces pienso en conceptos claros, abstractos, sin palabras ni imágenes.',
+        'Me gusta encontrar defectos lógicos en lo que las personas dicen o hacen.',
+        'Me siento más cómodo cuando algo ha sido medido, categorizado o analizado.',
+      ]},
+      { name: 'Lingüística', emoji: '📖', questions: [
+        'Para mí los libros son importantes.',
+        'Puedo escuchar las palabras en mi cabeza antes de leerlas o decirlas.',
+        'Puedo extraer más de un audio/radio que de la TV.',
+        'Me gustan los juegos con palabras (Scrabble, etc.).',
+        'Me agrada entretenerme con trabalenguas, rimas o chistes verbales.',
+        'Las otras personas me piden que explique el significado de palabras que uso.',
+        'Lengua e historia fueron más fáciles para mí que matemáticas.',
+        'Presto más atención a los carteles escritos que al paisaje al viajar.',
+        'Mi conversación incluye referencias a cosas que leí u oí.',
+        'Recientemente escribí algo de lo que me sentí orgulloso.',
+      ]},
+      { name: 'Espacial', emoji: '🎨', questions: [
+        'Soy sensible a los colores.',
+        'Uso cámara o video para registrar lo que veo.',
+        'Disfruto armar rompecabezas y laberintos.',
+        'De noche tengo sueños vívidos.',
+        'Me resulta fácil encontrar mi camino en lugares que no conozco.',
+        'Me gusta dibujar mientras hago otras cosas.',
+        'La geometría fue más fácil que el álgebra.',
+        'Puedo imaginar sin dificultad cómo se vería una cosa desde arriba.',
+        'Prefiero materiales de lectura con muchas ilustraciones.',
+      ]},
+      { name: 'Corporal-Cinética', emoji: '🤸', questions: [
+        'Practico regularmente algún deporte o actividad física.',
+        'Me resulta difícil estar sentado mucho tiempo.',
+        'Me gusta trabajar con mis manos en actividades concretas.',
+        'Mis mejores ideas vienen cuando camino o hago actividad física.',
+        'Prefiero pasar mi tiempo libre al aire libre.',
+        'Uso señales y gestos corporales al conversar.',
+        'Necesito tocar las cosas para saber más de ellas.',
+        'Disfruto actividades físicamente arriesgadas.',
+        'Me describiría como bien coordinado.',
+        'Me gusta practicar una nueva habilidad física más que leer sobre ella.',
+      ]},
+      { name: 'Musical', emoji: '🎵', questions: [
+        'Tengo una voz agradable para cantar.',
+        'Puedo darme cuenta cuándo una nota musical está fuera de tono.',
+        'Escucho música frecuentemente.',
+        'Toco un instrumento musical.',
+        'Mi vida sería más pobre sin música.',
+        'A veces llevo en la mente una melodía al caminar.',
+        'Con facilidad puedo seguir el ritmo con percusión simple.',
+        'Conozco de memoria muchas piezas musicales.',
+        'Puedo volver a cantar una melodía con precisión tras escucharla pocas veces.',
+        'A menudo tamborileo o canto mientras trabajo o estudio.',
+      ]},
+      { name: 'Naturalista', emoji: '🌿', questions: [
+        'Amo ir a caminar a los bosques y mirar árboles y flores.',
+        'Disfruto la jardinería.',
+        'Disfruto de la naturaleza y estar al aire libre.',
+        'Disfruto aprendiendo los nombres de seres vivientes.',
+        'Hago colecciones de piedras, hojas, insectos, etc.',
+        'Me gusta pasar tiempo al aire libre donde pueda correr.',
+        'Disfruto la pesca, caza, horticultura o sembrar.',
+        'Me gusta todo tipo de animales.',
+        'Regularmente reviso los informes del clima.',
+        'Me gusta alejarme de las ciudades y disfrutar de la naturaleza.',
+      ]},
+      { name: 'Intrapersonal', emoji: '🪞', questions: [
+        'Paso tiempo solo meditando, reflexionando o pensando.',
+        'He asistido a terapia o seminarios de crecimiento personal.',
+        'Soy capaz de resistir los golpes de la vida.',
+        'Tengo un hobby o interés personal que no comparto con otros.',
+        'Tengo metas importantes sobre las que pienso regularmente.',
+        'Tengo una visión realista de mis fuerzas y debilidades.',
+        'Preferiría un fin de semana solo en una cabaña que en un balneario lleno de gente.',
+        'Considero que poseo una voluntad fuerte y mente independiente.',
+        'Llevo un diario personal de mi vida interior.',
+        'He pensado seriamente en establecerme de manera independiente.',
+      ]},
+      { name: 'Interpersonal', emoji: '🫂', questions: [
+        'Vienen a pedirme consejo en mi trabajo o barrio.',
+        'Prefiero deportes grupales a los solitarios.',
+        'Cuando tengo un problema busco a otro para contárselo.',
+        'Tengo por lo menos tres amigos íntimos.',
+        'Prefiero pasatiempos sociales a los solitarios.',
+        'Disfruto el desafío de enseñar a otra persona.',
+        'Me considero un líder u otros me lo han dicho.',
+        'Me siento cómodo en medio de una multitud.',
+        'Me gusta participar en actividades sociales de trabajo o comunidad.',
+        'Prefiero una fiesta animada a quedarme solo en casa.',
+      ]},
+    ];
+
+    const allQ = [];
+    intelligences.forEach(intel => {
+      intel.questions.forEach(q => allQ.push({ name: intel.name, emoji: intel.emoji, text: q }));
+    });
+
+    const TOTAL_VOC = allQ.length; // 79
+
+    // Palate cleansers — same slider, no scoring, just fun
+    const CLEANSERS = [
+      { text: 'La pizza con piña es un delito internacional.', emoji: '🍕' },
+      { text: 'Madrugar un domingo para hacer deporte tiene su encanto.', emoji: '⏰' },
+      { text: 'El drama en redes sociales es entretenimiento de primera.', emoji: '📱' },
+      { text: 'Mirar la misma serie por tercera vez en vez de empezar algo nuevo.', emoji: '📺' },
+    ];
+
+    // Checkpoint screens
+    const CHECKPOINTS = [
+      {
+        emoji: '😅',
+        title: '20 preguntas.\nNi en TikTok scrolleás tan concentrado.',
+        sub: 'Tomáte un segundo. Estás yendo muy bien.',
+        btn: 'Dale, sigo',
+        bgPhase: 1,
+      },
+      {
+        emoji: '✨',
+        title: '60 preguntas.\nLa recta final.',
+        sub: 'Pocas personas llegan hasta acá con tanto foco. Ya casi lo tenemos.',
+        btn: 'Vamos',
+        bgPhase: 3,
+      },
+    ];
+
+    // Background color phases (subtle shifts between sections)
+    const BG_PHASES = ['#F9F8F6', '#F5F2F8', '#F2F6F3', '#F8F4F0'];
+
+    // Intelligence flavor text for the teaser
+    const INTEL_FLAVOR = {
+      'Lógico-Matemática': { emoji: '🧠', tease: 'Hasta acá veo una mente muy analítica. Encontrás patrones donde otros ven ruido.' },
+      'Lingüística':       { emoji: '📝', tease: 'Hay algo acá con las palabras. Leer, escribir, comunicar... ¿te suena?' },
+      'Espacial':          { emoji: '🎨', tease: 'Tu perfil hasta ahora grita creatividad visual. Imágenes, colores, formas.' },
+      'Corporal-Cinética': { emoji: '🤸', tease: 'El cuerpo en movimiento, las manos en acción... se nota que eso te va.' },
+      'Musical':           { emoji: '🎵', tease: 'Hay mucha sensibilidad musical en tus respuestas. El ritmo corre por tus venas.' },
+      'Naturalista':       { emoji: '🌿', tease: 'Lo natural te llama. Sos de las personas que prefieren el mundo vivo al digital.' },
+      'Intrapersonal':     { emoji: '🪞', tease: 'Bastante introspectivo/a, ¿no? Te conocés bien a vos mismo/a.' },
+      'Interpersonal':     { emoji: '🫂', tease: 'Las personas son tu energía. El perfil social es muy fuerte hasta ahora.' },
+    };
+
+    // ── Build the flow array ───────────────────────────────────────────
+    // Structure: Q1-15, CLEANSER, Q16-20, CHECKPOINT, Q21-35, CLEANSER,
+    //            Q36-40, TEASER, Q41-55, CLEANSER, Q56-60, CHECKPOINT,
+    //            Q61-75, CLEANSER, Q76-79
+    function buildFlow() {
+      const items = [];
+      let qIdx  = 0;
+      let vocNum = 0;
+
+      function addQ(n) {
+        for (let i = 0; i < n && qIdx < allQ.length; i++) {
+          items.push({ type: 'question', q: allQ[qIdx++], vocNum: ++vocNum });
+        }
+      }
+
+      addQ(15);
+      items.push({ type: 'cleanser', data: CLEANSERS[0] });
+      addQ(5);
+      items.push({ type: 'checkpoint', data: CHECKPOINTS[0] });
+      addQ(15);
+      items.push({ type: 'cleanser', data: CLEANSERS[1] });
+      addQ(5);
+      items.push({ type: 'teaser', bgPhase: 2 });
+      addQ(15);
+      items.push({ type: 'cleanser', data: CLEANSERS[2] });
+      addQ(5);
+      items.push({ type: 'checkpoint', data: CHECKPOINTS[1] });
+      addQ(15);
+      items.push({ type: 'cleanser', data: CLEANSERS[3] });
+      while (qIdx < allQ.length) {
+        items.push({ type: 'question', q: allQ[qIdx++], vocNum: ++vocNum });
+      }
+
+      return items;
+    }
+
+    const flow = buildFlow();
+    const THUMB_W = 30;
+
+    // Score accumulator per intelligence
+    const scores = {};
+    intelligences.forEach(i => { scores[i.name] = { total: 0, count: 0 }; });
+
+    // ── DOM refs ──────────────────────────────────────────────────────
+    const phoneWrap      = document.getElementById('phoneWrap');
+    const content        = document.getElementById('content');
+    const completion     = document.getElementById('completion');
+    const progressFill   = document.getElementById('progressFill');
+    const badgeRow       = document.getElementById('badgeRow');
+    const badge          = document.getElementById('badge');
+    const badgeEmoji     = document.getElementById('badgeEmoji');
+    const badgeName      = document.getElementById('badgeName');
+    const counter        = document.getElementById('counter');
+    const questionText   = document.getElementById('questionText');
+    const sliderZone     = document.getElementById('sliderZone');
+    const slider         = document.getElementById('slider');
+    const floatLabel     = document.getElementById('floatLabel');
+    const specialContent = document.getElementById('specialContent');
+    const specialEmoji   = document.getElementById('specialEmoji');
+    const specialTitle   = document.getElementById('specialTitle');
+    const specialSub     = document.getElementById('specialSub');
+    const continueBtn    = document.getElementById('continueBtn');
+    const toast          = document.getElementById('toast');
+
+    let currentFlowIdx  = 0;
+    let canAdvance      = false;
+    let questionShownAt = 0;
+    let streakCount     = 0;
+    let toastTimeout    = null;
+
+    // ── Zone lookup ───────────────────────────────────────────────────
+    function getZone(val) {
+      if (val < 1.8) return { text: 'Nunca',        color: '#62B8E8' };
+      if (val < 2.6) return { text: 'Casi nunca',   color: '#80B8D8' };
+      if (val < 3.4) return { text: 'A veces',      color: '#D4A830' };
+      if (val < 4.2) return { text: 'Casi siempre', color: '#E07030' };
+                     return { text: 'Siempre',       color: '#D03820' };
+    }
+
+    function updateFloatLabel(val) {
+      const zone = getZone(val);
+      const pct  = (val - 1) / 4;
+      const left = pct * (slider.offsetWidth - THUMB_W) + THUMB_W / 2;
+      floatLabel.textContent = zone.text;
+      floatLabel.style.color = zone.color;
+      floatLabel.style.left  = left + 'px';
+    }
+
+    // ── Background phase ──────────────────────────────────────────────
+    function updateBg(phase) {
+      phoneWrap.style.background = BG_PHASES[phase];
+    }
+
+    // ── Top intelligence so far (for teaser) ─────────────────────────
+    function getTopIntel() {
+      let top = null, topAvg = -1;
+      for (const [name, data] of Object.entries(scores)) {
+        if (data.count === 0) continue;
+        const avg = data.total / data.count;
+        if (avg > topAvg) { topAvg = avg; top = name; }
+      }
+      return top;
+    }
+
+    // ── Toast ─────────────────────────────────────────────────────────
+    function showToast(msg, type = 'info') {
+      clearTimeout(toastTimeout);
+      toast.textContent = msg;
+      toast.className   = `toast toast--${type} visible`;
+      toastTimeout = setTimeout(() => {
+        toast.className = `toast toast--${type}`;
+      }, 2800);
+    }
+
+    // ── Streak / speed check ──────────────────────────────────────────
+    function checkAnswerSpeed(elapsed) {
+      if (elapsed < 700) {
+        streakCount = 0;
+        showToast('Tomáte un momento para pensar 🙏', 'warn');
+      } else {
+        streakCount++;
+        if (streakCount >= 5) {
+          showToast('¡En racha! Seguí así 🔥', 'streak');
+          streakCount = 0;
+        }
+      }
+    }
+
+    // ── Load a flow item ──────────────────────────────────────────────
+    function loadFlowItem(idx) {
+      questionShownAt = Date.now();
+      const item = flow[idx];
+
+      if (item.type === 'question' || item.type === 'cleanser') {
+        // Show slider UI, hide special content
+        badgeRow.style.display      = 'flex';
+        questionText.style.display  = 'block';
+        sliderZone.style.display    = 'flex';
+        specialContent.classList.remove('visible');
+
+        if (item.type === 'question') {
+          badge.className          = 'badge';
+          badgeEmoji.textContent   = item.q.emoji;
+          badgeName.textContent    = item.q.name;
+          counter.textContent      = `${item.vocNum} / ${TOTAL_VOC}`;
+          questionText.textContent = item.q.text;
+        } else {
+          badge.className          = 'badge badge--fun';
+          badgeEmoji.textContent   = item.data.emoji;
+          badgeName.textContent    = 'Pausa mental';
+          counter.textContent      = '';
+          questionText.textContent = item.data.text;
+        }
+
+        slider.value = 3;
+        canAdvance   = false;
+        requestAnimationFrame(() => updateFloatLabel(3));
+
+      } else {
+        // Checkpoint or teaser — hide slider UI, show special content
+        badgeRow.style.display     = 'none';
+        questionText.style.display = 'none';
+        sliderZone.style.display   = 'none';
+        specialContent.classList.add('visible');
+
+        if (item.type === 'checkpoint') {
+          specialEmoji.textContent = item.data.emoji;
+          specialTitle.textContent = item.data.title;
+          specialSub.textContent   = item.data.sub;
+          continueBtn.textContent  = item.data.btn;
+          updateBg(item.data.bgPhase);
+
+        } else {
+          // Teaser: personalized based on scores so far
+          const topIntel = getTopIntel();
+          const flavor   = topIntel
+            ? (INTEL_FLAVOR[topIntel] || { emoji: '🤔', tease: 'Interesante perfil el tuyo...' })
+            : { emoji: '👀', tease: 'Seguimos construyendo tu perfil...' };
+
+          specialEmoji.textContent = flavor.emoji;
+          specialTitle.textContent = 'Hmm... un momento.';
+          specialSub.textContent   = flavor.tease;
+          continueBtn.textContent  = 'Seguir';
+          updateBg(item.bgPhase);
+        }
+      }
+    }
+
+    // ── Advance to next item ──────────────────────────────────────────
+    function advance() {
+      const item = flow[currentFlowIdx];
+
+      // Record score + check speed (only for real vocational questions)
+      if (item.type === 'question') {
+        const val = parseFloat(slider.value);
+        scores[item.q.name].total += val;
+        scores[item.q.name].count++;
+        progressFill.style.width = (item.vocNum / TOTAL_VOC * 100) + '%';
+        checkAnswerSpeed(Date.now() - questionShownAt);
+      }
+
+      // Fade out
+      content.style.opacity   = '0';
+      content.style.transform = 'translateY(8px)';
+
+      setTimeout(() => {
+        currentFlowIdx++;
+        if (currentFlowIdx >= flow.length) {
+          showCompletion();
+        } else {
+          loadFlowItem(currentFlowIdx);
+          content.style.opacity   = '1';
+          content.style.transform = 'translateY(0)';
+        }
+      }, 220);
+    }
+
+    function showCompletion() {
+      localStorage.setItem('termometro_data', JSON.stringify(scores));
+      content.style.display = 'none';
+      completion.classList.add('visible');
+      progressFill.style.width = '100%';
+    }
+
+    // ── Events ───────────────────────────────────────────────────────
+    slider.addEventListener('input', () => {
+      canAdvance = true;
+      updateFloatLabel(parseFloat(slider.value));
+    });
+
+    function handleSliderAdvance() {
+      if (!canAdvance) return;
+      canAdvance = false;
+      setTimeout(advance, 420);
+    }
+
+    slider.addEventListener('pointerup', handleSliderAdvance);
+    slider.addEventListener('touchend',  handleSliderAdvance);
+
+    continueBtn.addEventListener('click', advance);
+
+    // ── Init ─────────────────────────────────────────────────────────
+    loadFlowItem(0);
+    content.style.opacity   = '0';
+    content.style.transform = 'translateY(8px)';
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      content.style.opacity   = '1';
+      content.style.transform = 'translateY(0)';
+    }));
+  </script>
+</body>
+</html>

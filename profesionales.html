@@ -1,0 +1,927 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Hablemos con Profesionales · Timón</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:          #F9F8F6;
+      --sidebar-bg:  #F0EDE8;
+      --bot-bubble:  #FFFFFF;
+      --user-bubble: #EDE8DF;
+      --text:        #2D2D2D;
+      --text-soft:   #9A9590;
+      --text-muted:  #C4BEB6;
+      --border:      #E8E3DC;
+      --shadow:      0 1px 6px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.03);
+      --prof-color:  #2D2D2D;
+    }
+
+    html, body {
+      height: 100%; background: var(--bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text); -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Outer wrapper (phone container on mobile, card on desktop) ── */
+    .app-outer {
+      width: 100%; height: 100%;
+      display: flex; justify-content: center; align-items: stretch;
+    }
+
+    /* ── Main two-panel layout ── */
+    .app-wrap {
+      width: 100%; max-width: 100%;
+      display: flex; overflow: hidden;
+      position: relative;
+    }
+
+    /* ══════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════ */
+    .sidebar {
+      width: 100%;               /* mobile: full width */
+      flex-shrink: 0;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+      z-index: 2;
+    }
+
+    .sidebar-head {
+      padding: 16px 20px 14px;
+      background: var(--sidebar-bg);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px;
+      flex-shrink: 0;
+    }
+    .sidebar-back {
+      font-size: 18px; color: var(--text-soft); text-decoration: none;
+      line-height: 1; flex-shrink: 0; padding: 4px;
+      transition: color 0.15s;
+    }
+    .sidebar-back:hover { color: var(--text); }
+    .sidebar-title-wrap { flex: 1; }
+    .sidebar-title { font-size: 16px; font-weight: 700; letter-spacing: -0.3px; }
+    .sidebar-progress { font-size: 12px; color: var(--text-soft); margin-top: 1px; }
+
+    .prof-list { flex: 1; overflow-y: auto; }
+    .prof-list::-webkit-scrollbar { width: 3px; }
+    .prof-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .prof-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.15s;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .prof-item:hover   { background: rgba(0,0,0,0.04); }
+    .prof-item.active  { background: rgba(0,0,0,0.06); }
+
+    .prof-item-avatar {
+      width: 46px; height: 46px; flex-shrink: 0;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+    }
+    .prof-item-body  { flex: 1; min-width: 0; }
+    .prof-item-name  { font-size: 14px; font-weight: 600; letter-spacing: -0.1px; }
+    .prof-item-area  {
+      font-size: 12px; color: var(--text-soft); margin-top: 2px;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .prof-item-status { flex-shrink: 0; }
+
+    /* Status dot */
+    .status-dot {
+      width: 9px; height: 9px; border-radius: 50%;
+      background: var(--border);
+    }
+    .status-dot.done { background: #6BCB77; }
+
+    /* ══════════════════════════════════════
+       CHAT PANEL
+    ══════════════════════════════════════ */
+    .chat-panel {
+      flex: 1;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+      background: var(--bg);
+      /* On mobile: absolutely positioned, slides in */
+      position: absolute; inset: 0;
+      transform: translateX(100%);
+      transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+      z-index: 3;
+    }
+    .app-wrap.chat-open .chat-panel {
+      transform: translateX(0);
+    }
+
+    /* Empty state (desktop only) */
+    .empty-state {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 40px; text-align: center;
+    }
+    .empty-icon  { font-size: 44px; margin-bottom: 16px; opacity: 0.4; }
+    .empty-title { font-size: 18px; font-weight: 600; color: var(--text); }
+    .empty-sub   { font-size: 13px; color: var(--text-soft); margin-top: 6px; max-width: 240px; line-height: 1.5; }
+
+    /* Chat view */
+    .chat-view { display: flex; flex-direction: column; flex: 1; overflow: hidden; }
+
+    /* Chat header */
+    .chat-header {
+      padding: 12px 16px;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 12px; flex-shrink: 0;
+    }
+    .mobile-back {
+      font-size: 18px; color: var(--text-soft); background: none;
+      border: none; cursor: pointer; padding: 4px; line-height: 1;
+      flex-shrink: 0; transition: color 0.15s;
+    }
+    .mobile-back:hover { color: var(--text); }
+
+    .chat-avatar {
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--prof-color); flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px;
+    }
+    .chat-name { font-size: 15px; font-weight: 600; letter-spacing: -0.2px; }
+    .chat-role { font-size: 12px; color: var(--text-soft); margin-top: 1px; display: flex; align-items: center; gap: 4px; }
+    .online-dot { width: 7px; height: 7px; background: #6BCB77; border-radius: 50%; display: inline-block; }
+
+    /* Progress */
+    .progress-track { height: 2px; background: var(--border); flex-shrink: 0; }
+    .progress-fill  { height: 100%; background: var(--prof-color); width: 0%;
+                      transition: width 0.35s cubic-bezier(0.4,0,0.2,1); }
+
+    /* Messages */
+    .messages-area {
+      flex: 1; overflow-y: auto;
+      padding: 20px 16px 10px;
+      display: flex; flex-direction: column; gap: 8px;
+      scroll-behavior: smooth;
+    }
+    .messages-area::-webkit-scrollbar { width: 3px; }
+    .messages-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    /* Bubbles */
+    .msg {
+      display: flex; max-width: 82%;
+      animation: popIn 0.22s ease-out forwards; opacity: 0;
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .msg.bot  { align-self: flex-start; }
+    .msg.user { align-self: flex-end; }
+
+    .bubble { padding: 10px 14px; font-size: 14.5px; line-height: 1.6; border-radius: 20px; }
+    .msg.bot .bubble  { background: var(--bot-bubble); box-shadow: var(--shadow); border-top-left-radius: 5px; }
+    .msg.user .bubble { background: var(--user-bubble); border-top-right-radius: 5px; }
+
+    /* Typing */
+    .typing-wrap { align-self: flex-start; animation: popIn 0.2s ease forwards; opacity: 0; }
+    .typing-bubble {
+      background: var(--bot-bubble); box-shadow: var(--shadow);
+      border-radius: 20px; border-top-left-radius: 5px;
+      padding: 11px 15px; display: flex; align-items: center; gap: 5px;
+    }
+    .dot { width: 6px; height: 6px; background: #C8C2BB; border-radius: 50%; animation: bounce 1.1s ease-in-out infinite; }
+    .dot:nth-child(2) { animation-delay: 0.18s; }
+    .dot:nth-child(3) { animation-delay: 0.36s; }
+    @keyframes bounce {
+      0%,60%,100% { transform: translateY(0); }
+      30%          { transform: translateY(-3px); }
+    }
+
+    /* Input area */
+    .input-area {
+      padding: 12px 16px max(12px, env(safe-area-inset-bottom));
+      background: var(--bg); border-top: 1px solid var(--border);
+      flex-shrink: 0; min-height: 68px;
+      display: flex; align-items: flex-start;
+    }
+
+    /* Quick replies */
+    .quick-replies { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; }
+    .qr-btn {
+      padding: 9px 17px; background: var(--bg);
+      border: 1.5px solid var(--border); border-radius: 999px;
+      font-size: 13.5px; font-family: inherit; font-weight: 500;
+      color: var(--text); cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+      user-select: none;
+    }
+    .qr-btn:hover  { background: var(--text); color: var(--bg); border-color: var(--text); }
+    .qr-btn:active { transform: scale(0.96); }
+
+    /* Text input */
+    .text-form { display: flex; align-items: flex-end; gap: 10px; width: 100%; }
+    .text-input {
+      flex: 1; padding: 11px 15px;
+      background: #FFFFFF; border: 1.5px solid var(--border); border-radius: 24px;
+      font-size: 14.5px; font-family: inherit; color: var(--text);
+      outline: none; resize: none; overflow-y: hidden;
+      line-height: 1.5; min-height: 44px; max-height: 108px;
+      transition: border-color 0.2s;
+    }
+    .text-input::placeholder { color: #B8B2AB; }
+    .text-input:focus { border-color: #AAA49D; }
+    .send-btn {
+      width: 44px; height: 44px; flex-shrink: 0;
+      background: var(--prof-color); border: none; border-radius: 50%;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .send-btn:hover  { opacity: 0.82; }
+    .send-btn:active { transform: scale(0.94); }
+
+    /* Chips */
+    .chips-wrap { width: 100%; display: flex; flex-direction: column; gap: 10px; }
+    .chip-area  { display: flex; flex-wrap: wrap; gap: 7px; }
+    .chip-btn {
+      padding: 7px 14px; background: var(--bg);
+      border: 1.5px solid var(--border); border-radius: 999px;
+      font-size: 13px; font-family: inherit; font-weight: 500;
+      color: var(--text); cursor: pointer;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.1s;
+      user-select: none;
+    }
+    .chip-btn:active { transform: scale(0.97); }
+    .chip-btn.chip-on {
+      background: var(--prof-color); color: #FFFFFF; border-color: var(--prof-color);
+    }
+    /* "Ninguno de estos" chip — visually lighter by default */
+    .chip-btn.chip-none { color: var(--text-soft); border-style: dashed; }
+    .chip-btn.chip-none.chip-on { color: #FFFFFF; border-style: solid; }
+
+    .chip-confirm {
+      padding: 10px 20px; align-self: flex-end;
+      background: var(--text); color: #FFFFFF; border: none;
+      border-radius: 12px; font-size: 13.5px; font-family: inherit;
+      font-weight: 600; cursor: pointer;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .chip-confirm:hover  { opacity: 0.82; }
+    .chip-confirm:active { transform: scale(0.97); }
+
+    /* End state */
+    .end-state { width: 100%; display: flex; justify-content: center; padding: 4px 0; }
+    .end-btn {
+      padding: 11px 26px; background: var(--text); color: #FFFFFF;
+      border-radius: 999px; font-size: 13.5px; font-weight: 600;
+      text-decoration: none; font-family: inherit; transition: opacity 0.15s;
+    }
+    .end-btn:hover { opacity: 0.82; }
+
+    /* ══════════════════════════════════════
+       DESKTOP (≥ 768px): side-by-side layout
+    ══════════════════════════════════════ */
+    @media (min-width: 768px) {
+      html, body {
+        height: auto; min-height: 100svh;
+        background: #DDD9D1;
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: center;
+        padding: 40px 24px;
+      }
+
+      .app-outer {
+        width: 100%; max-width: 900px;
+        height: min(680px, calc(100svh - 80px));
+        border-radius: 24px;
+        box-shadow: 0 12px 56px rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.05);
+        overflow: hidden;
+        align-items: stretch;
+      }
+
+      .app-wrap {
+        height: 100%; flex: 1;
+      }
+
+      /* Sidebar: fixed width, always visible */
+      .sidebar {
+        width: 280px;
+        position: static;
+        transform: none !important;
+      }
+
+      .sidebar-head { padding: 18px 20px 14px; }
+
+      /* Chat panel: always visible, no slide */
+      .chat-panel {
+        position: static;
+        transform: none !important;
+        flex: 1;
+      }
+
+      /* Mobile back hidden on desktop */
+      .mobile-back { display: none; }
+
+      .chat-header { padding: 14px 20px; }
+      .messages-area { padding: 22px 20px 10px; }
+      .input-area { padding: 12px 20px 16px; }
+      .bubble { font-size: 14.5px; }
+      .msg { max-width: 76%; }
+    }
+
+    @media (min-width: 1024px) {
+      .app-outer { max-width: 1040px; height: min(720px, calc(100svh - 80px)); }
+      .sidebar { width: 300px; }
+      .bubble { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+<div class="app-outer">
+  <div class="app-wrap" id="appWrap">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <a href="dashboard.html" class="sidebar-back" aria-label="Volver al dashboard">←</a>
+        <div class="sidebar-title-wrap">
+          <div class="sidebar-title">Profesionales</div>
+          <div class="sidebar-progress" id="completedCount">0 de 9 completados</div>
+        </div>
+      </div>
+      <div class="prof-list" id="profList">
+        <!-- JS inserts professional items here -->
+      </div>
+    </aside>
+
+    <!-- ── CHAT PANEL ── -->
+    <main class="chat-panel" id="chatPanel">
+
+      <!-- Empty state (desktop, no selection) -->
+      <div class="empty-state" id="emptyState">
+        <div class="empty-icon">💬</div>
+        <div class="empty-title">Elegí un profesional</div>
+        <div class="empty-sub">Seleccioná una conversación para empezar tu investigación de talentos.</div>
+      </div>
+
+      <!-- Active chat -->
+      <div class="chat-view" id="chatView" style="display:none; flex:1; flex-direction:column; overflow:hidden;">
+        <div class="chat-header">
+          <button class="mobile-back" id="mobileBack" aria-label="Volver">←</button>
+          <div class="chat-avatar" id="chatAvatar">✦</div>
+          <div>
+            <div class="chat-name" id="chatName">...</div>
+            <div class="chat-role"><span class="online-dot"></span><span id="chatRole">...</span></div>
+          </div>
+        </div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="messages-area" id="messagesArea"></div>
+        <div class="input-area"    id="inputArea"></div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// DATOS DE PROFESIONALES
+// ══════════════════════════════════════════════════════════════
+const PROFESSIONALS = [
+  {
+    id:'negocios', name:'Lucía Ferreyra', role:'Emprendedora · Consultora de negocios',
+    color:'#C87828', emoji:'💼', area:'Administración y Negocios',
+    flow:[
+      {t:'bot', text:'¡Hola! Soy Lucía 👋', delay:800},
+      {t:'bot', text:'Empecé mi primer negocio a los 24 y hoy trabajo ayudando a empresas a crecer y detectar nuevas oportunidades. El mundo de los negocios mezcla números, estrategia y personas — está en todo lado, desde una startup de tecnología hasta una empresa familiar.', delay:1700},
+      {t:'bot', text:'Voy a mostrarte algunas actividades de mi área. Marcá las que reconocés como talentos tuyos — cosas que se te dan bien o que genuinamente disfrutás.', delay:1400},
+      {t:'chips', text:'¿Con cuáles de estas te identificás?', delay:1100,
+       items:['Trabajar con números','Liderar','Supervisar','Tareas de oficina']},
+      {t:'chips', text:'¿Y de estas?', delay:800,
+       items:['Iniciar proyecto propio','Asumir riesgos','Detectar oportunidades','Convencer a otros']},
+      {t:'chips', text:'Último grupo...', delay:700,
+       items:['Manejar contabilidad','Llevar cuentas','Planificar ganancias','Diseñar inversiones']},
+      {t:'options', text:'¿Alguna vez te imaginaste teniendo tu propio negocio o proyecto?', delay:1200,
+       options:['Sí, es algo que me llama mucho','Lo pensé pero no sé por dónde empezar','No es lo que me imagino haciendo']},
+      {t:'text', text:'¿Hay algún aspecto del mundo de los negocios que siempre te generó curiosidad?', placeholder:'Lo que se te venga a la mente...', delay:1300},
+      {t:'bot', text:'Perfecto. Con esto tengo una imagen clara de tu relación con este mundo. ¡Fue un placer! 🙌', delay:1000},
+      {t:'end'}
+    ]
+  },
+  {
+    id:'sociales', name:'Mateo Vargas', role:'Sociólogo · Especialista en RRHH',
+    color:'#248850', emoji:'🤝', area:'Sociales y RRHH',
+    flow:[
+      {t:'bot', text:'¡Hola! Soy Mateo 👋', delay:800},
+      {t:'bot', text:'Soy sociólogo y llevo diez años trabajando en Recursos Humanos. Mi trabajo es entender qué necesita la gente — tanto dentro de las organizaciones como en la comunidad. Si te importa el bienestar de los demás y cómo funciona la sociedad, probablemente tenemos cosas en común.', delay:1700},
+      {t:'bot', text:'Voy a mostrarte actividades del área social y de RRHH. Marcá las que reconocés en vos — cosas que ya hacés o que se te dan de forma natural.', delay:1400},
+      {t:'chips', text:'¿Con cuáles de estas te identificás?', delay:1100,
+       items:['Ayudar a otros','Aconsejar','Contención emocional','Trabajo en equipo']},
+      {t:'chips', text:'Seguimos...', delay:800,
+       items:['Percibir necesidades','Tareas solidarias','Actividades con niños/ancianos','Incentivar relaciones']},
+      {t:'chips', text:'Y estas últimas...', delay:700,
+       items:['Leer sobre problemas sociales','Interés en conducta humana']},
+      {t:'options', text:'¿Qué es lo que más te moviliza cuando se trata de trabajar con personas?', delay:1200,
+       options:['Ayudar a resolver problemas concretos','Generar conexión y vínculo genuino','Entender por qué la gente hace lo que hace']},
+      {t:'text', text:'¿Hay algún grupo social, problemática o comunidad que te quite el sueño?', placeholder:'Lo que se te venga a la mente...', delay:1400},
+      {t:'bot', text:'Gracias por la sinceridad. Se nota lo que te importa — eso es lo más valioso en este campo. ¡Hasta pronto! 🙌', delay:1100},
+      {t:'end'}
+    ]
+  },
+  {
+    id:'humanidades', name:'Valentina Ros', role:'Psicóloga · Educadora',
+    color:'#7B3FA0', emoji:'📚', area:'Humanidades y Educación',
+    flow:[
+      {t:'bot', text:'¡Hola! Soy Valentina 👋', delay:800},
+      {t:'bot', text:'Soy psicóloga y trabajo en educación. Acompaño a personas de todas las edades a entenderse mejor y desarrollar su potencial. Me apasionan los idiomas, la filosofía y todo lo que tenga que ver con cómo pensamos y aprendemos.', delay:1600},
+      {t:'bot', text:'Voy a mostrarte actividades del área de humanidades, educación y psicología. Marcá las que reconocés como talentos tuyos o que genuinamente te atraen.', delay:1400},
+      {t:'chips', text:'¿Con cuáles de estas te identificás?', delay:1100,
+       items:['Enseñar/Entrenar','Hablar en público','Facilitar comunicación','Planear recreación']},
+      {t:'chips', text:'¿Y de estas?', delay:800,
+       items:['Idiomas','Escribir','Leer','Talleres literarios/culturales']},
+      {t:'chips', text:'Y las últimas...', delay:700,
+       items:['Interés educativo','Reflexión filosófica','Retiros espirituales']},
+      {t:'options', text:'¿Qué rol te imaginás más naturalmente en el futuro?', delay:1200,
+       options:['Guiar o enseñar a otros','Explorar ideas y generar contenido','Acompañar procesos internos de las personas']},
+      {t:'text', text:'¿Hay algún campo de las humanidades o la psicología que siempre te generó curiosidad?', placeholder:'Lo que se te venga a la mente...', delay:1400},
+      {t:'bot', text:'Me alegra que hayas llegado hasta acá. Se nota que tenés un mundo interior rico — eso es una ventaja enorme en este campo. ¡Hasta pronto! 🙌', delay:1100},
+      {t:'end'}
+    ]
+  },
+  {
+    id:'salud', name:'Diego Moreira', role:'Médico clínico',
+    color:'#2E78C8', emoji:'🩺', area:'Salud',
+    flow:[
+      {t:'bot', text:'¡Hola! Soy Diego 👋', delay:800},
+      {t:'bot', text:'Soy médico clínico con más de diez años de experiencia. El mundo de la salud es enorme: medicina, enfermería, nutrición, investigación... Lo que me mueve es poder hacer una diferencia real en la vida de las personas. Hay algo único en estar cerca cuando alguien más lo necesita.', delay:1700},
+      {t:'bot', text:'Voy a mostrarte actividades del área de la salud. Marcá las que reconocés en vos — aunque sea a nivel de interés o curiosidad natural.', delay:1400},
+      {t:'chips', text:'¿Con cuáles de estas te identificás?', delay:1100,
+       items:['Anatomía/Fisiología','Investigación en salud','Leer sobre medicina','Nutrición']},
+      {t:'chips', text:'¿Y estas?', delay:800,
+       items:['Ayudar enfermos','Voluntariado hospitalario','Prevención']},
+      {t:'chips', text:'Últimas...', delay:700,
+       items:['Emergencias','Primeros auxilios']},
+      {t:'options', text:'¿Qué aspecto del mundo de la salud te genera más vocación?', delay:1200,
+       options:['El contacto directo con pacientes','La investigación y el conocimiento científico','La prevención y la salud pública']},
+      {t:'text', text:'¿Hay algo del mundo de la salud que siempre te llamó la atención, aunque todavía no lo hayas explorado mucho?', placeholder:'Lo que se te venga a la mente...', delay:1400},
+      {t:'bot', text:'Muy bien. Con esto tengo una imagen de tu relación con este mundo. ¡Gracias por la charla! 🙌', delay:1000},
+      {t:'end'}
+    ]
+  },
+  {
+    id:'juridicas', name:'Camila Bravo', role:'Abogada · Asesora en política pública',
+    color:'#C02828', emoji:'⚖️', area:'Jurídicas y Política',
+    flow:[
+      {t:'bot', text:'¡Hola! Soy Camila 👋', delay:800},
+      {t:'bot', text:'Soy abogada especialista en derecho internacional y también trabajé en política pública y organizaciones de seguridad. Este campo es para quienes quieren que el mundo sea más justo — ya sea desde la ley, la política o la protección de los derechos. Si las injusticias te indignan, probablemente tenemos algo en común.', delay:1800},
+      {t:'bot', text:'Voy a mostrarte actividades del área jurídica, política y de seguridad. Marcá las que reconocés como talentos tuyos o que genuinamente te movilizan.', delay:1400},
+      {t:'chips', text:'¿Con cuáles de estas te identificás?', delay:1100,
+       items:['Defender causas justas','Defender derechos','Juzgar con objetividad','Conciliar disputas']},
+      {t:'chips', text:'¿Y estas?', delay:800,
+       items:['Política','Relaciones internacionales','Seguridad de los demás','Defensa del territorio']},
+      {t:'chips', text:'Últimas...', delay:700,
+       items:['Noticias delictivas','Prevención del delito']},
+      {t:'options', text:'¿Desde qué lugar te imaginás haciendo una diferencia?', delay:1200,
+       options:['Desde la ley y los derechos','Desde la política y las instituciones','Desde la seguridad y la protección']},
+      {t:'text', text:'¿Hay alguna causa, injusticia o problemática que especialmente te movilice?', placeholder:'Lo que se te venga a la mente...', delay:1400},
+      {t:'bot', text:'Muy interesante. Se nota que tenés convicciones — eso es esencial en este campo. ¡Hasta la próxima! 🙌', delay:1000},
+      {t:'end'}
+    ]
+  },
+  {
+    id:'ecologia', name:'Tomás Alvarado', role:'Biólogo · Conservacionista',
+    color:'#3D7A52', emoji:'🌿', area:'Ecología y Naturaleza',
+    flow:[
+      {t:'bot', text:'¡Hola! Soy Tomás 👋', delay:800},
+      {t:'bot', text:'Soy biólogo y trabajo en conservación de ecosistemas. Pasé años en campo — desde la Patagonia hasta el Amazonas. Si el mundo natural te fascina, si te preocupa el medio ambiente, o si simplemente amás los animales y las plantas, creo que vamos a tener mucho para hablar.', delay:1700},
+      {t:'bot', text:'Voy a mostrarte actividades del área de ecología y naturaleza. Marcá las que reconocés en vos — aunque sea a nivel de interés genuino.', delay:1400},
+      {t:'chips', text:'¿Con cuáles de estas te identificás?', delay:1100,
+       items:['Medio ambiente','Biología/Ecología','Vida marina','Preservación de especies']},
+      {t:'chips', text:'¿Y estas?', delay:800,
+       items:['Alimentación humana','Actividad agrícola/ganadera','Crianza de animales','Reservas animales']},
+      {t:'chips', text:'Últimas...', delay:700,
+       items:['Cocina','Genética','Geografía']},
+      {t:'options', text:'¿Qué es lo que más te conecta con el mundo natural?', delay:1200,
+       options:['La complejidad de los ecosistemas','Los animales y su comportamiento','El impacto humano y cómo reducirlo']},
+      {t:'text', text:'¿Hay algún ecosistema, especie o problema ambiental que te apasione especialmente?', placeholder:'Lo que se te venga a la mente...', delay:1400},
+      {t:'bot', text:'Genial. Se nota que el mundo natural te habla. Con esa sensibilidad se construyen grandes vocaciones. ¡Hasta pronto! 🙌', delay:1100},
+      {t:'end'}
+    ]
+  },
+  {
+    id:'exactas', name:'Sofía Méndez', role:'Ingeniera en Sistemas',
+    color:'#5040B0', emoji:'⚙️', area:'Exactas e Ingeniería',
+    flow:[
+      {t:'bot', text:'¡Hola! Soy Sofía 👋', delay:800},
+      {t:'bot', text:'Soy ingeniera en sistemas y llevo años trabajando en desarrollo de software y proyectos de tecnología. Me encanta la lógica, los problemas complejos y encontrar soluciones elegantes. Si sos de las personas a las que les gusta entender cómo funciona todo por dentro, este mundo puede ser el tuyo.', delay:1700},
+      {t:'bot', text:'Voy a mostrarte actividades del área de exactas, ingeniería y sistemas. Marcá las que reconocés como talentos tuyos o que te atraen de forma natural.', delay:1400},
+      {t:'chips', text:'¿Con cuáles de estas te identificás?', delay:1100,
+       items:['Relacionar teorías','Lógica','Cálculos complejos','Fórmulas matemáticas/químicas']},
+      {t:'chips', text:'¿Y estas?', delay:800,
+       items:['Informática','Programar software','Organizar objetos/datos','Leer revistas científicas']},
+      {t:'chips', text:'Últimas...', delay:700,
+       items:['Manipular herramientas','Experimentos','Reparaciones']},
+      {t:'options', text:'¿Cómo sos cuando te encontrás con un problema difícil?', delay:1200,
+       options:['Me meto de lleno hasta resolverlo','Lo analizo primero, después actúo','Prefiero colaborar con alguien más']},
+      {t:'text', text:'¿Hay algún problema técnico, científico o tecnológico que te parezca especialmente fascinante?', placeholder:'Lo que se te venga a la mente...', delay:1400},
+      {t:'bot', text:'Muy bien. La forma en que procesás los problemas dice mucho de tus afinidades. ¡Gracias por la charla! 🙌', delay:1000},
+      {t:'end'}
+    ]
+  },
+  {
+    id:'comunicacion', name:'Nicolás Paredes', role:'Periodista · Comunicador',
+    color:'#D4680A', emoji:'📡', area:'Comunicación y Medios',
+    flow:[
+      {t:'bot', text:'¡Hola! Soy Nico 👋', delay:800},
+      {t:'bot', text:'Soy periodista con más de quince años de carrera — pasé por radio, televisión, medios digitales y comunicación institucional. Lo que me apasiona de este campo es que siempre estás conectado con lo que pasa en el mundo. Si te gusta contar historias, investigar y transmitir ideas, probablemente tenés algo de esto.', delay:1800},
+      {t:'bot', text:'Voy a mostrarte actividades del área de comunicación y medios. Marcá las que reconocés en vos — cosas que se te dan bien o que te atraen de forma natural.', delay:1400},
+      {t:'chips', text:'¿Con cuáles de estas te identificás?', delay:1100,
+       items:['Relatar','Periodismo','Entrevistar','Transmitir comunicación']},
+      {t:'chips', text:'¿Y estas?', delay:800,
+       items:['Promocionar','Indagar culturas/historia','Crítica de espectáculos','Organizar eventos']},
+      {t:'chips', text:'Últimas...', delay:700,
+       items:['Planificar viajes/eventos','Luces y sonido','Operar sistemas electrónicos']},
+      {t:'options', text:'¿Qué forma de contar historias te llama más?', delay:1200,
+       options:['En texto — artículos, crónicas, reportajes','En audio o video — podcast, radio, televisión','En redes — contenido digital, social media']},
+      {t:'text', text:'¿Hay algún medio, formato o historia que te haya impactado y que siempre recordás?', placeholder:'Lo que se te venga a la mente...', delay:1400},
+      {t:'bot', text:'Buenísimo. Se nota que tenés ojo para las historias — eso es lo más difícil de enseñar en este campo. ¡Hasta la próxima! 🙌', delay:1000},
+      {t:'end'}
+    ]
+  },
+  {
+    id:'arte', name:'Ana Suárez', role:'Diseñadora · Artista visual',
+    color:'#C83070', emoji:'🎨', area:'Arte y Diseño',
+    flow:[
+      {t:'bot', text:'¡Hola! Soy Ana 👋', delay:800},
+      {t:'bot', text:'Soy diseñadora gráfica y artista visual. Trabajo con marcas, ilustración, fotografía y también doy clases de diseño. Este mundo es para quienes ven las cosas de forma diferente y necesitan expresarlo. Si creás, diseñás, o simplemente te emocionás con lo que es bello y bien hecho, bienvenido/a.', delay:1700},
+      {t:'bot', text:'Voy a mostrarte actividades del área de arte y diseño. Marcá las que reconocés como talentos tuyos o que te atraen genuinamente.', delay:1400},
+      {t:'chips', text:'¿Con cuáles de estas te identificás?', delay:1100,
+       items:['Dibujar/Pintar','Fotografía','Diseño de objetos/imágenes','Decorar']},
+      {t:'chips', text:'¿Y estas?', delay:800,
+       items:['Teatro','Danza','Tocar instrumento','Leer partituras']},
+      {t:'chips', text:'Últimas...', delay:700,
+       items:['Historia del arte','Manualidades/Escultura','Confección de ropa','Maquetas','Diseño web']},
+      {t:'options', text:'¿Cómo definirías tu relación con el arte y la expresión?', delay:1200,
+       options:['Es una parte central de quién soy','Me atrae pero no lo practiqué mucho','Me gusta apreciarlo más que crearlo']},
+      {t:'text', text:'¿Hay alguna forma artística que siempre quisiste explorar pero nunca te animaste o tuviste la oportunidad?', placeholder:'Lo que se te venga a la mente...', delay:1400},
+      {t:'bot', text:'Me alegra que hayas llegado hasta acá. La sensibilidad estética es un talento que muchos no reconocen como tal. ¡Hasta pronto! 🙌', delay:1100},
+      {t:'end'}
+    ]
+  },
+];
+
+// ══════════════════════════════════════════════════════════════
+// ACK POOLS
+// ══════════════════════════════════════════════════════════════
+const ACK_CHIPS_NONE   = ['Entendido, seguimos.', 'Ok.'];
+const ACK_CHIPS_FEW    = ['Hay algo ahí.', 'Algunos de estos.', 'Interesante.'];
+const ACK_CHIPS_MANY   = ['¡Bastante de esto te resuena!', 'Hay material.', 'Interesante lo que marcás.', 'Bien.'];
+const ACK_NINGUNO      = [
+  'No pasa nada — no necesariamente tenés que tener talentos en cada área. Lo importante es ir viendo dónde sí te reconocés.',
+  'Totalmente válido. No tenés por qué identificarte con todos los talentos de una industria — eso también dice algo.',
+  'Está bien. No necesitás reconocerte en todos los talentos de un área para que sea relevante para vos.',
+];
+const ACK_REG          = ['Interesante.','Tiene sentido.','Bien pensado.','Qué bueno.','Me gusta eso.','Eso dice mucho.','Bueno saberlo.'];
+
+function rnd(arr)     { return arr[Math.floor(Math.random() * arr.length)]; }
+function chipAck(sel) {
+  if (sel.length === 1 && sel[0] === 'Ninguno de estos') return rnd(ACK_NINGUNO);
+  if (sel.length === 0) return rnd(ACK_CHIPS_NONE);
+  if (sel.length <= 2)  return rnd(ACK_CHIPS_FEW);
+  return rnd(ACK_CHIPS_MANY);
+}
+
+// ══════════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════════
+let activeProfId   = null;
+let flowIdx        = 0;
+let answerable     = 0;
+let answered       = 0;
+let talentPicks    = [];
+let openAnswers    = {};
+
+// ══════════════════════════════════════════════════════════════
+// DOM REFS
+// ══════════════════════════════════════════════════════════════
+const appWrap      = document.getElementById('appWrap');
+const profList     = document.getElementById('profList');
+const completedCnt = document.getElementById('completedCount');
+const emptyState   = document.getElementById('emptyState');
+const chatView     = document.getElementById('chatView');
+const chatAvatar   = document.getElementById('chatAvatar');
+const chatName     = document.getElementById('chatName');
+const chatRole     = document.getElementById('chatRole');
+const progressFill = document.getElementById('progressFill');
+const messagesArea = document.getElementById('messagesArea');
+const inputArea    = document.getElementById('inputArea');
+
+document.getElementById('mobileBack').addEventListener('click', () => {
+  appWrap.classList.remove('chat-open');
+  activeProfId = null;
+  // Deselect sidebar item
+  document.querySelectorAll('.prof-item').forEach(i => i.classList.remove('active'));
+});
+
+// ══════════════════════════════════════════════════════════════
+// BUILD SIDEBAR
+// ══════════════════════════════════════════════════════════════
+function buildSidebar() {
+  profList.innerHTML = '';
+  let doneCount = 0;
+  PROFESSIONALS.forEach(prof => {
+    const done = localStorage.getItem('prof_' + prof.id) === 'done';
+    if (done) doneCount++;
+
+    const item = document.createElement('div');
+    item.className = 'prof-item' + (done ? '' : '');
+    item.id = 'item-' + prof.id;
+    item.innerHTML = `
+      <div class="prof-item-avatar" style="background:${prof.color}20; border: 2px solid ${prof.color}40">
+        <span>${prof.emoji}</span>
+      </div>
+      <div class="prof-item-body">
+        <div class="prof-item-name">${prof.name}</div>
+        <div class="prof-item-area">${prof.area}</div>
+      </div>
+      <div class="prof-item-status">
+        <div class="status-dot ${done ? 'done' : ''}"></div>
+      </div>`;
+    item.addEventListener('click', () => openProfessional(prof.id));
+    profList.appendChild(item);
+  });
+  completedCnt.textContent = `${doneCount} de 9 completados`;
+}
+
+// ══════════════════════════════════════════════════════════════
+// OPEN A PROFESSIONAL CONVERSATION
+// ══════════════════════════════════════════════════════════════
+function openProfessional(id) {
+  const prof = PROFESSIONALS.find(p => p.id === id);
+  if (!prof) return;
+
+  // Update sidebar active state
+  document.querySelectorAll('.prof-item').forEach(i => i.classList.remove('active'));
+  document.getElementById('item-' + id)?.classList.add('active');
+
+  // Apply theme
+  document.documentElement.style.setProperty('--prof-color', prof.color);
+  chatAvatar.textContent = prof.emoji;
+  chatAvatar.style.background = prof.color;
+  chatName.textContent = prof.name;
+  chatRole.textContent = prof.role;
+
+  // Reset chat state
+  activeProfId = id;
+  flowIdx      = 0;
+  answered     = 0;
+  talentPicks  = [];
+  openAnswers  = {};
+  answerable   = prof.flow.filter(s => ['chips','options','text'].includes(s.t)).length;
+  progressFill.style.width = '0%';
+  messagesArea.innerHTML = '';
+  inputArea.innerHTML = '';
+
+  // Show chat panel
+  emptyState.style.display = 'none';
+  chatView.style.display   = 'flex';
+  appWrap.classList.add('chat-open');
+
+  // Start flow
+  processStep(0);
+}
+
+// ══════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════
+function scrollBottom() {
+  requestAnimationFrame(() => { messagesArea.scrollTop = messagesArea.scrollHeight; });
+}
+function updateProgress() {
+  progressFill.style.width = ((answered / answerable) * 100) + '%';
+}
+function clearInput() { inputArea.innerHTML = ''; }
+
+function showTyping() {
+  const el = document.createElement('div');
+  el.className = 'typing-wrap'; el.id = 'typing';
+  el.innerHTML = `<div class="typing-bubble">
+    <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+  </div>`;
+  messagesArea.appendChild(el); scrollBottom();
+}
+function hideTyping() { document.getElementById('typing')?.remove(); }
+
+function appendBotMsg(text) {
+  const el = document.createElement('div');
+  el.className = 'msg bot';
+  el.innerHTML = `<div class="bubble">${text}</div>`;
+  messagesArea.appendChild(el); scrollBottom();
+}
+function appendUserMsg(text) {
+  const el = document.createElement('div');
+  el.className = 'msg user';
+  el.innerHTML = `<div class="bubble">${escHtml(text)}</div>`;
+  messagesArea.appendChild(el); scrollBottom();
+}
+function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function showAckThenAdvance(ack, nextIdx) {
+  showTyping();
+  setTimeout(() => {
+    hideTyping();
+    appendBotMsg(ack);
+    setTimeout(() => processStep(nextIdx), 480);
+  }, 650);
+}
+
+// ══════════════════════════════════════════════════════════════
+// INPUT RENDERERS
+// ══════════════════════════════════════════════════════════════
+function renderOptions(options, onAnswer) {
+  clearInput();
+  const wrap = document.createElement('div');
+  wrap.className = 'quick-replies';
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'qr-btn'; btn.textContent = opt;
+    btn.addEventListener('click', () => {
+      wrap.querySelectorAll('button').forEach(b => b.disabled = true);
+      onAnswer(opt);
+    });
+    wrap.appendChild(btn);
+  });
+  inputArea.appendChild(wrap);
+}
+
+function renderChips(items, onAnswer) {
+  clearInput();
+  const wrap = document.createElement('div'); wrap.className = 'chips-wrap';
+  const area = document.createElement('div'); area.className = 'chip-area';
+
+  const selected = new Set();
+  const allItems = [...items, 'Ninguno de estos'];
+
+  allItems.forEach(item => {
+    const isNone = item === 'Ninguno de estos';
+    const btn = document.createElement('button');
+    btn.className = 'chip-btn' + (isNone ? ' chip-none' : '');
+    btn.textContent = item;
+
+    btn.addEventListener('click', () => {
+      if (isNone) {
+        // "Ninguno de estos" deselects everything else
+        if (selected.has(item)) {
+          selected.delete(item); btn.classList.remove('chip-on');
+        } else {
+          selected.clear();
+          area.querySelectorAll('.chip-btn').forEach(b => b.classList.remove('chip-on'));
+          selected.add(item); btn.classList.add('chip-on');
+        }
+      } else {
+        // Regular chip: deselect "Ninguno de estos" if active
+        if (selected.has('Ninguno de estos')) {
+          selected.delete('Ninguno de estos');
+          area.querySelector('.chip-none')?.classList.remove('chip-on');
+        }
+        if (selected.has(item)) { selected.delete(item); btn.classList.remove('chip-on'); }
+        else                    { selected.add(item);    btn.classList.add('chip-on'); }
+      }
+    });
+    area.appendChild(btn);
+  });
+
+  const confirm = document.createElement('button');
+  confirm.className = 'chip-confirm'; confirm.textContent = 'Listo →';
+  confirm.addEventListener('click', () => {
+    wrap.querySelectorAll('button').forEach(b => b.disabled = true);
+    onAnswer(Array.from(selected));
+  });
+
+  wrap.appendChild(area); wrap.appendChild(confirm);
+  inputArea.appendChild(wrap);
+}
+
+function renderTextInput(placeholder, onAnswer) {
+  clearInput();
+  const form = document.createElement('div'); form.className = 'text-form';
+  const ta   = document.createElement('textarea'); ta.className = 'text-input';
+  ta.placeholder = placeholder || 'Escribí lo que se te venga a la mente...'; ta.rows = 1;
+  const btn = document.createElement('button'); btn.className = 'send-btn'; btn.type = 'button';
+  btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+    <path d="M22 2L11 13M22 2L15 22L11 13M22 2L2 9L11 13"
+      stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+  function submit() {
+    const val = ta.value.trim(); if (!val) return;
+    ta.disabled = true; btn.disabled = true; onAnswer(val);
+  }
+  ta.addEventListener('input', () => { ta.style.height = 'auto'; ta.style.height = Math.min(ta.scrollHeight, 108) + 'px'; });
+  ta.addEventListener('keydown', e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); } });
+  btn.addEventListener('click', submit);
+  form.appendChild(ta); form.appendChild(btn);
+  inputArea.appendChild(form);
+  setTimeout(() => ta.focus(), 80);
+}
+
+function renderEnd() {
+  clearInput();
+  const wrap = document.createElement('div'); wrap.className = 'end-state';
+  wrap.innerHTML = `<a href="#" class="end-btn" id="endBackBtn">← Ver otros profesionales</a>`;
+  inputArea.appendChild(wrap);
+  document.getElementById('endBackBtn').addEventListener('click', e => {
+    e.preventDefault();
+    appWrap.classList.remove('chat-open');
+    document.querySelectorAll('.prof-item').forEach(i => i.classList.remove('active'));
+    activeProfId = null;
+  });
+}
+
+// ══════════════════════════════════════════════════════════════
+// MOTOR DEL FLUJO
+// ══════════════════════════════════════════════════════════════
+function processStep(idx) {
+  const prof = PROFESSIONALS.find(p => p.id === activeProfId);
+  if (!prof || idx >= prof.flow.length) return;
+  const step = prof.flow[idx];
+  clearInput();
+
+  if (step.t === 'end') {
+    // Save completion
+    localStorage.setItem('prof_' + prof.id, 'done');
+    localStorage.setItem('prof_' + prof.id + '_data', JSON.stringify({
+      professional: prof.name, area: prof.id,
+      talents: talentPicks, answers: openAnswers,
+    }));
+    // Update sidebar item
+    const dot = document.querySelector('#item-' + prof.id + ' .status-dot');
+    if (dot) dot.classList.add('done');
+    const done = PROFESSIONALS.filter(p => localStorage.getItem('prof_' + p.id) === 'done').length;
+    completedCnt.textContent = `${done} de 9 completados`;
+    renderEnd();
+    return;
+  }
+
+  showTyping();
+  setTimeout(() => {
+    hideTyping();
+    appendBotMsg(step.text);
+
+    if (step.t === 'bot') {
+      setTimeout(() => processStep(idx + 1), 480);
+
+    } else if (step.t === 'chips') {
+      renderChips(step.items, selected => {
+        answered++; updateProgress();
+        // Don't store "Ninguno de estos" as a talent
+        talentPicks.push(...selected.filter(s => s !== 'Ninguno de estos'));
+        const display = selected.length === 0 ? 'Ninguno de estos.'
+          : selected.join(', ') + '.';
+        appendUserMsg(display);
+        showAckThenAdvance(chipAck(selected), idx + 1);
+      });
+
+    } else if (step.t === 'options') {
+      renderOptions(step.options, value => {
+        answered++; updateProgress();
+        appendUserMsg(value);
+        openAnswers['q' + idx] = value;
+        if (Math.random() < 0.30) { showAckThenAdvance(rnd(ACK_REG), idx + 1); }
+        else                       { setTimeout(() => processStep(idx + 1), 480); }
+      });
+
+    } else if (step.t === 'text') {
+      renderTextInput(step.placeholder, value => {
+        answered++; updateProgress();
+        appendUserMsg(value);
+        openAnswers['q' + idx] = value;
+        if (Math.random() < 0.30) { showAckThenAdvance(rnd(ACK_REG), idx + 1); }
+        else                       { setTimeout(() => processStep(idx + 1), 480); }
+      });
+    }
+  }, step.delay || 900);
+}
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+buildSidebar();
+
+// Open directly if URL hash matches a professional
+const hashId = location.hash.slice(1);
+if (hashId && PROFESSIONALS.find(p => p.id === hashId)) {
+  openProfessional(hashId);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RIASEC Holland · Timón</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:     #F9F8F6;
+      --card:   #FFFFFF;
+      --text:   #1A1918;
+      --gray:   #7A7570;
+      --muted:  #B2ADA6;
+      --border: #E8E4DE;
+      --panel:  #1A1918;
+
+      /* Type colors */
+      --R: #C87828; --I: #2E78C8; --A: #A83080;
+      --S: #248850; --E: #C02828; --C: #6048A8;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      font-family: 'Inter', -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      color: var(--text);
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       APP WRAPPER — mobile: full column, desktop: side-by-side
+    ───────────────────────────────────────────────────────── */
+    .app-wrap {
+      display: flex;
+      flex-direction: column;
+      min-height: 100svh;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       CONTENT AREA (left / top)
+    ───────────────────────────────────────────────────────── */
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding-bottom: 148px; /* room for fixed bottom panel on mobile */
+    }
+
+    /* Sticky section header */
+    .section-header {
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 10;
+      padding: 48px 24px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-meta {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .section-index {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .section-steps {
+      display: flex;
+      gap: 4px;
+    }
+
+    .step-dot {
+      width: 18px;
+      height: 3px;
+      border-radius: 2px;
+      background: var(--border);
+      transition: background 0.3s ease;
+    }
+
+    .step-dot.active  { background: var(--text); }
+    .step-dot.done    { background: var(--muted); }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+      line-height: 1.2;
+      margin-bottom: 5px;
+    }
+
+    .section-subtitle {
+      font-size: 13px;
+      color: var(--gray);
+      line-height: 1.45;
+    }
+
+    /* Scrollable words body */
+    .words-body {
+      flex: 1;
+      padding: 20px 24px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Type group */
+    .type-group {}
+
+    .type-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .type-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .type-name {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--gray);
+    }
+
+    .type-count {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      margin-left: auto;
+      min-width: 20px;
+      text-align: right;
+      transition: color 0.2s ease;
+    }
+
+    .type-count.has-selection {
+      color: var(--text);
+    }
+
+    /* Word chips */
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 8px 14px;
+      border-radius: 99px;
+      font-size: 13px;
+      font-weight: 500;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      transition: background 0.14s ease, border-color 0.14s ease, color 0.14s ease, transform 0.1s ease;
+      line-height: 1;
+    }
+
+    .chip:active { transform: scale(0.95); }
+
+    .chip.selected {
+      color: white;
+      border-color: transparent;
+    }
+
+    /* ─────────────────────────────────────────────────────────
+       ANALYSIS PANEL — mobile: fixed bottom, desktop: sidebar
+    ───────────────────────────────────────────────────────── */
+    .analysis-panel {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 400px;
+      background: var(--bg);
+      border-top: 1px solid var(--border);
+      padding: 12px 20px 20px;
+      z-index: 50;
+    }
+
+    /* Mini bars (6 bars in 3×2 grid) */
+    .mini-bars {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px 16px;
+      margin-bottom: 12px;
+    }
+
+    .mini-bar-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .mini-letter {
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      width: 12px;
+      flex-shrink: 0;
+    }
+
+    .mini-track {
+      flex: 1;
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .mini-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 2px;
+      transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Next button */
+    .next-btn {
+      width: 100%;
+      background: var(--text);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 14px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      font-family: inherit;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: opacity 0.15s ease;
+    }
+
+    .next-btn:hover { opacity: 0.84; }
+    .next-btn:active { opacity: 0.76; }
+
+    /* ─────────────────────────────────────────────────────────
+       RESULTS SCREEN
+    ───────────────────────────────────────────────────────── */
+    .results-view {
+      display: none;
+      flex-direction: column;
+      min-height: 100svh;
+    }
+
+    .results-view.visible { display: flex; }
+
+    .results-header {
+      padding: 52px 24px 28px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .results-eyebrow {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 12px;
+    }
+
+    .results-code {
+      display: flex;
+      gap: 6px;
+      align-items: baseline;
+      margin-bottom: 12px;
+    }
+
+    .code-letter {
+      font-size: 52px;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      line-height: 1;
+    }
+
+    .results-desc {
+      font-size: 14px;
+      color: var(--gray);
+      line-height: 1.55;
+    }
+
+    .results-body {
+      flex: 1;
+      padding: 24px 24px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+
+    .results-section-title {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 14px;
+    }
+
+    /* Full result bars */
+    .result-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .result-bar-item {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .result-bar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .result-bar-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .result-bar-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .result-bar-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .result-bar-score {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gray);
+    }
+
+    .result-track {
+      height: 5px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .result-fill {
+      height: 100%;
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    /* Top types cards */
+    .top-types {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .top-type-card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06), 0 0 0 1px rgba(0,0,0,0.04);
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      animation: slideUp 0.25s ease-out both;
+    }
+
+    .top-type-card:nth-child(2) { animation-delay: 0.05s; }
+    .top-type-card:nth-child(3) { animation-delay: 0.10s; }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .top-type-letter {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1;
+      flex-shrink: 0;
+    }
+
+    .top-type-body {}
+
+    .top-type-name {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 3px;
+    }
+
+    .top-type-desc {
+      font-size: 12px;
+      color: var(--gray);
+      line-height: 1.5;
+    }
+
+    .btn-back {
+      display: block;
+      width: calc(100% - 48px);
+      margin: 0 24px 40px;
+      background: var(--text);
+      color: white;
+      border-radius: 12px;
+      padding: 14px;
+      font-size: 15px;
+      font-weight: 600;
+      text-align: center;
+      text-decoration: none;
+      font-family: inherit;
+      letter-spacing: -0.01em;
+      transition: opacity 0.15s ease;
+    }
+
+    .btn-back:hover { opacity: 0.82; }
+
+    /* ─────────────────────────────────────────────────────────
+       WEB RESPONSIVE — tablet/desktop side-by-side
+    ───────────────────────────────────────────────────────── */
+    @media (min-width: 768px) {
+      html, body {
+        background: #DDD9D1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 24px;
+        min-height: 100svh;
+      }
+
+      .app-wrap {
+        flex-direction: row;
+        max-width: 980px;
+        width: 100%;
+        height: min(800px, calc(100svh - 64px));
+        border-radius: 20px;
+        box-shadow: 0 12px 56px rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.05);
+        overflow: hidden;
+        min-height: unset;
+      }
+
+      /* Main content: 62% width, left */
+      .content-area {
+        flex: 62;
+        padding-bottom: 0;
+        height: 100%;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .section-header {
+        padding: 40px 36px 22px;
+        position: static;
+      }
+
+      .section-title { font-size: 24px; }
+
+      .words-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px 36px 24px;
+        scrollbar-width: thin;
+        scrollbar-color: var(--border) transparent;
+      }
+
+      .words-body::-webkit-scrollbar { width: 3px; }
+      .words-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+      /* Desktop "Siguiente" footer (inside left panel) */
+      .desktop-footer {
+        display: block;
+        padding: 16px 36px 28px;
+        border-top: 1px solid var(--border);
+        background: var(--bg);
+        flex-shrink: 0;
+      }
+
+      .desktop-footer .next-btn {
+        max-width: 200px;
+      }
+
+      /* Analysis panel: 38% width, right — dark sidebar */
+      .analysis-panel {
+        position: static;
+        transform: none;
+        flex: 38;
+        background: var(--panel);
+        border-top: none;
+        padding: 40px 32px 32px;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        max-width: unset;
+      }
+
+      .mini-bars { display: none; } /* hidden on desktop */
+      .mobile-next { display: none; } /* next btn moved to desktop-footer */
+
+      /* Full desktop bars (shown in panel) */
+      .desktop-bars {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        flex: 1;
+      }
+
+      .panel-label {
+        font-size: 9px;
+        font-weight: 700;
+        letter-spacing: 1.8px;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.35);
+        margin-bottom: 24px;
+      }
+
+      .d-bar-item {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .d-bar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .d-bar-left {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .d-bar-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+      }
+
+      .d-bar-name {
+        font-size: 13px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.85);
+      }
+
+      .d-bar-score {
+        font-size: 13px;
+        font-weight: 700;
+        color: rgba(255,255,255,0.35);
+        transition: color 0.3s ease;
+        font-variant-numeric: tabular-nums;
+      }
+
+      .d-bar-score.active { color: rgba(255,255,255,0.7); }
+
+      .d-bar-track {
+        height: 3px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .d-bar-fill {
+        height: 100%;
+        border-radius: 2px;
+        width: 0%;
+        transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      /* Results view on desktop */
+      .results-view {
+        flex-direction: row;
+        min-height: unset;
+        height: 100%;
+      }
+
+      .results-main {
+        flex: 62;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .results-header {
+        padding: 40px 36px 28px;
+      }
+
+      .results-body {
+        padding: 20px 36px 36px;
+      }
+
+      .results-side {
+        flex: 38;
+        background: var(--panel);
+        padding: 40px 32px;
+        overflow-y: auto;
+      }
+
+      .btn-back {
+        width: calc(100% - 72px);
+        margin: 0 36px 36px;
+      }
+    }
+
+    @media (min-width: 1100px) {
+      .app-wrap {
+        max-width: 1080px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ MAIN QUIZ VIEW ══════════════════════════════════════ -->
+  <div class="app-wrap" id="appWrap">
+
+    <!-- LEFT / TOP: Preguntas + palabras -->
+    <div class="content-area" id="contentArea">
+
+      <div class="section-header">
+        <div class="section-meta">
+          <span class="section-index" id="sectionIndex">Sección 1 de 4</span>
+          <div class="section-steps" id="sectionSteps"></div>
+        </div>
+        <h2 class="section-title" id="sectionTitle"></h2>
+        <p class="section-subtitle" id="sectionSubtitle"></p>
+      </div>
+
+      <div class="words-body" id="wordsBody"></div>
+
+      <!-- Desktop footer (hidden on mobile via CSS) -->
+      <div class="desktop-footer" id="desktopFooter" style="display:none;">
+        <button class="next-btn" id="desktopNextBtn"></button>
+      </div>
+
+    </div>
+
+    <!-- RIGHT / BOTTOM: Análisis RIASEC -->
+    <aside class="analysis-panel" id="analysisPanel">
+
+      <!-- Mobile: compact mini-bars -->
+      <div class="mini-bars" id="miniBars"></div>
+
+      <!-- Mobile: next button -->
+      <button class="next-btn mobile-next" id="mobileNextBtn"></button>
+
+      <!-- Desktop: full bars (built by JS) -->
+      <div id="desktopBarsWrap" style="display:none;">
+        <div class="panel-label">Análisis en tiempo real</div>
+        <div class="desktop-bars" id="desktopBars"></div>
+      </div>
+
+    </aside>
+
+  </div>
+
+  <!-- ══ RESULTS VIEW ════════════════════════════════════════ -->
+  <div class="results-view" id="resultsView">
+
+    <!-- On mobile: single column. On desktop: two columns via CSS -->
+    <div class="results-main" id="resultsMain">
+
+      <div class="results-header">
+        <div class="results-eyebrow">Tu perfil RIASEC · John Holland</div>
+        <div class="results-code" id="resultsCode"></div>
+        <p class="results-desc" id="resultsDesc"></p>
+      </div>
+
+      <div class="results-body">
+        <p class="results-section-title">Tus 3 tipos dominantes</p>
+        <div class="top-types" id="topTypes"></div>
+      </div>
+
+      <a href="dashboard.html" class="btn-back">Volver al inicio</a>
+
+    </div>
+
+    <!-- Desktop: right side shows all 6 scores -->
+    <div class="results-side" id="resultsSide" style="display:none;">
+      <div class="panel-label">Puntuación completa</div>
+      <div class="result-bars" id="resultBars"></div>
+    </div>
+
+  </div>
+
+  <script>
+    // ─── Data ────────────────────────────────────────────────────────
+    const TYPES = ['R','I','A','S','E','C'];
+
+    const TYPE_INFO = {
+      R: { name: 'Realista',      color: '#C87828', desc: 'Trabajo concreto, físico y técnico. Preferís resolver cosas con las manos y el cuerpo.' },
+      I: { name: 'Investigador',  color: '#2E78C8', desc: 'Pensamiento analítico y científico. Disfrutás investigar, cuestionar y resolver problemas complejos.' },
+      A: { name: 'Artístico',     color: '#A83080', desc: 'Expresión creativa y originalidad. Buscás crear, diseñar e innovar sin seguir reglas fijas.' },
+      S: { name: 'Social',        color: '#248850', desc: 'Conexión humana y cuidado del otro. Te energizás trabajando con y para personas.' },
+      E: { name: 'Emprendedor',   color: '#C02828', desc: 'Liderazgo y persuasión. Disfrutás convencer, liderar y alcanzar metas con impacto.' },
+      C: { name: 'Convencional',  color: '#6048A8', desc: 'Organización y precisión. Trabajás muy bien con datos, sistemas y procesos claros.' },
+    };
+
+    // Max possible score per type: 13+10+5+6 = 34
+    const MAX_SCORE = 34;
+
+    const sections = [
+      {
+        title: 'Características de Personalidad',
+        subtitle: 'Marcá las que sentís que te describen.',
+        items: {
+          R: ['Dinámico','Concreto','Conservador','Franco','Independiente','Persistente','Práctico','Bien coordinado','Rígido','Fuerte','Ahorrador','Tradicional','Individualista'],
+          I: ['Original','Metódico','Explorador','Independiente','Inquisidor','Intelectual','Lógico','Observador','Racional','Curioso','Reservado','Preciso','Investigativo'],
+          A: ['Idealista','Informal','Emocional','Impulsivo','Imaginativo','Original','Espontáneo','No conformista','Expresivo','Independiente','Poco práctico','Sensible','Creativo'],
+          S: ['Cálido','Sensitivo','Cooperativo','Ético','Amigable','Generoso','Responsable','Genuino','Perceptivo','Sociable','Comprensivo','Idealista','Prudente'],
+          E: ['Aventurero','Dinámico','Dominante','Popular','Seguro de sí','Sociable','Curioso','Extrovertido','Optimista','Colaborador','Persuasivo','Acometedor','Competitivo'],
+          C: ['Preciso','Ordenado','Cuidadoso','Organizado','Conformista','Conservador','Eficiente','Prudente','Detallista','Responsable','Práctico','Predecible','Callado'],
+        }
+      },
+      {
+        title: 'Habilidades',
+        subtitle: 'Marcá las habilidades que reconocés en vos.',
+        items: {
+          R: ['Mecánica','Atlética','Manual','Precisión','Practicidad','Estabilidad','Analítica','Crítica','Kinésica','Espacial'],
+          I: ['Analítica','Abstracta','Matemática','Científica','Verbal','Resolutiva','Metódica','Observación','Paciencia','Investigación'],
+          A: ['Creativa','Expresiva','Intuitiva','Introspectiva','Musical','Diseño','Espacial','Imaginación','Detalle','Innovación'],
+          S: ['Enseñanza','Comprensión','Escucha','Ayuda al otro','Comunicación','Imaginación','Responsabilidad','Conciliación','Persuasión','Sagacidad'],
+          E: ['Persuasión','Responsabilidad','Liderazgo','Comunicación','Expresión oral','Organización','Objetividad','Practicidad','Tolerancia','Ambición'],
+          C: ['Cálculo','Finanzas','Prolijidad','Planificación','Método','Orden','Responsabilidad','Practicidad','Detalle','Exactitud'],
+        }
+      },
+      {
+        title: 'Intereses',
+        subtitle: 'Marcá los que observás más en tu persona.',
+        items: {
+          R: ['Cálculo','Científico','Manual','Exacto','Planificación'],
+          I: ['Clasificación','Numérico','Análisis/síntesis','Orden/precisión','Investigación'],
+          A: ['Estético','Armónico','Manual','Visual','Auditivo'],
+          S: ['Precisión verbal','Organización','Comunicación','Ayuda','Justicia'],
+          E: ['Organización','Supervisión','Colaboración','Análisis/síntesis','Estrategias'],
+          C: ['Orden','Supervisión','Computación','Detalle','Cálculo'],
+        }
+      },
+      {
+        title: 'Motivaciones',
+        subtitle: 'Marcá las que registrás en tu vida.',
+        items: {
+          R: ['Lo tradicional','Vida al aire libre','Trabajo manual','Sentido común','Naturaleza','Deportes'],
+          I: ['Conocimiento','Resolución de problemas','Independencia','Teorías','Ciencia','Curiosidad'],
+          A: ['Ayuda','Arte','Lograr armonía','Observación','Expresión','La belleza'],
+          S: ['Cooperación','Trabajo en equipo','Comunicación','Protección','Curar','El desarrollo personal'],
+          E: ['Desafíos','Competencia','Organización','Poder/servicio','El estatus','Emprender'],
+          C: ['Seguridad','Precisión','Eficiencia','Estadística','Métodos','Pertenencia'],
+        }
+      },
+    ];
+
+    // ─── State ───────────────────────────────────────────────────────
+    const scores   = { R:0, I:0, A:0, S:0, E:0, C:0 };
+    // Track selected chips per section+type so we can scroll back and modify
+    // selections[sectionIdx][type] = Set of word strings
+    const selections = sections.map(() =>
+      Object.fromEntries(TYPES.map(t => [t, new Set()]))
+    );
+
+    let currentSection = 0;
+    let isDesktop = false;
+
+    // ─── DOM refs ────────────────────────────────────────────────────
+    const appWrap        = document.getElementById('appWrap');
+    const contentArea    = document.getElementById('contentArea');
+    const sectionIndex   = document.getElementById('sectionIndex');
+    const sectionSteps   = document.getElementById('sectionSteps');
+    const sectionTitle   = document.getElementById('sectionTitle');
+    const sectionSubtitle = document.getElementById('sectionSubtitle');
+    const wordsBody      = document.getElementById('wordsBody');
+    const desktopFooter  = document.getElementById('desktopFooter');
+    const desktopNextBtn = document.getElementById('desktopNextBtn');
+    const mobileNextBtn  = document.getElementById('mobileNextBtn');
+    const miniBars       = document.getElementById('miniBars');
+    const desktopBarsWrap = document.getElementById('desktopBarsWrap');
+    const desktopBars    = document.getElementById('desktopBars');
+    const resultsView    = document.getElementById('resultsView');
+    const resultsMain    = document.getElementById('resultsMain');
+    const resultsSide    = document.getElementById('resultsSide');
+
+    // ─── Detect desktop ─────────────────────────────────────────────
+    function checkDesktop() {
+      isDesktop = window.innerWidth >= 768;
+
+      desktopFooter.style.display   = isDesktop ? 'block' : 'none';
+      desktopBarsWrap.style.display = isDesktop ? 'block' : 'none';
+      miniBars.style.display        = isDesktop ? 'none'  : 'grid';
+      mobileNextBtn.style.display   = isDesktop ? 'none'  : 'block';
+
+      if (isDesktop) {
+        resultsSide.style.display = 'flex';
+        resultsSide.style.flexDirection = 'column';
+      }
+    }
+
+    window.addEventListener('resize', checkDesktop);
+
+    // ─── Build mini bars (mobile) ───────────────────────────────────
+    function buildMiniBars() {
+      miniBars.innerHTML = '';
+      // 3 per row (R I A / S E C)
+      const order = ['R','I','A','S','E','C'];
+      order.forEach(t => {
+        const item = document.createElement('div');
+        item.className = 'mini-bar-item';
+        item.innerHTML = `
+          <span class="mini-letter" style="color:${TYPE_INFO[t].color}">${t}</span>
+          <div class="mini-track">
+            <div class="mini-fill" id="mini-${t}" style="background:${TYPE_INFO[t].color}"></div>
+          </div>`;
+        miniBars.appendChild(item);
+      });
+    }
+
+    // ─── Build desktop bars ─────────────────────────────────────────
+    function buildDesktopBars() {
+      desktopBars.innerHTML = '';
+      TYPES.forEach(t => {
+        const item = document.createElement('div');
+        item.className = 'd-bar-item';
+        item.innerHTML = `
+          <div class="d-bar-header">
+            <div class="d-bar-left">
+              <div class="d-bar-dot" style="background:${TYPE_INFO[t].color}"></div>
+              <span class="d-bar-name">${TYPE_INFO[t].name}</span>
+            </div>
+            <span class="d-bar-score" id="dscore-${t}">0</span>
+          </div>
+          <div class="d-bar-track">
+            <div class="d-bar-fill" id="dfill-${t}" style="background:${TYPE_INFO[t].color}"></div>
+          </div>`;
+        desktopBars.appendChild(item);
+      });
+    }
+
+    // ─── Build step dots ────────────────────────────────────────────
+    function buildStepDots() {
+      sectionSteps.innerHTML = '';
+      sections.forEach((_, i) => {
+        const dot = document.createElement('div');
+        dot.className = 'step-dot';
+        dot.id = `step-${i}`;
+        sectionSteps.appendChild(dot);
+      });
+    }
+
+    function updateStepDots(idx) {
+      sections.forEach((_, i) => {
+        const dot = document.getElementById(`step-${i}`);
+        dot.classList.remove('active','done');
+        if (i === idx) dot.classList.add('active');
+        else if (i < idx) dot.classList.add('done');
+      });
+    }
+
+    // ─── Update scores ───────────────────────────────────────────────
+    function recalcScores() {
+      TYPES.forEach(t => {
+        scores[t] = sections.reduce((sum, _, si) =>
+          sum + selections[si][t].size, 0
+        );
+      });
+    }
+
+    function updateBars() {
+      TYPES.forEach(t => {
+        const pct = (scores[t] / MAX_SCORE * 100).toFixed(1);
+        // Mobile mini
+        const mf = document.getElementById(`mini-${t}`);
+        if (mf) mf.style.width = pct + '%';
+        // Desktop full
+        const df = document.getElementById(`dfill-${t}`);
+        const ds = document.getElementById(`dscore-${t}`);
+        if (df) df.style.width = pct + '%';
+        if (ds) {
+          ds.textContent = scores[t];
+          ds.classList.toggle('active', scores[t] > 0);
+        }
+      });
+    }
+
+    // ─── Render section ──────────────────────────────────────────────
+    function renderSection(idx) {
+      const sec = sections[idx];
+      const isLast = idx === sections.length - 1;
+      const btnLabel = isLast ? 'Ver mi perfil →' : 'Siguiente →';
+
+      sectionIndex.textContent  = `Sección ${idx + 1} de ${sections.length}`;
+      sectionTitle.textContent  = sec.title;
+      sectionSubtitle.textContent = sec.subtitle;
+      desktopNextBtn.textContent  = btnLabel;
+      mobileNextBtn.textContent   = btnLabel;
+      updateStepDots(idx);
+
+      // Build word groups
+      wordsBody.innerHTML = '';
+      TYPES.forEach(t => {
+        const group = document.createElement('div');
+        group.className = 'type-group';
+
+        const count = selections[idx][t].size;
+        group.innerHTML = `
+          <div class="type-header">
+            <div class="type-dot" style="background:${TYPE_INFO[t].color}"></div>
+            <span class="type-name">${TYPE_INFO[t].name}</span>
+            <span class="type-count ${count > 0 ? 'has-selection' : ''}" id="count-${t}">
+              ${count > 0 ? count : ''}
+            </span>
+          </div>
+          <div class="chips" id="chips-${t}"></div>`;
+        wordsBody.appendChild(group);
+
+        const chipsEl = group.querySelector(`#chips-${t}`);
+        sec.items[t].forEach(word => {
+          const chip = document.createElement('button');
+          chip.className = 'chip' + (selections[idx][t].has(word) ? ' selected' : '');
+          chip.textContent = word;
+          if (selections[idx][t].has(word)) {
+            chip.style.background = TYPE_INFO[t].color;
+          }
+          chip.addEventListener('click', () => toggleChip(chip, t, word, idx));
+          chipsEl.appendChild(chip);
+        });
+      });
+
+      // Scroll content to top
+      wordsBody.scrollTop = 0;
+      if (contentArea) contentArea.scrollTop = 0;
+    }
+
+    function toggleChip(chip, type, word, sIdx) {
+      const set = selections[sIdx][type];
+      if (set.has(word)) {
+        set.delete(word);
+        chip.classList.remove('selected');
+        chip.style.background = '';
+      } else {
+        set.add(word);
+        chip.classList.add('selected');
+        chip.style.background = TYPE_INFO[type].color;
+      }
+
+      // Update count badge for this type
+      const countEl = document.getElementById(`count-${type}`);
+      const newCount = set.size;
+      countEl.textContent = newCount > 0 ? newCount : '';
+      countEl.classList.toggle('has-selection', newCount > 0);
+
+      // Recalc & update bars
+      recalcScores();
+      updateBars();
+    }
+
+    // ─── Navigate ────────────────────────────────────────────────────
+    function nextSection() {
+      if (currentSection < sections.length - 1) {
+        currentSection++;
+        // Fade out/in
+        wordsBody.style.opacity = '0';
+        setTimeout(() => {
+          renderSection(currentSection);
+          wordsBody.style.opacity = '1';
+        }, 200);
+      } else {
+        showResults();
+      }
+    }
+
+    // ─── Show results ─────────────────────────────────────────────────
+    function showResults() {
+      appWrap.style.display = 'none';
+      resultsView.classList.add('visible');
+
+      // Sort types by score
+      const sorted = [...TYPES].sort((a, b) => scores[b] - scores[a]);
+      const top3   = sorted.slice(0, 3);
+      const maxAll = Math.max(...Object.values(scores), 1);
+      // Collect selected words per top type (all 4 sections combined)
+      const wordsByType = {};
+      top3.forEach(t => {
+        wordsByType[t] = sections.reduce((arr, _, si) => [...arr, ...[...selections[si][t]]], []);
+      });
+      localStorage.setItem('riasec_data', JSON.stringify({
+        scores,
+        riasecCode: top3.join(''),
+        topTypes: top3.map(t => ({ code: t, name: TYPE_INFO[t].name, desc: TYPE_INFO[t].desc })),
+        wordsByType,
+      }));
+
+      // RIASEC code
+      const codeEl = document.getElementById('resultsCode');
+      codeEl.innerHTML = top3.map(t =>
+        `<span class="code-letter" style="color:${TYPE_INFO[t].color}">${t}</span>`
+      ).join('');
+
+      // Description
+      const descEl = document.getElementById('resultsDesc');
+      descEl.textContent = `Tu código RIASEC es ${top3.join('')}. Esto refleja tus tendencias dominantes en personalidad, habilidades, intereses y motivaciones.`;
+
+      // Top type cards
+      const topTypesEl = document.getElementById('topTypes');
+      top3.forEach(t => {
+        const card = document.createElement('div');
+        card.className = 'top-type-card';
+        card.innerHTML = `
+          <div class="top-type-letter" style="color:${TYPE_INFO[t].color}">${t}</div>
+          <div class="top-type-body">
+            <div class="top-type-name">${TYPE_INFO[t].name}</div>
+            <div class="top-type-desc">${TYPE_INFO[t].desc}</div>
+          </div>`;
+        topTypesEl.appendChild(card);
+      });
+
+      // Full result bars (desktop side / mobile body)
+      const rbEl = document.getElementById('resultBars');
+      sorted.forEach((t, i) => {
+        const pct = (scores[t] / maxAll * 100).toFixed(1);
+        const item = document.createElement('div');
+        item.className = 'result-bar-item';
+        item.innerHTML = `
+          <div class="result-bar-header">
+            <div class="result-bar-label">
+              <div class="result-bar-dot" style="background:${TYPE_INFO[t].color}"></div>
+              <span class="result-bar-name">${TYPE_INFO[t].name}</span>
+            </div>
+            <span class="result-bar-score">${scores[t]}</span>
+          </div>
+          <div class="result-track">
+            <div class="result-fill" id="rfill-${t}" style="background:${TYPE_INFO[t].color}"></div>
+          </div>`;
+        rbEl.appendChild(item);
+        // On mobile, also add bars to results body
+        if (!isDesktop) {
+          resultsMain.insertBefore(
+            (() => {
+              if (i === 0) {
+                const wrap = document.createElement('div');
+                wrap.className = 'results-body';
+                wrap.style.paddingTop = '0';
+                const ttl = document.createElement('p');
+                ttl.className = 'results-section-title';
+                ttl.textContent = 'Puntuación completa';
+                wrap.appendChild(ttl);
+                wrap.appendChild(rbEl);
+                return wrap;
+              }
+              return null;
+            })() || document.createElement('span'),
+            document.querySelector('.btn-back')
+          );
+        }
+        setTimeout(() => {
+          const fill = document.getElementById(`rfill-${t}`);
+          if (fill) fill.style.width = pct + '%';
+        }, 80);
+      });
+
+      console.log('RIASEC scores:', scores);
+      console.log('Código:', top3.join(''));
+    }
+
+    // ─── Event listeners ─────────────────────────────────────────────
+    desktopNextBtn.addEventListener('click', nextSection);
+    mobileNextBtn.addEventListener('click', nextSection);
+
+    // ─── Init ─────────────────────────────────────────────────────────
+    checkDesktop();
+    buildMiniBars();
+    buildDesktopBars();
+    buildStepDots();
+    renderSection(0);
+
+    // Smooth transition on words body
+    wordsBody.style.transition = 'opacity 0.2s ease';
+  </script>
+</body>
+</html>

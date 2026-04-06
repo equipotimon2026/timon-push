@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Autobiografía · Timón</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:        #F9F8F6;
+      --card:      #FFFFFF;
+      --text:      #1A1918;
+      --soft:      #7A7570;
+      --muted:     #B2ADA6;
+      --border:    #EDE8E1;
+      --accent:    #1A1918;
+      --gen-bg:    #F5F2EC;
+      --shadow-sm: 0 1px 4px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.04);
+      --shadow-md: 0 4px 20px rgba(0,0,0,0.07), 0 0 0 1px rgba(0,0,0,0.04);
+    }
+
+    html, body {
+      background: var(--bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text); -webkit-font-smoothing: antialiased;
+      min-height: 100%;
+    }
+
+    /* ── Phone container ── */
+    .screen { max-width: 480px; margin: 0 auto; min-height: 100svh; display: flex; flex-direction: column; }
+
+    /* ── Sticky header ── */
+    .top-bar {
+      position: sticky; top: 0; z-index: 10;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: 14px 20px 12px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .top-back {
+      font-size: 18px; color: var(--soft); text-decoration: none;
+      line-height: 1; padding: 2px; flex-shrink: 0; transition: color 0.15s;
+    }
+    .top-back:hover { color: var(--text); }
+    .top-title { font-size: 15px; font-weight: 700; letter-spacing: -0.3px; flex: 1; }
+    .top-progress { font-size: 12px; color: var(--muted); font-weight: 500; flex-shrink: 0; }
+
+    /* ── Progress bar ── */
+    .prog-track { height: 2px; background: var(--border); }
+    .prog-fill  { height: 100%; background: var(--text); width: 0%; transition: width 0.35s cubic-bezier(0.4,0,0.2,1); }
+
+    /* ── Content area ── */
+    .content { flex: 1; padding: 24px 16px 60px; display: flex; flex-direction: column; gap: 20px; }
+
+    /* ── Section card ── */
+    .sec-card {
+      background: var(--card); border-radius: 18px;
+      box-shadow: var(--shadow-sm); overflow: hidden;
+    }
+
+    .sec-head {
+      padding: 18px 20px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 14px;
+    }
+    .sec-num {
+      width: 36px; height: 36px; flex-shrink: 0;
+      background: var(--text); color: #FFF;
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; letter-spacing: 0.2px;
+    }
+    .sec-title   { font-size: 15px; font-weight: 700; letter-spacing: -0.2px; line-height: 1.2; }
+    .sec-subtitle{ font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .sec-body { padding: 20px; display: flex; flex-direction: column; gap: 22px; }
+
+    /* ── Question block ── */
+    .q-block { display: flex; flex-direction: column; gap: 8px; }
+
+    .q-label {
+      font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.1px;
+      line-height: 1.35;
+    }
+
+    /* Guiding questions */
+    .q-hints {
+      background: var(--gen-bg); border-radius: 10px;
+      padding: 12px 14px; display: flex; flex-direction: column; gap: 4px;
+    }
+    .q-hints-title {
+      font-size: 11px; font-weight: 600; color: var(--muted);
+      letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 6px;
+    }
+    .q-hints li {
+      font-size: 12.5px; color: var(--soft); line-height: 1.5;
+      padding-left: 14px; position: relative; list-style: none;
+    }
+    .q-hints li::before {
+      content: '→'; position: absolute; left: 0; color: var(--muted);
+      font-size: 11px; top: 2px;
+    }
+
+    .q-textarea {
+      width: 100%; padding: 12px 14px;
+      background: var(--bg); border: 1.5px solid var(--border);
+      border-radius: 12px; font-size: 14px; font-family: inherit;
+      color: var(--text); outline: none; resize: none;
+      line-height: 1.6; min-height: 96px;
+      transition: border-color 0.2s;
+    }
+    .q-textarea::placeholder { color: var(--muted); }
+    .q-textarea:focus { border-color: #AAA49D; }
+
+    .q-textarea.tall { min-height: 140px; }
+    .q-textarea.xtall{ min-height: 180px; }
+
+    /* ── Generated text panel ── */
+    .gen-panel {
+      margin-top: 4px;
+      border-top: 1px solid var(--border);
+      padding-top: 20px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .gen-head {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .gen-head-title { font-size: 13px; font-weight: 700; letter-spacing: -0.1px; }
+    .gen-head-sub   { font-size: 12px; color: var(--soft); margin-top: 2px; line-height: 1.4; }
+
+    .gen-btn {
+      padding: 8px 16px;
+      background: var(--text); color: #FFF; border: none;
+      border-radius: 999px; font-size: 12.5px; font-family: inherit;
+      font-weight: 600; cursor: pointer; flex-shrink: 0;
+      transition: opacity 0.15s, transform 0.1s;
+    }
+    .gen-btn:hover  { opacity: 0.82; }
+    .gen-btn:active { transform: scale(0.96); }
+
+    .gen-note {
+      font-size: 11.5px; color: var(--muted); font-style: italic;
+      line-height: 1.4;
+    }
+
+    .gen-textarea {
+      width: 100%; padding: 16px;
+      background: var(--gen-bg); border: 1.5px solid transparent;
+      border-radius: 12px; font-size: 14px; font-family: inherit;
+      color: var(--text); outline: none; resize: none;
+      line-height: 1.75; min-height: 200px;
+      transition: border-color 0.2s;
+    }
+    .gen-textarea:focus { border-color: var(--border); }
+    .gen-textarea::placeholder { color: var(--muted); }
+
+    /* ── Section divider ── */
+    .sec-divider {
+      display: flex; align-items: center; gap: 10px; padding: 0 4px;
+    }
+    .sec-divider span {
+      font-size: 10.5px; font-weight: 600; color: var(--muted);
+      letter-spacing: 1.2px; text-transform: uppercase; white-space: nowrap;
+    }
+    .sec-divider::before, .sec-divider::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* ── Prefill banner ── */
+    .prefill-banner {
+      background: var(--text); color: #fff;
+      padding: 14px 20px; font-size: 13px; line-height: 1.55;
+      display: none; gap: 2px; flex-direction: column;
+    }
+    .prefill-banner.visible { display: flex; }
+    .prefill-banner strong { font-weight: 700; }
+    .prefill-banner span { color: rgba(255,255,255,0.65); font-size: 12px; }
+
+    /* ── Save indicator ── */
+    .save-indicator {
+      font-size: 11px; color: var(--muted); text-align: center;
+      padding: 0 0 8px; opacity: 0; transition: opacity 0.4s;
+    }
+    .save-indicator.visible { opacity: 1; }
+
+    /* ── Web nav ── */
+    .web-nav { display: none; }
+
+    /* ── Tablet / Desktop ── */
+    @media (min-width: 640px) {
+      html, body {
+        background: #DDD9D1;
+        display: flex; flex-direction: column;
+        align-items: center; padding: 48px 24px 64px; min-height: 100svh;
+      }
+      .web-nav {
+        display: flex; align-items: center; justify-content: space-between;
+        width: 100%; max-width: 600px; padding: 0 4px; margin-bottom: 16px;
+      }
+      .web-nav-brand { font-size: 15px; font-weight: 700; color: rgba(249,248,246,0.9); letter-spacing: -0.04em; }
+      .web-nav-tag   { font-size: 11px; font-weight: 500; color: rgba(249,248,246,0.45); text-transform: uppercase; letter-spacing: 1.2px; }
+
+      .screen {
+        max-width: 600px; min-height: auto;
+        border-radius: 24px;
+        box-shadow: 0 12px 56px rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.05);
+        overflow: hidden;
+      }
+      .content { padding: 28px 28px 60px; }
+    }
+
+    @media (min-width: 1024px) {
+      .screen { max-width: 680px; }
+      .content { padding: 32px 36px 64px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="web-nav">
+  <span class="web-nav-brand">Timón ✦</span>
+  <span class="web-nav-tag">Autobiografía</span>
+</nav>
+
+<div class="screen">
+  <div class="top-bar">
+    <a href="dashboard.html" class="top-back" aria-label="Volver">←</a>
+    <span class="top-title">Autobiografía</span>
+    <span class="top-progress" id="topProgress">0 / 4</span>
+  </div>
+  <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+
+  <!-- Pre-fill notice -->
+  <div class="prefill-banner" id="prefillBanner">
+    <strong>✦ Armamos un borrador con tus respuestas anteriores.</strong>
+    <span>Revisá cada sección, confirmá lo que aplica y agregá lo que quieras.</span>
+  </div>
+
+  <div class="content">
+
+    <!-- ══════════════════════════════════
+         SECCIÓN B · YO SOY
+    ══════════════════════════════════ -->
+    <div class="sec-divider"><span>Sección B</span></div>
+
+    <div class="sec-card">
+      <div class="sec-head">
+        <div class="sec-num">B</div>
+        <div>
+          <div class="sec-title">Yo Soy</div>
+          <div class="sec-subtitle">Adjetivos y manera de ser</div>
+        </div>
+      </div>
+      <div class="sec-body">
+
+        <div class="q-block">
+          <div class="q-label">Contá cómo sos como persona. Podés arrancar con "Yo soy…" y usar adjetivos o frases cortas.</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿Cuáles son los tres adjetivos con los que más te identificás?</li>
+              <li>¿Cómo te describirían las personas que te conocen bien?</li>
+              <li>¿Qué cualidades tuyas aparecen de forma natural, sin esfuerzo?</li>
+              <li>¿Cómo actuás bajo presión o cuando las cosas se complican?</li>
+              <li>¿Hay aspectos de tu personalidad que estás trabajando para mejorar?</li>
+              <li>¿Qué te diferencia de los demás?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea xtall" id="b-q1"
+            placeholder="Soy curioso/a, me gusta conectar con la gente, soy muy detallista..."></textarea>
+        </div>
+
+        <div class="gen-panel">
+          <div class="gen-head">
+            <div>
+              <div class="gen-head-title">✦ Tu texto generado</div>
+              <div class="gen-head-sub">Editá y personalizá con lo que fuiste respondiendo.</div>
+            </div>
+            <button class="gen-btn" onclick="generateSection('b')">Generar ✦</button>
+          </div>
+          <p class="gen-note">El texto toma tus palabras como base. Podés editarlo, ampliarlo o reescribirlo como quieras.</p>
+          <textarea class="gen-textarea" id="gen-b"
+            placeholder="Hacé click en Generar para crear tu texto autobiográfico..."></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SECCIÓN D · CONCEPTOS
+    ══════════════════════════════════ -->
+    <div class="sec-divider"><span>Sección D</span></div>
+
+    <div class="sec-card">
+      <div class="sec-head">
+        <div class="sec-num">D</div>
+        <div>
+          <div class="sec-title">Conceptos</div>
+          <div class="sec-subtitle">Felicidad · Infelicidad · Éxito · Certeza</div>
+        </div>
+      </div>
+      <div class="sec-body">
+
+        <!-- D1: Felicidad -->
+        <div class="q-block">
+          <div class="q-label">Felicidad: ¿Qué cosas te hacen feliz en el día a día, por más pequeñas que sean?</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿Qué actividades hacés que te hacen perder la noción del tiempo?</li>
+              <li>¿Qué tipo de personas o situaciones te generan bienestar genuino?</li>
+              <li>¿Cuándo fue la última vez que te sentiste profundamente contento/a? ¿Qué estabas haciendo?</li>
+              <li>¿Hay cosas simples que otros no notan pero a vos te alegran el día?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea tall" id="d-q1"
+            placeholder="Me hace feliz tomar un buen café por la mañana, hablar con mis amigos, aprender algo nuevo..."></textarea>
+        </div>
+
+        <!-- D2: Infelicidad -->
+        <div class="q-block">
+          <div class="q-label">Infelicidad: ¿Qué cosas te hacen infeliz y quisieras evitar o minimizar?</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿Qué situaciones o ambientes te drenan la energía?</li>
+              <li>¿Hay cosas que tenés que hacer y te generan malestar genuino?</li>
+              <li>¿Qué tipo de relaciones o dinámicas te afectan negativamente?</li>
+              <li>¿Qué es lo que más te frustra o te genera ansiedad?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea tall" id="d-q2"
+            placeholder="Me genera infelicidad la falta de libertad, las rutinas sin propósito, los conflictos sin resolver..."></textarea>
+        </div>
+
+        <!-- D3: Éxito -->
+        <div class="q-block">
+          <div class="q-label">Éxito: ¿Cómo definirías con tus palabras el "éxito profesional"?</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿El éxito para vos es individual o también implica impactar a otros?</li>
+              <li>¿Incluye el dinero, el reconocimiento, la libertad, la trascendencia, o algo más?</li>
+              <li>¿Qué tendrías que lograr para sentirte exitoso/a en 10 años?</li>
+              <li>¿Hay algún modelo de éxito que rechazás? ¿Por qué?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea tall" id="d-q3"
+            placeholder="Para mí el éxito es tener libertad para elegir con qué me dedico, poder..."></textarea>
+        </div>
+
+        <!-- D4: Certeza -->
+        <div class="q-block">
+          <div class="q-label">Certeza: Si supieras con certeza que las próximas cinco cosas que hagas te saldrán exactamente como querés, ¿cuáles serían?</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿Estas cinco cosas reflejan lo que realmente querés o lo que creés que deberías querer?</li>
+              <li>¿Hay alguna que venís postergando por miedo al fracaso?</li>
+              <li>¿Qué te dice esta lista sobre tus prioridades reales?</li>
+              <li>¿Incluiría algo relacionado con tu vocación o trabajo?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea tall" id="d-q4"
+            placeholder="1. Empezar el proyecto que tengo en mente hace meses&#10;2. Tener una conversación importante que vengo postergando..."></textarea>
+        </div>
+
+        <div class="gen-panel">
+          <div class="gen-head">
+            <div>
+              <div class="gen-head-title">✦ Tu texto generado</div>
+              <div class="gen-head-sub">Editá y personalizá con lo que fuiste respondiendo.</div>
+            </div>
+            <button class="gen-btn" onclick="generateSection('d')">Generar ✦</button>
+          </div>
+          <p class="gen-note">El texto toma tus respuestas y construye un retrato de tus valores y motivaciones. Podés editarlo libremente.</p>
+          <textarea class="gen-textarea" id="gen-d"
+            placeholder="Hacé click en Generar para crear tu texto de conceptos..."></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SECCIÓN 2 · AUTOBIOGRAFÍA
+    ══════════════════════════════════ -->
+    <div class="sec-divider"><span>Sección 2</span></div>
+
+    <div class="sec-card">
+      <div class="sec-head">
+        <div class="sec-num">2</div>
+        <div>
+          <div class="sec-title">Autobiografía</div>
+          <div class="sec-subtitle">Tu historia de vida, en tus palabras</div>
+        </div>
+      </div>
+      <div class="sec-body">
+
+        <!-- Yo -->
+        <div class="q-block">
+          <div class="q-label">Yo — ¿Quién soy hoy? ¿Cómo me definiría en pocas palabras?</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿Cuáles son las tres palabras que mejor te definen hoy?</li>
+              <li>¿Qué cambió en vos en los últimos dos o tres años?</li>
+              <li>¿Qué es lo que más valorás de quien sos hoy?</li>
+              <li>¿Hay algo que te cuesta reconocer de vos mismo/a?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea tall" id="auto-yo"
+            placeholder="Hoy soy una persona que está en un proceso de..."></textarea>
+        </div>
+
+        <!-- Retrato -->
+        <div class="q-block">
+          <div class="q-label">Retrato — ¿Cómo soy físicamente y como persona? Pensá en tu carácter, actitudes y manera de estar en el mundo.</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿Cómo te verías si te observaras desde afuera?</li>
+              <li>¿Cómo te ven los demás vs cómo te ves vos?</li>
+              <li>¿Cuáles son tus actitudes más características ante los desafíos?</li>
+              <li>¿Qué es lo que más te cuesta en términos de carácter o personalidad?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea tall" id="auto-retrato"
+            placeholder="Soy una persona de contextura... En mi carácter, destaca que..."></textarea>
+        </div>
+
+        <!-- Orígenes -->
+        <div class="q-block">
+          <div class="q-label">Orígenes — Mi familia, mi casa, mi barrio. ¿Qué cosas de ahí me marcaron?</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿Qué valores o creencias heredaste de tu familia que todavía te acompañan?</li>
+              <li>¿Hay alguna persona de tu familia que te marcó positiva o negativamente?</li>
+              <li>¿Cómo influye el lugar donde creciste en quien sos hoy?</li>
+              <li>¿Qué de ese contexto querés conservar y qué preferirías dejar atrás?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea tall" id="auto-origenes"
+            placeholder="Crecí en un hogar donde se valoraba... Mi familia me enseñó que..."></textarea>
+        </div>
+
+        <!-- Pasado -->
+        <div class="q-block">
+          <div class="q-label">Pasado — Mi infancia, mis juegos, mis amigos y mi escuela. ¿Qué recuerdo de esa etapa?</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿A qué jugabas de chico/a? ¿Qué te gustaba hacer en tu tiempo libre?</li>
+              <li>¿Quién eras antes de preocuparte por lo que pensaban los demás?</li>
+              <li>¿Qué aprendiste en esa etapa que todavía usás hoy?</li>
+              <li>¿Hay algo de esa época que añorás o que quisieras recuperar?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea tall" id="auto-pasado"
+            placeholder="De chico/a me acuerdo mucho de... Pasaba el tiempo..."></textarea>
+        </div>
+
+        <!-- Perfil -->
+        <div class="q-block">
+          <div class="q-label">Perfil — Mis intereses y habilidades. Lo que se me da bien, lo que me gusta hacer, mis hábitos y ambiciones.</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿En qué actividades perdés la noción del tiempo?</li>
+              <li>¿Qué habilidades venís desarrollando sin darte cuenta?</li>
+              <li>¿Qué es lo que otros te piden que les enseñes, expliques o hagas?</li>
+              <li>¿Cuáles son tus ambiciones más genuinas, las que no le contás a cualquiera?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea tall" id="auto-perfil"
+            placeholder="Se me da bien... Me gusta mucho dedicarle tiempo a..."></textarea>
+        </div>
+
+        <!-- Memorias -->
+        <div class="q-block">
+          <div class="q-label">Memorias — Mis mejores recuerdos y los más difíciles. ¿Qué momentos fueron los más lindos? ¿Cuáles los más complicados?</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿Qué momentos recordás con más orgullo o emoción?</li>
+              <li>¿Qué momentos difíciles te forjaron como persona?</li>
+              <li>¿Hay alguna experiencia que cambió tu forma de ver la vida?</li>
+              <li>¿Qué edad tenías cuando te sentiste más vivo/a?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea tall" id="auto-memorias"
+            placeholder="Uno de mis mejores recuerdos es cuando... Un momento difícil que me marcó fue..."></textarea>
+        </div>
+
+        <!-- Presente -->
+        <div class="q-block">
+          <div class="q-label">Presente — ¿Cómo es mi vida hoy? ¿Qué me alegra y qué me preocupa actualmente?</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿Qué aspectos de tu vida actual te satisfacen más?</li>
+              <li>¿Qué te genera más incertidumbre o preocupación hoy?</li>
+              <li>¿Con quién compartís más tu vida? ¿Qué rol tienen esas personas?</li>
+              <li>¿Sentís que tu vida de hoy refleja quién realmente sos?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea tall" id="auto-presente"
+            placeholder="Hoy mi vida está atravesada por... Lo que más me alegra actualmente es..."></textarea>
+        </div>
+
+        <!-- Futuro -->
+        <div class="q-block">
+          <div class="q-label">Futuro — Mis sueños y proyectos. ¿Cómo me imagino en algunos años y qué me gustaría lograr?</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿Cómo te imaginás en 5 o 10 años?</li>
+              <li>¿Qué proyecto o sueño querés comenzar cuanto antes?</li>
+              <li>¿Qué cosas querés que estén — y cuáles querés que NO estén — en tu vida futura?</li>
+              <li>¿Qué legado te gustaría dejar?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea tall" id="auto-futuro"
+            placeholder="Me imagino en unos años... Lo que más quiero lograr es..."></textarea>
+        </div>
+
+        <div class="gen-panel">
+          <div class="gen-head">
+            <div>
+              <div class="gen-head-title">✦ Tu autobiografía generada</div>
+              <div class="gen-head-sub">Editá y personalizá con lo que fuiste respondiendo.</div>
+            </div>
+            <button class="gen-btn" onclick="generateSection('auto')">Generar ✦</button>
+          </div>
+          <p class="gen-note">El texto teje todas tus respuestas en una narración autobiográfica. Editalo hasta que sienta tuyo al 100%.</p>
+          <textarea class="gen-textarea" id="gen-auto" style="min-height: 280px;"
+            placeholder="Hacé click en Generar para crear tu autobiografía..."></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         SECCIÓN 3 · HISTORIA VITAL
+    ══════════════════════════════════ -->
+    <div class="sec-divider"><span>Sección 3</span></div>
+
+    <div class="sec-card">
+      <div class="sec-head">
+        <div class="sec-num">3</div>
+        <div>
+          <div class="sec-title">Historia Vital (HVT)</div>
+          <div class="sec-subtitle">Recuerdos de satisfacción</div>
+        </div>
+      </div>
+      <div class="sec-body">
+
+        <div class="q-block">
+          <div class="q-label">Recuerdo de Satisfacción #1 — Recuperá de tu memoria un hecho que te haya producido mucha satisfacción y gratificación a nivel personal, donde hayas tenido un papel activo (no como espectador).</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿Cuántos años tenías? ¿Qué contexto rodeaba ese momento?</li>
+              <li>¿Cuál fue tu papel específico? ¿Qué hiciste vos concretamente?</li>
+              <li>¿Qué habilidades o cualidades tuyas contribuyeron al resultado?</li>
+              <li>¿Por qué ese momento todavía te genera satisfacción al recordarlo?</li>
+              <li>¿Qué te dice sobre lo que valorás y disfrutás hacer?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea xtall" id="hvt-r1"
+            placeholder="Tenía aproximadamente... años cuando... Yo específicamente me encargué de... Lo que más recuerdo de ese momento es..."></textarea>
+        </div>
+
+        <div class="q-block">
+          <div class="q-label">Recuerdo de Satisfacción #2 — Otro hecho inolvidable que te haya producido gratificación, donde hayas tenido protagonismo.</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿Es un recuerdo de una etapa diferente al primero? ¿Qué diferencias notás entre ambos?</li>
+              <li>¿Qué competencias o talentos se pusieron en juego?</li>
+              <li>¿Cómo te sentiste durante y después de ese momento?</li>
+              <li>¿Qué dice ese recuerdo sobre el tipo de tareas y entornos donde más florecés?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea xtall" id="hvt-r2"
+            placeholder="El otro recuerdo que me viene a la mente es cuando..."></textarea>
+        </div>
+
+        <div class="q-block">
+          <div class="q-label">Reflexión — ¿Qué patrones o talentos encontrás en común entre estos dos recuerdos?</div>
+          <div class="q-hints">
+            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
+            <ul>
+              <li>¿Qué tienen en común ambos momentos en términos de lo que hacías?</li>
+              <li>¿Aparecen las mismas habilidades o valores en los dos?</li>
+              <li>¿Qué tipo de entorno o dinámica los rodea?</li>
+              <li>¿Qué te dicen estos dos recuerdos sobre qué trabajo o actividad podría darte satisfacción genuina?</li>
+            </ul>
+          </div>
+          <textarea class="q-textarea tall" id="hvt-reflexion"
+            placeholder="Lo que noto en común entre ambos recuerdos es que en los dos..."></textarea>
+        </div>
+
+        <div class="gen-panel">
+          <div class="gen-head">
+            <div>
+              <div class="gen-head-title">✦ Tu texto generado</div>
+              <div class="gen-head-sub">Editá y personalizá con lo que fuiste respondiendo.</div>
+            </div>
+            <button class="gen-btn" onclick="generateSection('hvt')">Generar ✦</button>
+          </div>
+          <p class="gen-note">El texto teje tus recuerdos en un relato que destaca tus talentos y lo que te mueve. Editalo hasta que sienta tuyo.</p>
+          <textarea class="gen-textarea" id="gen-hvt"
+            placeholder="Hacé click en Generar para crear tu texto de Historia Vital..."></textarea>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="save-indicator" id="saveIndicator">✓ Guardado automáticamente</div>
+
+  </div><!-- /content -->
+</div><!-- /screen -->
+
+<script>
+// ══════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════
+function ucFirst(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+function trim(s)    { return (s || '').trim(); }
+
+function val(id) { return trim(document.getElementById(id)?.value || ''); }
+function setVal(id, v) { const el = document.getElementById(id); if (el) el.value = v; }
+
+// Extract key phrases from free text
+function extractParts(text) {
+  return text.split(/[,;.\n]|\s+y\s+/i)
+    .map(s => s.trim().toLowerCase().replace(/^(soy|me gusta|tengo|siento|es|me)\s+/i, ''))
+    .filter(s => s.length > 3)
+    .slice(0, 8);
+}
+
+function getNameOrFallback() {
+  const stored = (localStorage.getItem('timon_nombre') || '').trim();
+  return stored.length > 1 ? stored : '';
+}
+
+// ══════════════════════════════════════════════════════════════
+// LOAD DATA FROM PREVIOUS MODULES
+// ══════════════════════════════════════════════════════════════
+function loadFromModules() {
+  let charla = null, term = null, riasec = null;
+  try { charla = JSON.parse(localStorage.getItem('orientacion_data') || 'null'); } catch(e) {}
+  try { term   = JSON.parse(localStorage.getItem('termometro_data')  || 'null'); } catch(e) {}
+  try { riasec = JSON.parse(localStorage.getItem('riasec_data')      || 'null'); } catch(e) {}
+
+  const profIds = ['negocios','sociales','humanidades','salud','juridicas','ecologia','exactas','comunicacion','arte'];
+  const allTalents = [];
+  profIds.forEach(id => {
+    try {
+      const d = JSON.parse(localStorage.getItem('prof_' + id + '_data') || 'null');
+      if (d && Array.isArray(d.talents)) allTalents.push(...d.talents);
+    } catch(e) {}
+  });
+  const uniqueTalents = [...new Set(allTalents)];
+
+  // Find an answer in charla by substring of question text
+  function ans(keyword) {
+    if (!Array.isArray(charla)) return '';
+    const r = charla.find(r => r.question && r.question.toLowerCase().includes(keyword.toLowerCase()));
+    return r ? r.answer : '';
+  }
+
+  // Personality affirmations (OPTS_3: 'Sí, me define' | 'A veces' | 'No me define')
+  const TRAITS = [
+    ['cabeza que el corazón',          'uso más la cabeza que el corazón para tomar decisiones'],
+    ['corazón suele ganarle',          'mi corazón suele guiarme más que la razón'],
+    ['planifico y organizo',           'planifico y organizo con cuidado antes de comenzar'],
+    ['organizar todo hasta en sus',    'me gusta organizar todo hasta en sus mínimos detalles'],
+    ['actúo según el momento',         'actúo según el momento y las circunstancias'],
+    ['aprender a usar algo antes',     'prefiero la práctica antes de entender la teoría'],
+    ['imparcial y objetivo',           'soy imparcial y objetivo/a al resolver problemas'],
+    ['realista a la que no le gustan', 'soy realista y prefiero los hechos concretos'],
+    ['imaginación y las fantasías',    'disfruto de la imaginación y las ideas más que de la rutina'],
+    ['bienestar de todos',             'priorizo el bienestar colectivo al tomar decisiones'],
+    ['asumo el control',               'me gusta asumir el control de las situaciones'],
+    ['seguidor más que un líder',      'prefiero acompañar antes que liderar'],
+    ['hago que sucedan',               'no espero que las cosas pasen — las hago suceder'],
+    ['siempre hice lo que quise',      'siempre hice lo que quise y acepté las consecuencias'],
+    ['tiempo a solas para ordenar',    'necesito tiempo a solas para ordenar mis pensamientos'],
+    ['nervioso/a tener que conocer',   'me cuesta arrancar con personas nuevas'],
+    ['prefiero esperar y ver',         'cuando no puedo actuar, prefiero esperar'],
+  ];
+
+  const definedTraits  = TRAITS.filter(([kw]) => ans(kw) === 'Sí, me define').map(([, l]) => l);
+  const avecesTraits   = TRAITS.filter(([kw]) => ans(kw) === 'A veces').map(([, l]) => l);
+
+  // Top intelligences from termómetro
+  let topIntels = [];
+  if (term) {
+    topIntels = Object.entries(term)
+      .map(([name, v]) => ({ name, avg: v.count > 0 ? v.total / v.count : 0 }))
+      .sort((a, b) => b.avg - a.avg)
+      .slice(0, 3).map(i => i.name);
+  }
+
+  const riasecCode = riasec?.riasecCode || '';
+  const topTypes   = riasec?.topTypes   || [];
+  const topWords   = riasec?.wordsByType ? Object.values(riasec.wordsByType).flat() : [];
+
+  function listAnd(arr) {
+    if (!arr.length) return '';
+    if (arr.length === 1) return arr[0];
+    return arr.slice(0, -1).join(', ') + ' y ' + arr[arr.length - 1];
+  }
+
+  const yoSoy    = ans('yo soy');
+  const talentos = ans('talentos');
+  const prefill  = {};
+
+  // ── B · Yo Soy ──────────────────────────────────────────────
+  {
+    const t = [];
+    if (yoSoy)   t.push('Yo soy ' + yoSoy + '.');
+    if (talentos) t.push('Entre mis talentos me reconozco en: ' + talentos + '.');
+    if (riasecCode && topTypes.length)
+      t.push('Mi perfil Holland (RIASEC ' + riasecCode + ') me identifica con tendencias ' +
+        listAnd(topTypes.map(x => x.name)) + '.');
+    if (topIntels.length)
+      t.push('Mis inteligencias más desarrolladas son ' + listAnd(topIntels) + '.');
+    prefill['b-q1'] = t.join(' ');
+  }
+
+  // ── D · Felicidad ────────────────────────────────────────────
+  {
+    const gustos    = ans('10 cosas que más te gusta');
+    const atraccion = ans('atrae de un trabajo');
+    const t = [];
+    if (gustos)    t.push('Me hace feliz: ' + gustos + '.');
+    if (atraccion) t.push('En el trabajo, lo que más me atrae es: ' + atraccion + '.');
+    prefill['d-q1'] = t.join('\n');
+  }
+
+  // ── D · Infelicidad ──────────────────────────────────────────
+  {
+    const estresa = ans('estresa');
+    const miedo   = ans('me da miedo');
+    const t = [];
+    if (estresa) t.push('Lo que más me estresa actualmente es: ' + estresa + '.');
+    if (miedo)   t.push('A veces me da miedo: ' + miedo + '.');
+    prefill['d-q2'] = t.join('\n');
+  }
+
+  // ── D · Éxito ────────────────────────────────────────────────
+  {
+    const vidaQuiero = ans('en la vida quiero');
+    const porque     = ans('ambiciones que tenés');
+    const t = [];
+    if (vidaQuiero) t.push('En la vida quiero llegar a ser: ' + vidaQuiero + '.');
+    if (porque)     t.push('Tengo estas ambiciones porque: ' + porque + '.');
+    prefill['d-q3'] = t.join('\n');
+  }
+
+  // ── D · Certeza ──────────────────────────────────────────────
+  {
+    const viga    = ans('viga de acero');
+    const loteria = ans('lotería');
+    const t = [];
+    if (viga)    t.push('Lo único por lo que me jugaría todo (la viga de acero): ' + viga + '.');
+    if (loteria) t.push('Si ganara la lotería mañana: ' + loteria + '.');
+    prefill['d-q4'] = t.join('\n');
+  }
+
+  // ── 2 · Yo ───────────────────────────────────────────────────
+  {
+    const t = [];
+    if (yoSoy) t.push('Hoy me defino como: ' + yoSoy + '.');
+    if (riasecCode && topTypes.length)
+      t.push('Según el test de Holland, mi código RIASEC es ' + riasecCode +
+        ' (' + listAnd(topTypes.map(x => x.name)) + '). ' + (topTypes[0]?.desc || ''));
+    prefill['auto-yo'] = t.join(' ');
+  }
+
+  // ── 2 · Retrato ──────────────────────────────────────────────
+  {
+    const t = [];
+    if (definedTraits.length)
+      t.push('Me define que ' + listAnd(definedTraits) + '.');
+    if (avecesTraits.length)
+      t.push('A veces también ' + listAnd(avecesTraits) + '.');
+    if (topWords.length)
+      t.push('Palabras con las que me identifico: ' + topWords.slice(0, 8).join(', ') + '.');
+    prefill['auto-retrato'] = t.join(' ');
+  }
+
+  // ── 2 · Orígenes ─────────────────────────────────────────────
+  {
+    const padres = ans('padres quisieran');
+    prefill['auto-origenes'] = padres
+      ? 'Mis padres quisieran que yo ' + padres +
+        '. Ese contexto familiar me ayuda a entender los valores y expectativas con los que crecí.'
+      : '';
+  }
+
+  // ── 2 · Pasado ───────────────────────────────────────────────
+  {
+    const infancia = ans('versión de la infancia');
+    prefill['auto-pasado'] = infancia
+      ? 'Si le preguntaran a mi versión de la infancia qué trabajo le gustaría hacer, respondería: ' + infancia + '.'
+      : '';
+  }
+
+  // ── 2 · Perfil ───────────────────────────────────────────────
+  {
+    const t = [];
+    if (talentos)
+      t.push('Mis talentos: ' + talentos + '.');
+    if (topIntels.length)
+      t.push('Según el test de inteligencias múltiples, mis áreas más fuertes son ' + listAnd(topIntels) + '.');
+    if (uniqueTalents.length)
+      t.push('En mis conversaciones con profesionales de distintas industrias, reconocí talentos como: ' +
+        listAnd(uniqueTalents.slice(0, 8)) + '.');
+    prefill['auto-perfil'] = t.join(' ');
+  }
+
+  // ── 2 · Memorias ─────────────────────────────────────────────
+  {
+    const inspirado = ans('inspirado');
+    prefill['auto-memorias'] = inspirado
+      ? 'Un momento en el que me sentí profundamente inspirado/a: ' + inspirado + '.'
+      : '';
+  }
+
+  // ── 2 · Presente ─────────────────────────────────────────────
+  {
+    const presente = ans('estás donde querías');
+    prefill['auto-presente'] = presente
+      ? 'Cuando me pregunto si estoy donde quería estar, mi respuesta es: ' + presente + '.'
+      : '';
+  }
+
+  // ── 2 · Futuro ───────────────────────────────────────────────
+  {
+    const diez   = ans('diez años');
+    const escena = ans('escena');
+    const legado = ans('legado');
+    const t = [];
+    if (diez)   t.push('Dentro de diez años: ' + diez + '.');
+    if (escena) t.push('La escena de mi futuro que imagino: ' + escena + '.');
+    if (legado) t.push('El legado que me gustaría dejar: ' + legado + '.');
+    prefill['auto-futuro'] = t.join('\n');
+  }
+
+  // ── 3 · HVT Recuerdo 1 ───────────────────────────────────────
+  {
+    const inspirado = ans('inspirado');
+    prefill['hvt-r1'] = inspirado
+      ? 'Hubo un momento en el que me sentí profundamente en mi elemento: ' + inspirado + '.'
+      : '';
+  }
+
+  // ── 3 · HVT Recuerdo 2 ───────────────────────────────────────
+  {
+    const anioMas     = ans('un año más de vida');
+    const buenaMuerte = ans('buena muerte');
+    const t = [];
+    if (anioMas)      t.push('Si me quedara un año de vida, lo usaría para: ' + anioMas + '.');
+    if (buenaMuerte)  t.push('Para mí, una buena muerte sería: ' + buenaMuerte + '.');
+    prefill['hvt-r2'] = t.join('\n');
+  }
+
+  // ── 3 · HVT Reflexión ────────────────────────────────────────
+  {
+    const t = [];
+    if (riasecCode && topTypes.length)
+      t.push('Mi código RIASEC es ' + riasecCode +
+        ' (' + listAnd(topTypes.map(x => x.name)) + '): ' + (topTypes[0]?.desc || '') + '.');
+    if (topIntels.length)
+      t.push('Mis inteligencias más desarrolladas son ' + listAnd(topIntels) +
+        ', lo que me da pistas sobre qué tipo de actividades me generan satisfacción genuina.');
+    if (uniqueTalents.length)
+      t.push('Los talentos que más reconocí en distintas industrias son: ' +
+        listAnd(uniqueTalents.slice(0, 6)) +
+        '. Eso me dice algo sobre qué trabajo me podría hacer sentir vivo/a.');
+    prefill['hvt-reflexion'] = t.join(' ');
+  }
+
+  return prefill;
+}
+
+// ══════════════════════════════════════════════════════════════
+// TEXT GENERATORS
+// ══════════════════════════════════════════════════════════════
+
+function generateB() {
+  const name   = getNameOrFallback();
+  const text   = val('b-q1');
+  if (!text) return '(Completá las preguntas primero para generar el texto.)';
+
+  const parts  = extractParts(text);
+  const p = (i) => parts[i] ? ucFirst(parts[i]) : null;
+
+  let t = '';
+  const intro = name ? `Yo, ${name}, soy` : 'Soy';
+  t += `${intro} ${p(0) || 'una persona con características únicas y propias'}. `;
+  if (p(1)) t += `${p(1)}. `;
+  if (p(2)) t += `También me identifico como alguien que es ${p(2)}. `;
+  t += `Estas son algunas de las palabras con las que me describiría, y que quienes me conocen también reconocen en mí. `;
+  if (p(3)) t += `Otro rasgo que me define es que ${p(3)}. `;
+  if (p(4)) t += `${p(4)}. `;
+  t += `Mi forma de ser impacta directamente en el tipo de entornos donde me siento más cómodo/a, en las personas con las que me vinculo y en las actividades que me generan satisfacción genuina. `;
+  t += `A lo largo de mi vida, estos rasgos aparecieron en mis elecciones, en mis relaciones y en los momentos en que me sentí más yo mismo/a. `;
+  if (p(5)) t += `Además, ${p(5)}. `;
+  t += `Entender quién soy es el primer paso para elegir un camino profesional que esté alineado con mis valores, mi energía y mi manera de estar en el mundo. `;
+  t += `Sigo construyendo mi identidad, y cada respuesta que doy me acerca un poco más a esa claridad.`;
+  return t;
+}
+
+function generateD() {
+  const name      = getNameOrFallback();
+  const felicidad = val('d-q1');
+  const infeliz   = val('d-q2');
+  const exito     = val('d-q3');
+  const certeza   = val('d-q4');
+  if (!felicidad && !exito) return '(Completá al menos algunas preguntas para generar el texto.)';
+
+  let t = '';
+  t += `En mi vida cotidiana, hay cosas simples que me generan bienestar genuino. `;
+  if (felicidad) t += `${ucFirst(felicidad.replace(/\n/g, ' '))}. `;
+  t += `Estas son las fuentes de energía que me indican qué entornos y actividades me hacen bien. `;
+
+  if (infeliz) {
+    t += `Por otro lado, también tengo claridad sobre lo que me drena o me aleja de mi bienestar: ${infeliz.toLowerCase().replace(/\n/g, ' ')}. `;
+    t += `Reconocer esto me ayuda a tomar decisiones que protejan mi energía y mi motivación. `;
+  }
+
+  if (exito) {
+    t += `Cuando pienso en el éxito, lo defino como: ${exito.toLowerCase().replace(/\n/g, ' ')}. `;
+    t += `Esta definición es personal y propia — no la que otros esperan de mí, sino la que realmente me moviliza. `;
+  }
+
+  if (certeza) {
+    const lineas = certeza.split('\n').filter(l => l.trim().length > 2);
+    if (lineas.length > 0) {
+      t += `Si supiera con certeza que todo me va a salir bien, me dedicaría a: ${lineas.slice(0, 3).map(l => l.replace(/^\d+\.\s*/, '').toLowerCase()).join(', ')}. `;
+      t += `Esto me dice que, en el fondo, ya sé lo que quiero. Lo que muchas veces me frena no es la falta de claridad, sino el miedo a que no salga como espero. `;
+    }
+  }
+
+  t += `Estos conceptos — lo que me hace feliz, lo que me aleja de mi bienestar y mi propia definición de éxito — son una brújula para orientar mis decisiones vocacionales y de vida.`;
+  return t;
+}
+
+function generateAuto() {
+  const name      = getNameOrFallback();
+  const yo        = val('auto-yo');
+  const retrato   = val('auto-retrato');
+  const origenes  = val('auto-origenes');
+  const pasado    = val('auto-pasado');
+  const perfil    = val('auto-perfil');
+  const memorias  = val('auto-memorias');
+  const presente  = val('auto-presente');
+  const futuro    = val('auto-futuro');
+
+  const filled = [yo, retrato, origenes, pasado, perfil, memorias, presente, futuro].filter(t => t.length > 3);
+  if (filled.length < 2) return '(Completá al menos dos preguntas para generar tu autobiografía.)';
+
+  let t = '';
+
+  if (yo) {
+    const intro = name ? `Hoy, yo, ${name}, me defino como:` : 'Hoy me defino como:';
+    t += `${intro} ${yo.replace(/\n/g, ' ')}. `;
+  } else {
+    t += name ? `Mi nombre es ${name} y esta es mi historia. ` : 'Esta es mi historia. ';
+  }
+
+  if (retrato) t += `En cuanto a cómo soy como persona, ${retrato.replace(/\n/g, ' ')}. `;
+
+  if (origenes) {
+    t += `Mis orígenes son parte fundamental de quién soy hoy. ${ucFirst(origenes.replace(/\n/g, ' '))}. `;
+    t += `Ese contexto me dio herramientas y valores que todavía llevo conmigo. `;
+  }
+
+  if (pasado) {
+    t += `Si pienso en mi infancia y adolescencia, recuerdo que ${pasado.replace(/\n/g, ' ')}. `;
+    t += `Esos años me forjaron de formas que a veces no reconocí hasta mucho después. `;
+  }
+
+  if (perfil) {
+    t += `A lo largo de mi vida fui desarrollando un perfil particular: ${perfil.replace(/\n/g, ' ')}. `;
+    t += `Son intereses y habilidades que aparecen de forma natural y que me dan pistas sobre qué caminos me generan satisfacción genuina. `;
+  }
+
+  if (memorias) {
+    t += `Entre mis memorias más importantes, ${memorias.replace(/\n/g, ' ')}. `;
+    t += `Esos momentos — los buenos y los difíciles — me ayudaron a entender qué valoro y qué quiero para mi vida. `;
+  }
+
+  if (presente) {
+    t += `Hoy, ${presente.replace(/\n/g, ' ')}. `;
+  }
+
+  if (futuro) {
+    t += `Hacia adelante, ${futuro.replace(/\n/g, ' ')}. `;
+    t += `Esta historia que escribo hoy es el punto de partida de lo que viene.`;
+  } else {
+    t += `Esta autobiografía es un snapshot de quién soy en este momento, y también el punto de partida para construir lo que viene.`;
+  }
+
+  return t;
+}
+
+function generateHVT() {
+  const name      = getNameOrFallback();
+  const r1        = val('hvt-r1');
+  const r2        = val('hvt-r2');
+  const reflexion = val('hvt-reflexion');
+
+  if (!r1 && !r2) return '(Completá al menos un recuerdo para generar el texto.)';
+
+  let t = '';
+  t += `A lo largo de mi vida hubo momentos que me marcaron profundamente — situaciones donde me sentí verdaderamente activo/a, capaz y satisfecho/a con lo que hacía. `;
+
+  if (r1) {
+    t += `Uno de esos momentos fue cuando ${r1.replace(/\n/g, ' ')}. `;
+    t += `Lo que más recuerdo de ese episodio no es solo el resultado, sino la sensación de estar completamente involucrado/a en algo que valía la pena. `;
+  }
+
+  if (r2) {
+    t += `Otro recuerdo que me genera mucha gratificación es cuando ${r2.replace(/\n/g, ' ')}. `;
+    t += `En ese momento también puse en juego algo genuinamente mío — capacidades que se activaron de forma natural. `;
+  }
+
+  if (reflexion) {
+    t += `Al analizar ambos recuerdos, noto que ${reflexion.replace(/\n/g, ' ')}. `;
+  } else {
+    t += `Al analizar estos recuerdos, puedo ver patrones que se repiten: ciertas habilidades, ciertos tipos de desafíos y ciertos contextos que me generan satisfacción genuina. `;
+  }
+
+  t += `Estos momentos de gratificación son más que anécdotas: son evidencia de quién soy cuando estoy en mi mejor versión. `;
+  t += `Son una brújula para entender qué tipo de trabajo, proyectos y entornos me van a hacer sentir vivo/a y con propósito. `;
+  t += `El desafío es encontrar un camino donde esos momentos sean la regla y no la excepción.`;
+
+  return t;
+}
+
+// ══════════════════════════════════════════════════════════════
+// GENERATE DISPATCHER
+// ══════════════════════════════════════════════════════════════
+function generateSection(id) {
+  let text = '';
+  if (id === 'b')    text = generateB();
+  if (id === 'd')    text = generateD();
+  if (id === 'auto') text = generateAuto();
+  if (id === 'hvt')  text = generateHVT();
+
+  const el = document.getElementById('gen-' + id);
+  if (el) {
+    el.value = text;
+    el.style.height = 'auto';
+    el.style.height = Math.min(el.scrollHeight + 8, 600) + 'px';
+    saveAll();
+    updateProgress();
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+// SAVE / LOAD
+// ══════════════════════════════════════════════════════════════
+const FIELDS = [
+  'b-q1','gen-b',
+  'd-q1','d-q2','d-q3','d-q4','gen-d',
+  'auto-yo','auto-retrato','auto-origenes','auto-pasado',
+  'auto-perfil','auto-memorias','auto-presente','auto-futuro','gen-auto',
+  'hvt-r1','hvt-r2','hvt-reflexion','gen-hvt',
+];
+
+function saveAll() {
+  const data = {};
+  FIELDS.forEach(id => { data[id] = val(id); });
+  localStorage.setItem('autobiografia', JSON.stringify(data));
+
+  // Show indicator
+  const ind = document.getElementById('saveIndicator');
+  if (ind) { ind.classList.add('visible'); clearTimeout(ind._t); ind._t = setTimeout(() => ind.classList.remove('visible'), 2000); }
+}
+
+function loadAll() {
+  try {
+    const raw  = localStorage.getItem('autobiografia');
+    const data = raw ? JSON.parse(raw) : {};
+
+    // Load prefill from previous modules for fields not yet saved
+    const prefill = loadFromModules();
+
+    let usedPrefill = false;
+    FIELDS.forEach(id => {
+      if (data[id]) {
+        setVal(id, data[id]);
+      } else if (prefill[id]) {
+        setVal(id, prefill[id]);
+        usedPrefill = true;
+      }
+    });
+
+    // Show banner if any module data was used
+    if (usedPrefill || Object.values(prefill).some(v => v && v.length > 0)) {
+      document.getElementById('prefillBanner')?.classList.add('visible');
+    }
+
+    // Auto-resize all textareas that got content
+    document.querySelectorAll('textarea').forEach(el => {
+      if (el.value) { el.style.height = 'auto'; el.style.height = Math.max(el.scrollHeight, 96) + 'px'; }
+    });
+  } catch(e) {}
+}
+
+// ══════════════════════════════════════════════════════════════
+// PROGRESS
+// ══════════════════════════════════════════════════════════════
+function updateProgress() {
+  const sections = ['gen-b','gen-d','gen-auto','gen-hvt'];
+  const done = sections.filter(id => val(id).length > 20).length;
+  document.getElementById('topProgress').textContent = done + ' / 4';
+  document.getElementById('progFill').style.width = (done / 4 * 100) + '%';
+  localStorage.setItem('autobiografia_progress', done);
+}
+
+// ══════════════════════════════════════════════════════════════
+// AUTO-RESIZE TEXTAREAS
+// ══════════════════════════════════════════════════════════════
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.max(el.scrollHeight, 96) + 'px';
+}
+
+// ══════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════
+loadAll();
+updateProgress();
+
+// Attach events to all textareas
+let saveTimer;
+document.querySelectorAll('textarea, input').forEach(el => {
+  el.addEventListener('input', () => {
+    autoResize(el);
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => { saveAll(); updateProgress(); }, 800);
+  });
+  if (el.tagName === 'TEXTAREA') autoResize(el);
+});
+</script>
+</body>
+</html>

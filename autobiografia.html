@@ -195,23 +195,33 @@
       }
       .web-nav {
         display: flex; align-items: center; justify-content: space-between;
-        width: 100%; max-width: 600px; padding: 0 4px; margin-bottom: 16px;
+        width: 100%; max-width: 880px; padding: 0 4px; margin-bottom: 16px;
       }
       .web-nav-brand { font-size: 15px; font-weight: 700; color: rgba(249,248,246,0.9); letter-spacing: -0.04em; }
       .web-nav-tag   { font-size: 11px; font-weight: 500; color: rgba(249,248,246,0.45); text-transform: uppercase; letter-spacing: 1.2px; }
 
       .screen {
-        max-width: 600px; min-height: auto;
+        max-width: 880px; min-height: auto;
         border-radius: 24px;
         box-shadow: 0 12px 56px rgba(0,0,0,0.16), 0 0 0 1px rgba(0,0,0,0.05);
         overflow: hidden;
       }
-      .content { padding: 28px 28px 60px; }
+      .content { padding: 32px 36px 64px; }
+      .top-bar { padding: 16px 28px 14px; }
     }
 
     @media (min-width: 1024px) {
-      .screen { max-width: 680px; }
-      .content { padding: 32px 36px 64px; }
+      html, body { padding: 64px 24px 80px; }
+      .web-nav { max-width: 1000px; }
+      .screen   { max-width: 1000px; }
+      .top-bar  { padding: 18px 36px 16px; }
+      .content  { padding: 40px 52px 72px; }
+      .sec-head { padding: 22px 28px 18px; }
+      .sec-num  { width: 40px; height: 40px; font-size: 14px; border-radius: 12px; }
+      .sec-title { font-size: 16px; }
+      .sec-body { padding: 24px 28px 32px; gap: 28px; }
+      .q-label  { font-size: 14.5px; }
+      .gen-textarea { min-height: 240px; font-size: 14.5px; }
     }
   </style>
 </head>
@@ -270,19 +280,6 @@
             placeholder="Soy curioso/a, me gusta conectar con la gente, soy muy detallista..."></textarea>
         </div>
 
-        <div class="gen-panel">
-          <div class="gen-head">
-            <div>
-              <div class="gen-head-title">✦ Tu texto generado</div>
-              <div class="gen-head-sub">Editá y personalizá con lo que fuiste respondiendo.</div>
-            </div>
-            <button class="gen-btn" onclick="generateSection('b')">Generar ✦</button>
-          </div>
-          <p class="gen-note">El texto toma tus palabras como base. Podés editarlo, ampliarlo o reescribirlo como quieras.</p>
-          <textarea class="gen-textarea" id="gen-b"
-            placeholder="Hacé click en Generar para crear tu texto autobiográfico..."></textarea>
-        </div>
-
       </div>
     </div>
 
@@ -307,7 +304,6 @@
           <div class="q-hints">
             <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
             <ul>
-              <li>¿Qué actividades hacés que te hacen perder la noción del tiempo?</li>
               <li>¿Qué tipo de personas o situaciones te generan bienestar genuino?</li>
               <li>¿Cuándo fue la última vez que te sentiste profundamente contento/a? ¿Qué estabas haciendo?</li>
               <li>¿Hay cosas simples que otros no notan pero a vos te alegran el día?</li>
@@ -341,7 +337,6 @@
             <ul>
               <li>¿El éxito para vos es individual o también implica impactar a otros?</li>
               <li>¿Incluye el dinero, el reconocimiento, la libertad, la trascendencia, o algo más?</li>
-              <li>¿Qué tendrías que lograr para sentirte exitoso/a en 10 años?</li>
               <li>¿Hay algún modelo de éxito que rechazás? ¿Por qué?</li>
             </ul>
           </div>
@@ -365,19 +360,6 @@
             placeholder="1. Empezar el proyecto que tengo en mente hace meses&#10;2. Tener una conversación importante que vengo postergando..."></textarea>
         </div>
 
-        <div class="gen-panel">
-          <div class="gen-head">
-            <div>
-              <div class="gen-head-title">✦ Tu texto generado</div>
-              <div class="gen-head-sub">Editá y personalizá con lo que fuiste respondiendo.</div>
-            </div>
-            <button class="gen-btn" onclick="generateSection('d')">Generar ✦</button>
-          </div>
-          <p class="gen-note">El texto toma tus respuestas y construye un retrato de tus valores y motivaciones. Podés editarlo libremente.</p>
-          <textarea class="gen-textarea" id="gen-d"
-            placeholder="Hacé click en Generar para crear tu texto de conceptos..."></textarea>
-        </div>
-
       </div>
     </div>
 
@@ -395,38 +377,6 @@
         </div>
       </div>
       <div class="sec-body">
-
-        <!-- Yo -->
-        <div class="q-block">
-          <div class="q-label">Yo — ¿Quién soy hoy? ¿Cómo me definiría en pocas palabras?</div>
-          <div class="q-hints">
-            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
-            <ul>
-              <li>¿Cuáles son las tres palabras que mejor te definen hoy?</li>
-              <li>¿Qué cambió en vos en los últimos dos o tres años?</li>
-              <li>¿Qué es lo que más valorás de quien sos hoy?</li>
-              <li>¿Hay algo que te cuesta reconocer de vos mismo/a?</li>
-            </ul>
-          </div>
-          <textarea class="q-textarea tall" id="auto-yo"
-            placeholder="Hoy soy una persona que está en un proceso de..."></textarea>
-        </div>
-
-        <!-- Retrato -->
-        <div class="q-block">
-          <div class="q-label">Retrato — ¿Cómo soy físicamente y como persona? Pensá en tu carácter, actitudes y manera de estar en el mundo.</div>
-          <div class="q-hints">
-            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
-            <ul>
-              <li>¿Cómo te verías si te observaras desde afuera?</li>
-              <li>¿Cómo te ven los demás vs cómo te ves vos?</li>
-              <li>¿Cuáles son tus actitudes más características ante los desafíos?</li>
-              <li>¿Qué es lo que más te cuesta en términos de carácter o personalidad?</li>
-            </ul>
-          </div>
-          <textarea class="q-textarea tall" id="auto-retrato"
-            placeholder="Soy una persona de contextura... En mi carácter, destaca que..."></textarea>
-        </div>
 
         <!-- Orígenes -->
         <div class="q-block">
@@ -468,28 +418,11 @@
             <ul>
               <li>¿En qué actividades perdés la noción del tiempo?</li>
               <li>¿Qué habilidades venís desarrollando sin darte cuenta?</li>
-              <li>¿Qué es lo que otros te piden que les enseñes, expliques o hagas?</li>
               <li>¿Cuáles son tus ambiciones más genuinas, las que no le contás a cualquiera?</li>
             </ul>
           </div>
           <textarea class="q-textarea tall" id="auto-perfil"
             placeholder="Se me da bien... Me gusta mucho dedicarle tiempo a..."></textarea>
-        </div>
-
-        <!-- Memorias -->
-        <div class="q-block">
-          <div class="q-label">Memorias — Mis mejores recuerdos y los más difíciles. ¿Qué momentos fueron los más lindos? ¿Cuáles los más complicados?</div>
-          <div class="q-hints">
-            <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
-            <ul>
-              <li>¿Qué momentos recordás con más orgullo o emoción?</li>
-              <li>¿Qué momentos difíciles te forjaron como persona?</li>
-              <li>¿Hay alguna experiencia que cambió tu forma de ver la vida?</li>
-              <li>¿Qué edad tenías cuando te sentiste más vivo/a?</li>
-            </ul>
-          </div>
-          <textarea class="q-textarea tall" id="auto-memorias"
-            placeholder="Uno de mis mejores recuerdos es cuando... Un momento difícil que me marcó fue..."></textarea>
         </div>
 
         <!-- Presente -->
@@ -514,7 +447,6 @@
           <div class="q-hints">
             <div class="q-hints-title">Para desarrollar mejor tu respuesta</div>
             <ul>
-              <li>¿Cómo te imaginás en 5 o 10 años?</li>
               <li>¿Qué proyecto o sueño querés comenzar cuanto antes?</li>
               <li>¿Qué cosas querés que estén — y cuáles querés que NO estén — en tu vida futura?</li>
               <li>¿Qué legado te gustaría dejar?</li>
@@ -522,19 +454,6 @@
           </div>
           <textarea class="q-textarea tall" id="auto-futuro"
             placeholder="Me imagino en unos años... Lo que más quiero lograr es..."></textarea>
-        </div>
-
-        <div class="gen-panel">
-          <div class="gen-head">
-            <div>
-              <div class="gen-head-title">✦ Tu autobiografía generada</div>
-              <div class="gen-head-sub">Editá y personalizá con lo que fuiste respondiendo.</div>
-            </div>
-            <button class="gen-btn" onclick="generateSection('auto')">Generar ✦</button>
-          </div>
-          <p class="gen-note">El texto teje todas tus respuestas en una narración autobiográfica. Editalo hasta que sienta tuyo al 100%.</p>
-          <textarea class="gen-textarea" id="gen-auto" style="min-height: 280px;"
-            placeholder="Hacé click en Generar para crear tu autobiografía..."></textarea>
         </div>
 
       </div>
@@ -599,19 +518,6 @@
           </div>
           <textarea class="q-textarea tall" id="hvt-reflexion"
             placeholder="Lo que noto en común entre ambos recuerdos es que en los dos..."></textarea>
-        </div>
-
-        <div class="gen-panel">
-          <div class="gen-head">
-            <div>
-              <div class="gen-head-title">✦ Tu texto generado</div>
-              <div class="gen-head-sub">Editá y personalizá con lo que fuiste respondiendo.</div>
-            </div>
-            <button class="gen-btn" onclick="generateSection('hvt')">Generar ✦</button>
-          </div>
-          <p class="gen-note">El texto teje tus recuerdos en un relato que destaca tus talentos y lo que te mueve. Editalo hasta que sienta tuyo.</p>
-          <textarea class="gen-textarea" id="gen-hvt"
-            placeholder="Hacé click en Generar para crear tu texto de Historia Vital..."></textarea>
         </div>
 
       </div>

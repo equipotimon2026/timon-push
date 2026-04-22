@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Orientación Vocacional</title>
+  <title>Chatiemos · Timón</title>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -244,7 +244,7 @@
     <div class="chat-header">
       <div class="bot-avatar">✦</div>
       <div class="header-info">
-        <h1>Orientación Vocacional</h1>
+        <h1>Chatiemos</h1>
         <p><span class="online-dot"></span>En línea</p>
       </div>
       <a href="dashboard.html" class="header-back">← Dashboard</a>
@@ -262,251 +262,266 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// ACKNOWLEDGMENTS — aparecen solo 1 de cada 4 respuestas
+// ACKNOWLEDGMENTS
 // ═══════════════════════════════════════════════════════════
 const ACK_POOL = [
   'Interesante.', 'Bien pensado.', 'Qué buena respuesta.', 'Me gusta eso.',
   'Tiene sentido.', 'Qué bueno.', 'Me lo imagino.', 'Muy interesante eso.',
   'Gracias por la sinceridad.', 'Eso dice mucho.', 'Qué bueno saberlo.',
-  'Tiene mucho sentido.', 'Bueno saberlo.',
 ];
 
 function rnd(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
 function pickAck() { return rnd(ACK_POOL); }
 
 // ═══════════════════════════════════════════════════════════
+// PARTE (1, 2 o 3 vía ?parte=N)
+// ═══════════════════════════════════════════════════════════
+const parteParam = new URLSearchParams(window.location.search).get('parte');
+const parte = Math.min(3, Math.max(1, parseInt(parteParam) || 1));
+
+// ═══════════════════════════════════════════════════════════
 // FLUJO DE CONVERSACIÓN
 // ═══════════════════════════════════════════════════════════
-const OPTS_3 = ['Sí, me define', 'A veces', 'No me define'];
+const OPTS_3 = ['Me siento identificado/a', 'A veces', 'No me identifica'];
 
 const flow = [
 
   // ── INTRO ────────────────────────────────────────────────
-  { text: '¡Hola! ¿Cómo estás? 👋', inputType: 'none', delay: 900 },
-  { text: 'Me alegra que estés por acá.', inputType: 'none', delay: 1000 },
-  { text: '¿Arrancamos?', inputType: 'options',
-    options: ['¡Dale, empecemos!', 'Listo/a'],
-    isIcebreaker: true, ackText: 'Buenísimo. Vamos.',
-    delay: 900 },
+  { text: '¡Hola de nuevo! Acá te voy a ir haciendo una serie de preguntas. Respondé con lo primero que se te venga — sin pensarlo demasiado.', inputType: 'none', delay: 1200 },
+  { text: '¿Arrancamos?', inputType: 'options', options: ['¡Dale!', 'Listo/a'], isIcebreaker: true, ackText: 'Perfecto. Vamos.', delay: 1000 },
 
-  // ── SECCIÓN 1 · PARA EMPEZAR ────────────────────────────
-  // Preguntas fáciles y positivas para romper el hielo real.
-  // El usuario habla de lo que le gusta antes de que le pregunten quién es.
-  { isDivider: true, label: 'Sección 1 · Para empezar', sectionNum: 1, inputType: 'none', delay: 300 },
-  { text: 'Empezamos con algo simple. Sin presión.', inputType: 'none', delay: 900 },
+  // ── BLOQUE 1 · Q1–Q5 ─────────────────────────────────────
+  { text: 'Soy una persona tranquila y colaboradora.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Siempre he hecho lo que he querido y he aceptado las consecuencias.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Me gusta ser la persona que asume el control de las cosas.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Tengo una manera habitual de hacer las cosas, con lo que evito equivocarme.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Preferiría ser un seguidor más que un líder.', inputType: 'options', options: OPTS_3, delay: 800 },
 
-  { text: 'Hacé una lista de las 10 cosas que más te gusta hacer. Pueden ser actividades, sensaciones, cualquier cosa.',
-    inputType: 'text', placeholder: 'Enumeralas como quieras...', delay: 1200 },
-  { text: 'Lo que más me atrae de un trabajo es...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
-  { text: 'Si pudieras pasar un día entero en una gran biblioteca estudiando lo que quisieras, ¿qué elegirías?',
-    inputType: 'text', placeholder: 'Cualquier tema...', delay: 1300 },
-  { text: '¿Qué es lo que más te estresa actualmente?',
-    inputType: 'text', placeholder: 'Sin filtros...', delay: 1100 },
-  { text: 'Para trabajar es importante...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  // Proyectiva 1
+  { text: 'Siempre me gustó…', inputType: 'text', placeholder: 'Completá la frase...', delay: 900 },
 
-  // Icebreaker 1
-  { text: '¿Perro o gato?',
-    inputType: 'options', options: ['Perro 🐶', 'Gato 🐱', 'Ninguno de los dos'],
-    isIcebreaker: true, ackText: 'Fundamental saberlo.',
-    delay: 900 },
+  // Q6–Q9
+  { text: 'Con frecuencia me siento tenso en situaciones sociales.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'A veces siento que algunas figuras de autoridad abusan del poder que tienen.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Algunas veces he tenido que ser bastante brusco con la gente.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'No me importaría tener pocos amigos.', inputType: 'options', options: OPTS_3, delay: 800 },
 
-  { text: 'Para mí, lo ideal sería trabajar con ideas creativas.',
-    inputType: 'options', options: OPTS_3, delay: 1200 },
-  { text: 'Me gusta conocer gente nueva y saber cosas sobre sus vidas.',
-    inputType: 'options', options: OPTS_3, delay: 1200 },
-  { text: 'Me gusta ser popular y participar en muchas actividades sociales.',
-    inputType: 'options', options: OPTS_3, delay: 1200 },
-  { text: 'Si yo fuera rico/a podría...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  // Proyectiva 2
+  { text: 'En mi casa…', inputType: 'text', placeholder: 'Completá la frase...', delay: 900 },
 
-  // ── SECCIÓN 2 · TU MANERA DE SER ────────────────────────
-  // Con el contexto de lo que les gusta, ahora tiene sentido explorar estilo y personalidad.
-  { isDivider: true, label: 'Sección 2 · Tu manera de ser', sectionNum: 2, inputType: 'none', delay: 300 },
-  { text: 'Te voy a mostrar una serie de afirmaciones. Elegí la que mejor te represente. Sin pensarlo demasiado.', inputType: 'none', delay: 1100 },
+  // Q10–Q13
+  { text: 'Soy tímido e inhibido en situaciones sociales.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Aunque esté en desacuerdo, por lo general dejo que la gente haga lo que quiera.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Puedo hacer comentarios desagradables si considero que las personas se los merecen.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Me gusta cumplir con lo establecido y hacer lo que se espera de mí.', inputType: 'options', options: OPTS_3, delay: 800 },
 
-  { text: 'Uso más la cabeza que el corazón para tomar decisiones.',
-    inputType: 'options', options: OPTS_3, delay: 1200 },
-  { text: 'Mi corazón suele ganarle la pulseada a mi cabeza.',
-    inputType: 'options', options: OPTS_3, delay: 1200 },
-  { text: 'Planifico y organizo con cuidado antes de empezar cualquier tarea.',
-    inputType: 'options', options: OPTS_3, delay: 1200 },
-  { text: 'Me gusta organizar todo hasta en sus mínimos detalles.',
-    inputType: 'options', options: OPTS_3, delay: 1200 },
-  { text: 'Actúo según el momento, dependiendo de las circunstancias.',
-    inputType: 'options', options: OPTS_3, delay: 1200 },
-  { text: 'Prefiero aprender a usar algo antes que entender cómo funciona por dentro.',
-    inputType: 'options', options: OPTS_3, delay: 1200 },
-  { text: 'Soy imparcial y objetivo/a al momento de resolver un problema.',
-    inputType: 'options', options: OPTS_3, delay: 1200 },
-  { text: 'Soy una persona realista a la que no le gustan demasiado las especulaciones.',
-    inputType: 'options', options: OPTS_3, delay: 1300 },
-  { text: 'Disfruto más de la imaginación y las fantasías que de la rutina cotidiana.',
-    inputType: 'options', options: OPTS_3, delay: 1300 },
-  { text: 'Al tomar decisiones, lo más importante para mí es el bienestar de todos los involucrados.',
-    inputType: 'options', options: OPTS_3, delay: 1300 },
+  // Visión 1
+  { text: 'Imaginá que pasaron 10 años y sentís que estás bien con tu vida. ¿Cómo es un día de esa vida?', inputType: 'text', placeholder: 'Describí ese día con detalle...', delay: 1100 },
 
-  // Icebreaker 2
-  { text: 'Antes de continuar, algo urgente: ¿helado de menta granizada, sí o no?',
-    inputType: 'options', options: ['Sí, el mejor 🍦', 'No, horrible'],
-    isIcebreaker: true, ackText: 'Dato guardado. Muy importante.',
-    delay: 950 },
+  // Q14–Q17
+  { text: 'Siempre trato de hacer lo que es correcto.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Dependo poco de la amistad de los demás.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Cuando hay un límite claro, trato de respetarlo.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Me gusta organizar todas las cosas hasta en sus mínimos detalles.', inputType: 'options', options: OPTS_3, delay: 800 },
 
-  // Con la base de estilo establecida, ahora tienen sentido las preguntas de control y consecuencias.
-  { text: 'Me gusta ser la persona que asume el control de las cosas.',
-    inputType: 'options', options: OPTS_3, delay: 1200 },
-  { text: 'Preferiría ser un seguidor más que un líder.',
-    inputType: 'options', options: OPTS_3, delay: 1200 },
-  { text: 'No espero que las cosas pasen — hago que sucedan como yo quiero.',
-    inputType: 'options', options: OPTS_3, delay: 1300 },
-  { text: 'Siempre hice lo que quise y acepté las consecuencias.',
-    inputType: 'options', options: OPTS_3, delay: 1200 },
-  { text: 'Necesito bastante tiempo a solas para ordenar mis pensamientos.',
-    inputType: 'options', options: OPTS_3, delay: 1200 },
-  { text: 'Me pone bastante nervioso/a tener que conocer y conversar con gente nueva.',
-    inputType: 'options', options: OPTS_3, delay: 1300 },
-  { text: 'Cuando siento que no puedo hacer mucho, prefiero esperar y ver qué pasa.',
-    inputType: 'options', options: OPTS_3, delay: 1300 },
+  // Proyectiva 3
+  { text: 'Para trabajar es importante…', inputType: 'text', placeholder: 'Completá la frase...', delay: 900 },
 
-  { text: 'Segunda parte, lista.', inputType: 'none', delay: 900 },
+  // Q18–Q20
+  { text: 'A menudo los demás logran irritarme.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Me costaba desobedecer las indicaciones de mis padres.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Siempre logro conseguir lo que quiero aunque tenga que presionar a los demás.', inputType: 'options', options: OPTS_3, delay: 800 },
 
-  // ── SECCIÓN 3 · TU MUNDO Y LO QUE CREÉS ─────────────────
-  // Frases proyectivas: primero las creencias sobre el mundo externo (trabajo, sociedad),
-  // después las presiones familiares, y al final los miedos y bloqueos internos.
-  { isDivider: true, label: 'Sección 3 · Tu mundo y lo que creés', sectionNum: 3, inputType: 'none', delay: 300 },
-  { text: 'Ahora cambiamos de modalidad. Te muestro frases incompletas para que las termines. Escribí lo primero que se te venga a la mente — sin editarte. Eso es lo valioso.', inputType: 'none', delay: 1400 },
+  // Icebreaker after Q20
+  { text: '¿Café o mate?', inputType: 'options', options: ['Café ☕', 'Mate 🧉', 'Ninguno'], isIcebreaker: true, ackText: 'Dato importante. Seguimos.', delay: 900 },
 
-  { text: 'Conseguir trabajo hoy...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
-  { text: 'Sin un título...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
-  { text: 'Las carreras largas...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
-  { text: 'En esta sociedad, más vale la pena ganar plata que...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1200 },
-  { text: 'La sociedad espera que uno sea una persona...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1200 },
-  { text: 'Una persona adulta...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
-  { text: 'Mis padres quisieran que yo...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  // ── BLOQUE 2 · Q21–Q40 ───────────────────────────────────
 
-  // Icebreaker 3
-  { text: '¿Pizza con ananá: exquisitez o crimen de lesa humanidad?',
-    inputType: 'options', options: ['Exquisitez total 🍕', 'Crimen. Sin dudas.'],
-    isIcebreaker: true, ackText: 'Posición tomada. Lo anotamos.',
-    delay: 950 },
+  // Proyectiva 4
+  { text: 'Elegir…', inputType: 'text', placeholder: 'Completá la frase...', delay: 900 },
 
-  { text: 'A veces me da miedo...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
-  { text: 'Me da miedo equivocarme...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
-  { text: 'Si se me presenta una dificultad...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
-  { text: 'Puedo intentar un cambio, pero...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
-  { text: 'Lo difícil de tomar una decisión es...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
-  { text: 'Yo soy...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
+  // Q21–Q24
+  { text: 'Me importa mucho cuidar mi reputación personal.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Ya no expreso lo que realmente siento.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'A veces siento que lo que tengo para decir no les interesa a los demás.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Soy una persona dura, nada sentimental.', inputType: 'options', options: OPTS_3, delay: 800 },
 
-  { text: 'Tercera parte, lista.', inputType: 'none', delay: 900 },
+  // Proyectiva 5
+  { text: 'A veces me da miedo…', inputType: 'text', placeholder: 'Completá la frase...', delay: 900 },
 
-  // ── SECCIÓN 4 · TU FUTURO ────────────────────────────────
-  // Primero anclamos el presente (¿estás donde querías estar?),
-  // después construimos la visión: corto, mediano, largo plazo,
-  // y finalmente el ejercicio de los espacios como puente hacia lo concreto.
-  { isDivider: true, label: 'Sección 4 · Tu futuro', sectionNum: 3, inputType: 'none', delay: 300 },
-  { text: 'Esta parte es diferente. Primero, una pregunta directa.', inputType: 'none', delay: 1000 },
+  // Q25–Q28
+  { text: 'Me pone nervioso conocer y conversar con gente nueva.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Soy una persona colaboradora que cede ante los demás.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'A veces actúo según el momento y las circunstancias.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Primero planifico y luego sigo activamente el plan trazado.', inputType: 'options', options: OPTS_3, delay: 800 },
 
-  { text: '¿Estás donde querías estar en este momento de tu vida?',
-    inputType: 'options', options: ['Sí, bastante', 'Más o menos', 'No todavía'],
-    customAck: {
-      'Sí, bastante': 'Me alegra escuchar eso.',
-      'Más o menos':  'Honestidad pura.',
-      'No todavía':   'Y está bien saberlo.',
-    },
-    delay: 1300 },
-  { text: 'En la vida quiero llegar a ser...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
-  { text: 'Dentro de diez años...',
-    inputType: 'text', placeholder: 'Completá la frase...', delay: 1100 },
-  { text: 'Si le preguntáramos a tu versión de la infancia qué trabajo le gustaría hacer, ¿qué respondería?',
-    inputType: 'text', placeholder: 'Lo que diría el vos de antes...', delay: 1400 },
-  { text: 'Pensá en un lugar en el que te sentís genuinamente a gusto — puede ser cualquiera. Describilo.',
-    inputType: 'text', placeholder: 'Describí el lugar...', delay: 1200 },
-  { text: 'Ahora imaginá cómo sería tu lugar de trabajo ideal — más allá de la actividad en sí. ¿Cómo es el entorno físico?',
-    inputType: 'text', placeholder: 'Describí el espacio...', delay: 1300 },
-  { text: 'Y en ese lugar ideal, ¿qué podrías estar haciendo?',
-    inputType: 'text', placeholder: 'Describilo...', delay: 1100 },
-  { text: '🎬 La escena. Imaginá una escena de tu futuro (a 3, 5 o 10 años). ¿Qué está pasando? ¿Dónde estás? ¿Qué hacés?',
-    inputType: 'text', placeholder: 'Describí la escena...', delay: 1400 },
-  { text: '📅 Veinte años. Imaginá que estás a 20 años de hoy, rodeado/a de las personas más importantes de tu vida. ¿Quiénes son y qué están haciendo?',
-    inputType: 'text', placeholder: 'Describilo...', delay: 1400 },
+  // Q29–Q32
+  { text: 'Me parece importante controlar las emociones.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Tengo muy pocos lazos afectivos fuertes con otras personas.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Me siento intranquilo con personas que no conozco muy bien.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'A veces siento que las reglas pueden interpretarse de forma flexible.', inputType: 'options', options: OPTS_3, delay: 800 },
 
-  // Icebreaker 4
-  { text: '¿Mate o café?',
-    inputType: 'options', options: ['Mate 🧉', 'Café ☕', 'Ninguno de los dos'],
-    isIcebreaker: true, ackText: 'Lo tenemos en cuenta para el informe final.',
-    delay: 900 },
+  // Visión 2
+  { text: 'Si hoy pudieras elegir sin miedo ni presión externa, ¿hacia dónde irías?', inputType: 'text', placeholder: 'Respondé con honestidad...', delay: 1000 },
 
-  { text: '🗞️ El artículo. Dentro de 7 años, un diario publica un artículo sobre vos. Entrevistan a uno de tus padres, a un hermano/a y a un amigo/a. ¿Qué te gustaría que dijeran?',
-    inputType: 'text', placeholder: 'Describí lo que dirían...', delay: 1400 },
-  { text: '🏆 El legado. Dentro de muchos años, alguien escribe una nota sobre vos basada en entrevistas a toda la gente con la que interactuaste. ¿Cómo te gustaría ser recordado/a?',
-    inputType: 'text', placeholder: 'Escribí cómo querés que te recuerden...', delay: 1400 },
+  // Q33–Q36
+  { text: 'Con frecuencia siento que los demás no tienen una buena opinión de mí.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Sistemáticamente ordeno mis papeles y materiales de trabajo.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Las situaciones nuevas me ponen más tenso que a la mayoría.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Siempre trato de evitar las discusiones, por más que esté convencido de tener razón.', inputType: 'options', options: OPTS_3, delay: 800 },
 
-  { text: 'Cuarta parte, lista.', inputType: 'none', delay: 900 },
+  // Proyectiva 7
+  { text: 'Lo que más me atrae de un trabajo es…', inputType: 'text', placeholder: 'Completá la frase...', delay: 900 },
 
-  // ── SECCIÓN 5 · LO QUE TE MUEVE ─────────────────────────
-  // Con toda la base construida, ahora tiene sentido ir a las preguntas de propósito profundo.
-  // El usuario ya confió en la plataforma; las preguntas fuertes no caen de la nada.
-  { isDivider: true, label: 'Sección 5 · Lo que te mueve', sectionNum: 4, inputType: 'none', delay: 300 },
-  { text: 'Llegamos a la última parte. Son preguntas más personales — algunas pueden sorprenderte un poco.', inputType: 'none', delay: 1200 },
-  { text: 'Acá no hay respuestas acertadas. Solo las tuyas.', inputType: 'none', delay: 900 },
+  // Q37–Q40
+  { text: 'Busco situaciones novedosas y excitantes para mí.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Siempre termino mi trabajo antes de descansar.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Espero que las cosas sigan su curso antes de decidir qué hacer.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Procuro ocuparme más de los demás que de mí mismo.', inputType: 'options', options: OPTS_3, delay: 800 },
 
-  { text: 'Todos tenemos uno o más talentos. ¿Cuáles son los tuyos? No hace falta que sean convencionales.',
-    inputType: 'text', placeholder: 'Escribí los que se te ocurran...', delay: 1400 },
-  { text: '¿En qué áreas de tu vida te satisface ser "lo suficientemente bueno/a", sin necesidad de ser el mejor?',
-    inputType: 'text', placeholder: 'Escribí lo que se te ocurra...', delay: 1400 },
-  { text: 'Pensá en alguien que haya producido una diferencia positiva en tu vida. ¿Qué cualidades tiene esa persona que te gustaría desarrollar en vos?',
-    inputType: 'text', placeholder: 'Describí esa persona y sus cualidades...', delay: 1500 },
-  { text: '¿A qué personas te gustaría parecerte y en qué aspectos? Si no hay nadie en particular, ¿cómo te gustaría ser y a qué dedicarías tu vida si pudieras elegir sin restricciones?',
-    inputType: 'text', placeholder: 'Respondé con sinceridad...', delay: 1500 },
-  { text: 'Si pudieras pasar una hora con cualquier persona que haya existido — de cualquier época o lugar — ¿quién sería y qué le preguntarías?',
-    inputType: 'text', placeholder: 'Cualquier persona de la historia...', delay: 1500 },
-  { text: 'Pensá en un objeto o símbolo que te represente. ¿Cuál sería y por qué?',
-    inputType: 'text', placeholder: 'El primero que se te venga...', delay: 1300 },
-  { text: 'Si estuvieras a cargo de una fundación importante y pudieras abordar solo una problemática del mundo, ¿cuál elegirías?',
-    inputType: 'text', placeholder: 'Una sola...', delay: 1400 },
-  { text: '🏗️ La viga de acero. Si pusieran una viga de 15 cm de ancho entre dos rascacielos, ¿qué es lo único que te haría cruzarla?',
-    inputType: 'text', placeholder: 'Pensalo con calma...', delay: 1400 },
-  { text: '🎰 Una clásica, pero sigue siendo buena: si ganás la lotería mañana, ¿cuál es lo primero que harías?',
-    inputType: 'text', placeholder: 'Lo primero que se te venga...', delay: 1300 },
-  { text: '¿Por qué tenés las ambiciones que tenés?',
-    inputType: 'text', placeholder: 'Respondé con honestidad...', delay: 1200 },
-  { text: 'Te dicen que tenés un año más de vida. ¿Qué harías los próximos 12 meses?',
-    inputType: 'text', placeholder: 'Lo que se te venga a la mente...', delay: 1300 },
-  { text: 'Por último: describí un momento en el que te hayas sentido profundamente inspirado/a. ¿Qué pasó? ¿Dónde estabas?',
-    inputType: 'text', placeholder: 'Describí ese momento...', delay: 1500 },
-  { text: 'Una pregunta que puede sonar fuerte al principio, pero tiene mucho sentido en este contexto: ¿cómo sería, para vos, una buena muerte? (¿Habiendo hecho qué? ¿Rodeado/a de quién?)',
-    inputType: 'text', placeholder: 'Tomá tu tiempo...', delay: 1600 },
+  // Icebreaker after Q40
+  { text: '¿Prefiero las mañanas o las noches para hacer las cosas?', inputType: 'options', options: ['Mañanas 🌅', 'Noches 🌙', 'Igual'], isIcebreaker: true, ackText: 'Bien. Continuamos.', delay: 900 },
+
+  // ── BLOQUE 3 · Q41–Q60 ───────────────────────────────────
+
+  // Proyectiva 8
+  { text: 'En la vida quiero llegar a ser…', inputType: 'text', placeholder: 'Completá la frase...', delay: 900 },
+
+  // Q41–Q44
+  { text: 'El solo hecho de estar con otras personas me hace sentir inspirado.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Suelo respetar las reglas, incluso cuando nadie me está controlando.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Uso mi cabeza y no mi corazón para tomar decisiones.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'A veces me guío más por mi intuición que por la información disponible.', inputType: 'options', options: OPTS_3, delay: 800 },
+
+  // Q45–Q48
+  { text: 'En el colegio me gustaban más las materias prácticas que las teóricas.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Planifico las cosas con anticipación y actúo enérgicamente para que mis planes se cumplan.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'A veces siento que mis emociones influyen más que mi razón.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Siempre puedo ver el lado positivo de la vida.', inputType: 'options', options: OPTS_3, delay: 800 },
+
+  // Q49–Q52
+  { text: 'A menudo espero que alguien solucione mis problemas.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Hago lo que quiero, sin pensar cómo va a afectar a los otros.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Reacciono rápido ante situaciones que podrían convertirse en un problema.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Sólo me siento una buena persona cuando ayudo a los demás.', inputType: 'options', options: OPTS_3, delay: 800 },
+
+  // Visión 4
+  { text: '¿Qué es lo que más te frena hoy para avanzar hacia lo que querés?', inputType: 'text', placeholder: 'Sin filtros...', delay: 1000 },
+
+  // Q53–Q56
+  { text: 'Si algo sale mal, aunque no sea importante, se me arruina todo el día.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Me siento satisfecho dejando que las cosas ocurran.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Trato de ser más lógico que emocional.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Prefiero lo concreto antes que lo puramente imaginario.', inputType: 'options', options: OPTS_3, delay: 800 },
+
+  // Q57–Q60
+  { text: 'Me resulta difícil conversar con alguien que acabo de conocer.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Me interesan más las posibilidades futuras que los hechos del pasado.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Me resulta fácil disfrutar de las cosas.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Vivo según mis propias necesidades y no basado en las de los demás.', inputType: 'options', options: OPTS_3, delay: 800 },
+
+  // Icebreaker after Q60
+  { text: '¿Perro o gato?', inputType: 'options', options: ['Perro 🐶', 'Gato 🐱', 'Ninguno'], isIcebreaker: true, ackText: 'Fundamental saberlo. Seguimos.', delay: 900 },
+
+  // ── BLOQUE 4 · Q61–Q80 ───────────────────────────────────
+
+  // Q61–Q64
+  { text: 'Nunca espero que las cosas pasen, hago que sucedan como yo quiero.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Suelo evitar responder bruscamente cuando estoy molesto.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'La necesidad de ayudar a otros guía mi vida.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'A menudo me siento muy tenso, a la espera de que algo salga mal.', inputType: 'options', options: OPTS_3, delay: 800 },
+
+  // Proyectiva 12
+  { text: 'Ir a la universidad hoy…', inputType: 'text', placeholder: 'Completá la frase...', delay: 900 },
+
+  // Q65–Q68
+  { text: 'Nunca intenté copiarme en un examen.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Soy una persona difícil de conocer bien.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Es fácil para mí controlar mis estados de ánimo.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Soy algo pasivo y lento en temas relacionados con la organización de mi vida.', inputType: 'options', options: OPTS_3, delay: 800 },
+
+  // Visión 5
+  { text: 'Seamos honestos: ¿qué tan difícil te resulta sentarte y ponerte a estudiar? ¿Cuántas horas seguidas podés hacerlo? Cuando decís que lo vas a hacer, ¿lo terminás haciendo o lo pateas para más adelante?', inputType: 'text', placeholder: 'Con total sinceridad...', delay: 1300 },
+
+  // Q69–Q72
+  { text: 'Mis amigos y familiares recurren a mí para encontrar afecto y apoyo.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Aunque todo esté bien, a veces pienso que podría pasar algo malo.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Planifico y organizo con cuidado mi trabajo antes de empezar a hacerlo.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Soy impersonal y objetivo al tratar de resolver un problema.', inputType: 'options', options: OPTS_3, delay: 800 },
+
+  // Proyectiva 13
+  { text: 'Las personas que estudian…', inputType: 'text', placeholder: 'Completá la frase...', delay: 900 },
+
+  // Q73–Q76
+  { text: 'Soy una persona realista a la que no le gustan las especulaciones.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Primero me preocupo por mí y después de los demás.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Dedico mucho esfuerzo para que las cosas me salgan bien.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Suelo mantener la compostura, incluso en momentos difíciles.', inputType: 'options', options: OPTS_3, delay: 800 },
+
+  // Q77–Q80
+  { text: 'Demuestro mucho afecto hacia mis amigos.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Me gusta conocer gente nueva y saber cosas sobre sus vidas.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Puedo dejar de lado lo emocional para concentrarme en el trabajo.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Necesito mucho tiempo para poder estar a solas con mis pensamientos.', inputType: 'options', options: OPTS_3, delay: 800 },
+
+  // Icebreaker after Q80
+  { text: 'Pizza con piña: ¿exquisitez o crimen?', inputType: 'options', options: ['Exquisitez total 🍕', 'Crimen. Sin dudas.'], isIcebreaker: true, ackText: 'Posición clara. Seguimos.', delay: 900 },
+
+  // ── BLOQUE 5 · Q81–Q92 + cierre ──────────────────────────
+
+  // Visión 6
+  { text: 'Modelos: ¿A qué personas te quisieras parecer? ¿Por qué?', inputType: 'text', placeholder: 'Personas reales o de la historia...', delay: 1000 },
+
+  // Q81–Q83
+  { text: 'Me atraen más las personas soñadoras que las muy realistas.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Tiendo a evitar discutir, incluso cuando estoy muy enojado.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Expreso lo que pienso de manera franca y abierta.', inputType: 'options', options: OPTS_3, delay: 800 },
+
+  // Q84–Q86
+  { text: 'Me desagrada sentir que voy a depender demasiado de alguien en mi trabajo.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Trato de asegurar que las cosas salgan como yo quiero.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Disfruto más de las realidades concretas que de las fantasías.', inputType: 'options', options: OPTS_3, delay: 800 },
+
+  // Q87–Q89
+  { text: 'Aprendo bien observando y conversando con otras personas.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'No me satisface dejar que las cosas sucedan y simplemente contemplarlas.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Confío más en mis intuiciones que en lo que observo.', inputType: 'options', options: OPTS_3, delay: 800 },
+
+  // Proyectiva 17
+  { text: 'Siento que los demás esperan que yo…', inputType: 'text', placeholder: 'Completá la frase...', delay: 900 },
+
+  // Q90–Q92
+  { text: 'Me gusta tomar mis propias decisiones, evitando los consejos de los otros.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Me gusta ser popular y participar en muchas actividades sociales.', inputType: 'options', options: OPTS_3, delay: 800 },
+  { text: 'Decido cuáles son las cosas prioritarias y luego actúo firmemente para poder lograrlas.', inputType: 'options', options: OPTS_3, delay: 800 },
+
+  // Proyectiva 19 + cierre abierto
+  { text: 'Cuando se me acerca una figura de autoridad, yo…', inputType: 'text', placeholder: 'Completá la frase...', delay: 900 },
+  { text: 'Una profesión me daría la posibilidad de…', inputType: 'text', placeholder: 'Completá la frase...', delay: 900 },
+  { text: 'Cuando eras chico/a, ¿qué querías ser de grande?', inputType: 'text', placeholder: 'Lo primero que se te venga...', delay: 1000 },
 
   // ── CIERRE ───────────────────────────────────────────────
-  { text: 'Listo. Eso es todo.', inputType: 'none', delay: 900 },
-  { text: 'Guardamos todo lo que compartiste. A partir de esto vamos a trabajar para ayudarte a clarificar tu camino. Gracias por la sinceridad — eso es lo más valioso que podías aportar. 🎯',
-    inputType: 'end', delay: 1600 },
+  { text: 'Eso es todo.', inputType: 'none', delay: 900 },
+  { text: 'Todo lo que compartiste queda guardado. Gracias por la sinceridad — eso es lo más valioso. 🎯', inputType: 'end', delay: 1500 },
 ];
+
+// ── SLICES POR PARTE ──────────────────────────────────────
+const _endPart1 = { text: '¡Genial! Completaste la Parte 1. Seguimos en la Parte 2.', inputType: 'end', delay: 1200 };
+const _endPart2 = { text: '¡Muy bien! Completaste la Parte 2. Ya falta poco — seguí con la Parte 3.', inputType: 'end', delay: 1200 };
+const activeFlow = parte === 1 ? [...flow.slice(0, 52), _endPart1]
+                 : parte === 2 ? [...flow.slice(52, 99), _endPart2]
+                 :               flow.slice(99);
 
 // ═══════════════════════════════════════════════════════════
 // ESTADO
 // ═══════════════════════════════════════════════════════════
 let currentSection = 0;
 const responses    = [];
-const totalAnswerable = flow.filter(s =>
+const totalAnswerable = activeFlow.filter(s =>
   (s.inputType === 'options' || s.inputType === 'text') && !s.isIcebreaker
 ).length;
 let answered = 0;
+let answersSinceAck = 0;
 
 // ═══════════════════════════════════════════════════════════
 // DOM
@@ -571,15 +586,12 @@ function clearInput() { inputArea.innerHTML = ''; }
 
 // ═══════════════════════════════════════════════════════════
 // SISTEMA DE ACKNOWLEDGMENTS
-// Simula que el bot leyó la respuesta antes de avanzar
 // ═══════════════════════════════════════════════════════════
 function showAckThenAdvance(ackText, nextIdx) {
   showTyping();
-  // 700ms de "escritura" para que se sienta como que leyó y está respondiendo
   setTimeout(() => {
     hideTyping();
     appendBotMsg(ackText);
-    // pausa antes de la siguiente pregunta
     setTimeout(() => processStep(nextIdx), 500);
   }, 700);
 }
@@ -646,47 +658,54 @@ function renderTextInput(placeholder, onAnswer) {
 }
 
 function renderEnd() {
-  localStorage.setItem('orientacion_data', JSON.stringify(responses));
+  if (parte === 1) {
+    localStorage.setItem('orientacion_parte1_data', JSON.stringify(responses));
+    localStorage.setItem('orientacion_parte1_done', 'done');
+  } else if (parte === 2) {
+    localStorage.setItem('orientacion_parte2_data', JSON.stringify(responses));
+    localStorage.setItem('orientacion_parte2_done', 'done');
+  } else {
+    localStorage.setItem('orientacion_data', JSON.stringify(responses));
+    localStorage.setItem('orientacion_done', 'done');
+  }
   clearInput();
   const el = document.createElement('div');
   el.className = 'end-state';
-  el.textContent = '✓ Respuestas guardadas';
+  el.textContent = parte < 3 ? '✓ Parte ' + parte + ' completada' : '✓ Respuestas guardadas';
   inputArea.appendChild(el);
+  setTimeout(() => { window.location.href = 'dashboard.html'; }, 2000);
 }
 
 // ═══════════════════════════════════════════════════════════
 // MOTOR DEL FLUJO
 // ═══════════════════════════════════════════════════════════
 function saveAndAdvance(idx, question, value) {
-  const step = flow[idx];
+  const step = activeFlow[idx];
   const isIcebreaker = !!step.isIcebreaker;
 
   if (!isIcebreaker) {
     responses.push({ question, answer: value });
     answered++;
+    answersSinceAck++;
     updateProgress();
   }
 
   appendUserMsg(value);
 
   if (isIcebreaker) {
-    // Icebreakers: siempre responde
     showAckThenAdvance(step.ackText || 'Bien.', idx + 1);
   } else if (step.customAck && step.customAck[value]) {
-    // Respuestas con ack personalizado: siempre responde
     showAckThenAdvance(step.customAck[value], idx + 1);
-  } else if (Math.random() < 0.25) {
-    // Preguntas regulares: ack solo 1 de cada 4
+  } else if (answersSinceAck > 0 && answersSinceAck % 5 === 0) {
     showAckThenAdvance(pickAck(), idx + 1);
   } else {
-    // La mayoría de las veces: pasa directo a la siguiente pregunta
     setTimeout(() => processStep(idx + 1), 480);
   }
 }
 
 function processStep(idx) {
-  if (idx >= flow.length) return;
-  const step = flow[idx];
+  if (idx >= activeFlow.length) return;
+  const step = activeFlow[idx];
   clearInput();
 
   if (step.isDivider) {
@@ -715,6 +734,12 @@ function processStep(idx) {
     }
   }, step.delay);
 }
+
+// ── Actualizar subtítulo del header con número de parte
+(function() {
+  const sub = document.querySelector('.header-info p');
+  if (sub) sub.innerHTML = '<span class="online-dot"></span>Parte ' + parte + ' / 3';
+})();
 
 // ── ARRANQUE
 processStep(0);

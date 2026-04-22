@@ -569,42 +569,42 @@
     <div class="wp-dot" id="dot-4"></div>
   </div>
 
-  <!-- ── Step 1: Costo y Becas ── -->
+  <!-- ── Step 1: Costo ── -->
   <div class="step active enter-forward" id="step-0">
     <div>
       <div class="step-num">Paso 1 de 5</div>
-      <div class="step-title">Costo y Becas</div>
+      <div class="step-title">Costo</div>
     </div>
-    <p class="step-hint">¿Cómo vas a costear tu carrera?</p>
+    <p class="step-hint">En cuanto al contexto económico de tu familia, ¿qué tipo de cuota decidieron pagar para tus estudios?</p>
 
     <div class="option-list" id="costo-opts">
-      <button class="opt-btn" data-val="publica" onclick="selectOpt('costo-opts',this)">
+      <button class="opt-btn" data-val="sinCuota" onclick="selectOpt('costo-opts',this)">
         <div class="opt-radio"><div class="opt-dot"></div></div>
         <div class="opt-text">
-          <div class="opt-label">Universidad pública</div>
-          <div class="opt-sub">Gratuita y de acceso libre</div>
+          <div class="opt-label">Sin cuota, gratis</div>
+          <div class="opt-sub">No podemos ir a una universidad privada</div>
         </div>
       </button>
-      <button class="opt-btn" data-val="privada" onclick="selectOpt('costo-opts',this)">
+      <button class="opt-btn" data-val="cuotaMedia" onclick="selectOpt('costo-opts',this)">
         <div class="opt-radio"><div class="opt-dot"></div></div>
         <div class="opt-text">
-          <div class="opt-label">Universidad privada</div>
-          <div class="opt-sub">Aranceles mensuales, planes de pago</div>
+          <div class="opt-label">Cuota media</div>
+          <div class="opt-sub">Podemos pagar algunas privadas no muy caras, o ir a las caras si nos dan beca</div>
         </div>
       </button>
-      <button class="opt-btn" data-val="ambas" onclick="selectOpt('costo-opts',this)">
+      <button class="opt-btn" data-val="cuotaAlta" onclick="selectOpt('costo-opts',this)">
         <div class="opt-radio"><div class="opt-dot"></div></div>
         <div class="opt-text">
-          <div class="opt-label">Me abre a ambas opciones</div>
-          <div class="opt-sub">Depende de la carrera y la institución</div>
+          <div class="opt-label">Cuota alta</div>
+          <div class="opt-sub">Tenemos la posibilidad de poder pagar casi cualquier universidad</div>
         </div>
       </button>
     </div>
 
     <div class="toggle-row">
       <div class="toggle-text">
-        <div class="toggle-label">Estoy dispuesto/a a buscar una beca</div>
-        <div class="toggle-sub">Becas nacionales, provinciales o institucionales</div>
+        <div class="toggle-label">En caso de necesitar beca, ¿estás dispuesto/a a cumplir los requisitos académicos para mantenerla?</div>
+        <div class="toggle-sub">Las becas suelen pedir mantener un promedio mínimo</div>
       </div>
       <label class="toggle-switch">
         <input type="checkbox" id="beca-toggle">
@@ -613,35 +613,39 @@
     </div>
   </div>
 
-  <!-- ── Step 2: Ubicación ── -->
+  <!-- ── Step 2: Ubicación y Viaje ── -->
   <div class="step" id="step-1">
     <div>
       <div class="step-num">Paso 2 de 5</div>
-      <div class="step-title">Ubicación</div>
+      <div class="step-title">Ubicación y Viaje</div>
     </div>
-    <p class="step-hint">¿Dónde querés o podés estudiar?</p>
+    <p class="step-hint">¿Dónde vas a vivir y qué distancia aceptás?</p>
 
     <div class="field-group">
       <div class="field-wrap">
-        <label class="field-label" for="zona-input">¿En qué zona vivís o preferís estudiar?</label>
-        <input class="field-input" id="zona-input" type="text" placeholder="Ej: CABA, Rosario, me da igual…" autocomplete="off">
+        <label class="field-label" for="zona-input">¿Dónde vas a vivir mientras estudiás? (provincia, barrio)</label>
+        <input class="field-input" id="zona-input" type="text" placeholder="Ej: CABA, Palermo / Rosario / Mar del Plata…" autocomplete="off">
       </div>
       <div class="field-wrap">
-        <label class="field-label" for="viaje-input">¿Cuánto tiempo estás dispuesto/a a viajar por día?</label>
+        <label class="field-label" for="zona-univ-input">¿Dónde aceptarías que esté ubicada la universidad?</label>
+        <input class="field-input" id="zona-univ-input" type="text" placeholder="Ej: CABA, zona norte, cualquier lugar…" autocomplete="off">
+      </div>
+      <div class="field-wrap">
+        <label class="field-label" for="viaje-input">¿Cuánto tiempo de viaje aceptás?</label>
         <input class="field-input" id="viaje-input" type="text" placeholder="Ej: hasta 1 hora, no me importa…" autocomplete="off">
       </div>
       <div class="field-wrap">
-        <label class="field-label" for="distancia-input">¿Considerarías mudarte para estudiar?</label>
-        <input class="field-input" id="distancia-input" type="text" placeholder="Ej: sí si hay beca, no por ahora…" autocomplete="off">
+        <label class="field-label" for="distancia-input">¿Estás dispuesto/a a mudarte si fuera necesario?</label>
+        <input class="field-input" id="distancia-input" type="text" placeholder="Ej: Sí / Tal vez / No" autocomplete="off">
       </div>
     </div>
   </div>
 
-  <!-- ── Step 3: Exámenes de Ingreso ── -->
+  <!-- ── Step 3: Requisitos de Inscripción ── -->
   <div class="step" id="step-2">
     <div>
       <div class="step-num">Paso 3 de 5</div>
-      <div class="step-title">Exámenes de Ingreso</div>
+      <div class="step-title">Requisitos de Inscripción</div>
     </div>
     <p class="step-hint">Respondé rápido con lo primero que sientas.</p>
 
@@ -652,6 +656,11 @@
           <span class="yesno-icon">💪</span>
           <span class="yesno-word">Sí</span>
           <span class="yesno-sub">Me la banco</span>
+        </button>
+        <button class="yesno-btn no" data-q="q1" data-val="depende" onclick="selectYN(this)">
+          <span class="yesno-icon">🤔</span>
+          <span class="yesno-word">Depende</span>
+          <span class="yesno-sub">De la carrera</span>
         </button>
         <button class="yesno-btn no" data-q="q1" data-val="no" onclick="selectYN(this)">
           <span class="yesno-icon">😬</span>
@@ -669,6 +678,11 @@
           <span class="yesno-word">Sí</span>
           <span class="yesno-sub">Puedo prepararme bien</span>
         </button>
+        <button class="yesno-btn no" data-q="q2" data-val="masomenos" onclick="selectYN(this)">
+          <span class="yesno-icon">😅</span>
+          <span class="yesno-word">Más o menos</span>
+          <span class="yesno-sub">Algo de tiempo tengo</span>
+        </button>
         <button class="yesno-btn no" data-q="q2" data-val="no" onclick="selectYN(this)">
           <span class="yesno-icon">⏰</span>
           <span class="yesno-word">No</span>
@@ -678,41 +692,38 @@
     </div>
   </div>
 
-  <!-- ── Step 4: El Vibe de la Facu ── -->
+  <!-- ── Step 4: Perfil Institucional ── -->
   <div class="step" id="step-3">
     <div>
       <div class="step-num">Paso 4 de 5</div>
-      <div class="step-title">El Vibe de la Facu</div>
+      <div class="step-title">Perfil Institucional</div>
     </div>
-    <p class="step-hint">¿Qué priorizás? Elegí lo que más te importa en cada dimensión.</p>
+    <p class="step-hint">¿Qué priorizás en la institución? Elegí lo que más te importa en cada dimensión.</p>
 
     <div class="chip-section">
       <div class="chip-section-label">Prestigio</div>
       <div class="chip-row">
-        <button class="chip" data-group="prestigio" data-val="ranking"       onclick="selectChip(this)">Ranking nacional</button>
-        <button class="chip" data-group="prestigio" data-val="internacional" onclick="selectChip(this)">Reconocimiento internacional</button>
-        <button class="chip" data-group="prestigio" data-val="empleadores"   onclick="selectChip(this)">Valorada por empleadores</button>
-        <button class="chip" data-group="prestigio" data-val="ninguno"       onclick="selectChip(this)">No me importa el nombre</button>
+        <button class="chip" data-group="prestigio" data-val="muyimportante" onclick="selectChip(this)">Muy importante</button>
+        <button class="chip" data-group="prestigio" data-val="algoimportante" onclick="selectChip(this)">Algo importante</button>
+        <button class="chip" data-group="prestigio" data-val="noimporta" onclick="selectChip(this)">No me importa</button>
       </div>
     </div>
 
     <div class="chip-section">
-      <div class="chip-section-label">Ambiente</div>
+      <div class="chip-section-label">Valores e ideología</div>
       <div class="chip-row">
-        <button class="chip" data-group="ambiente" data-val="diverso"       onclick="selectChip(this)">Diverso e inclusivo</button>
-        <button class="chip" data-group="ambiente" data-val="competitivo"   onclick="selectChip(this)">Competitivo y exigente</button>
-        <button class="chip" data-group="ambiente" data-val="colaborativo"  onclick="selectChip(this)">Colaborativo y grupal</button>
-        <button class="chip" data-group="ambiente" data-val="flexible"      onclick="selectChip(this)">Flexible y autónomo</button>
+        <button class="chip" data-group="valores" data-val="religiosa" onclick="selectChip(this)">Afiliación religiosa</button>
+        <button class="chip" data-group="valores" data-val="laica" onclick="selectChip(this)">Ambiente laico</button>
+        <button class="chip" data-group="valores" data-val="indiferente" onclick="selectChip(this)">Me es indiferente</button>
       </div>
     </div>
 
     <div class="chip-section">
-      <div class="chip-section-label">Instalaciones</div>
+      <div class="chip-section-label">Instalaciones (campus, laboratorios, tecnología)</div>
       <div class="chip-row">
-        <button class="chip" data-group="instalaciones" data-val="laboratorios" onclick="selectChip(this)">Laboratorios y talleres</button>
-        <button class="chip" data-group="instalaciones" data-val="biblioteca"   onclick="selectChip(this)">Biblioteca y estudio</button>
-        <button class="chip" data-group="instalaciones" data-val="deportes"     onclick="selectChip(this)">Deportes y bienestar</button>
-        <button class="chip" data-group="instalaciones" data-val="virtual"      onclick="selectChip(this)">Plataforma virtual sólida</button>
+        <button class="chip" data-group="instalaciones" data-val="mucho" onclick="selectChip(this)">Me importa mucho</button>
+        <button class="chip" data-group="instalaciones" data-val="algo" onclick="selectChip(this)">Algo me importa</button>
+        <button class="chip" data-group="instalaciones" data-val="no" onclick="selectChip(this)">No es prioritario</button>
       </div>
     </div>
   </div>
@@ -723,17 +734,17 @@
       <div class="step-num">Paso 5 de 5</div>
       <div class="step-title">Armá tu Podio</div>
     </div>
-    <p class="step-hint">Tocá un factor y luego tocá la posición donde querés colocarlo.</p>
+    <p class="step-hint">Ordená estos 5 factores del más al menos importante para vos. Tocá un factor y luego tocá la posición donde querés colocarlo.</p>
 
     <div class="podio-wrap">
       <div class="podio-source">
         <div class="podio-source-label">Factores a ordenar</div>
         <div class="podio-chips" id="podio-source">
-          <div class="topic-chip" data-id="costo"     id="tc-costo"     onclick="onChipTap(this)">💰 Costo</div>
-          <div class="topic-chip" data-id="ubicacion" id="tc-ubicacion" onclick="onChipTap(this)">📍 Ubicación</div>
-          <div class="topic-chip" data-id="ingreso"   id="tc-ingreso"   onclick="onChipTap(this)">📝 Ingreso</div>
-          <div class="topic-chip" data-id="vibe"      id="tc-vibe"      onclick="onChipTap(this)">✨ Vibe</div>
-          <div class="topic-chip" data-id="carrera"   id="tc-carrera"   onclick="onChipTap(this)">🎓 Carrera</div>
+          <div class="topic-chip" data-id="costo"        id="tc-costo"        onclick="onChipTap(this)">💰 Costo</div>
+          <div class="topic-chip" data-id="ubicacion"    id="tc-ubicacion"    onclick="onChipTap(this)">📍 Ubicación</div>
+          <div class="topic-chip" data-id="ingreso"      id="tc-ingreso"      onclick="onChipTap(this)">📝 Tiempo de ingreso</div>
+          <div class="topic-chip" data-id="prestigio"    id="tc-prestigio"    onclick="onChipTap(this)">✨ Prestigio e instalaciones</div>
+          <div class="topic-chip" data-id="afiliacion"   id="tc-afiliacion"   onclick="onChipTap(this)">🏛️ Afiliación religiosa o ideológica</div>
         </div>
       </div>
 
@@ -766,6 +777,13 @@
           </div>
           <div class="pz-items" id="items-zone-4"></div>
         </div>
+        <div class="podio-zone" id="zone-5" onclick="onZoneTap('zone-5')" ondragover="onDragOver(event)" ondrop="onDrop(event,'zone-5')" ondragleave="onDragLeave(event)" style="grid-column:1/-1">
+          <div class="pz-header">
+            <div class="pz-rank">5°</div>
+            <div class="pz-name">Menos importante</div>
+          </div>
+          <div class="pz-items" id="items-zone-5"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -793,9 +811,9 @@ const TOTAL  = 5;
 
 const S = {
   costo: null, beca: false,
-  zona: '', viaje: '', distancia: '',
+  zona: '', zonaUniv: '', viaje: '', distancia: '',
   ingreso_q1: null, ingreso_q2: null,
-  prestigio: null, ambiente: null, instalaciones: null,
+  prestigio: null, valores: null, instalaciones: null,
   podio: {}   // { chipId: zoneId }
 };
 
@@ -971,11 +989,12 @@ function removePlaced(chipId) {
 /* ─── Save ─────────────────────────────────────────── */
 function saveAndFinish() {
   S.zona      = document.getElementById('zona-input').value.trim();
+  S.zonaUniv  = document.getElementById('zona-univ-input').value.trim();
   S.viaje     = document.getElementById('viaje-input').value.trim();
   S.distancia = document.getElementById('distancia-input').value.trim();
 
   // Build ordered podio
-  S.podioOrdered = ['zone-1','zone-2','zone-3','zone-4'].map(zid => ({
+  S.podioOrdered = ['zone-1','zone-2','zone-3','zone-4','zone-5'].map(zid => ({
     zone: zid,
     chips: Object.keys(S.podio).filter(cid => S.podio[cid] === zid)
   }));

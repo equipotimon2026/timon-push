@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Vos y el colegio · Timón</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:       #F9F8F6;
+      --card:     #FFFFFF;
+      --text:     #1A1918;
+      --soft:     #7A7570;
+      --muted:    #B2ADA6;
+      --border:   #EDE8E1;
+      --accent:   #E8956D;
+      --accent-bg:#FDF0EA;
+    }
+
+    html, body {
+      background: var(--bg);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: var(--text); -webkit-font-smoothing: antialiased;
+      min-height: 100%;
+    }
+
+    .screen { max-width: 540px; margin: 0 auto; min-height: 100svh; display: flex; flex-direction: column; }
+
+    /* ── Sticky top bar ── */
+    .top-bar {
+      position: sticky; top: 0; z-index: 10;
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: 14px 20px 12px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .top-back {
+      font-size: 18px; color: var(--soft); text-decoration: none;
+      line-height: 1; flex-shrink: 0; transition: color .15s;
+    }
+    .top-back:hover { color: var(--text); }
+    .top-title  { font-size: 15px; font-weight: 700; letter-spacing: -.3px; flex: 1; }
+    .top-step   { font-size: 12px; color: var(--muted); font-weight: 500; flex-shrink: 0; }
+
+    /* ── Progress bar ── */
+    .prog-track { height: 3px; background: var(--border); }
+    .prog-fill  { height: 100%; background: var(--accent); width: 0%; transition: width .35s cubic-bezier(.4,0,.2,1); }
+
+    /* ── Content ── */
+    .content { flex: 1; padding: 24px 16px 80px; display: flex; flex-direction: column; gap: 20px; }
+
+    /* ── Section card ── */
+    .sec-card {
+      background: var(--card); border-radius: 18px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.05), 0 0 0 1px rgba(0,0,0,.04);
+      overflow: hidden;
+    }
+    .sec-head {
+      padding: 18px 20px 14px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .sec-icon {
+      width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+      background: var(--accent-bg); color: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 17px;
+    }
+    .sec-title    { font-size: 15px; font-weight: 700; letter-spacing: -.2px; line-height: 1.2; }
+    .sec-subtitle { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .sec-body     { padding: 18px 20px 20px; display: flex; flex-direction: column; gap: 18px; }
+
+    /* ── Question block ── */
+    .q-block { display: flex; flex-direction: column; gap: 8px; }
+    .q-label { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -.1px; line-height: 1.35; }
+    .q-hint  { font-size: 12px; color: var(--soft); line-height: 1.4; margin-top: -4px; }
+
+    /* ── Slider de satisfacción (1-10) ── */
+    .scale-wrap {
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .scale-labels {
+      display: flex; justify-content: space-between;
+      font-size: 11px; color: var(--muted); font-weight: 500;
+    }
+    .scale-value {
+      text-align: center; font-size: 28px; font-weight: 700;
+      color: var(--accent); line-height: 1;
+    }
+    input[type="range"] {
+      width: 100%; -webkit-appearance: none; appearance: none;
+      height: 6px; border-radius: 99px;
+      background: linear-gradient(to right, var(--accent) 0%, var(--accent) var(--pct, 0%), var(--border) var(--pct, 0%));
+      outline: none; cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--accent); border: 3px solid white;
+      box-shadow: 0 1px 6px rgba(0,0,0,.2);
+      cursor: pointer; transition: transform .15s;
+    }
+    input[type="range"]::-webkit-slider-thumb:active { transform: scale(1.2); }
+    input[type="range"]::-moz-range-thumb {
+      width: 22px; height: 22px; border-radius: 50%;
+      background: var(--accent); border: 3px solid white;
+      box-shadow: 0 1px 6px rgba(0,0,0,.2);
+    }
+
+    /* ── Free text area ── */
+    .q-textarea {
+      width: 100%; padding: 12px 14px; min-height: 96px;
+      background: var(--bg); border: 1.5px solid var(--border); border-radius: 12px;
+      font-family: inherit; font-size: 14px; color: var(--text);
+      outline: none; resize: vertical; line-height: 1.6;
+      transition: border-color .2s;
+    }
+    .q-textarea:focus  { border-color: var(--accent); }
+    .q-textarea::placeholder { color: var(--muted); }
+
+    /* ── Subjects table ── */
+    .subjects-table {
+      display: flex; flex-direction: column; gap: 2px;
+      border: 1.5px solid var(--border); border-radius: 14px; overflow: hidden;
+    }
+    .subj-header {
+      display: grid; grid-template-columns: 1fr repeat(3, auto);
+      gap: 4px; padding: 10px 14px;
+      background: var(--accent-bg);
+      font-size: 10px; font-weight: 700; color: var(--accent);
+      letter-spacing: .8px; text-transform: uppercase;
+    }
+    .subj-header .col-opt { text-align: center; min-width: 80px; }
+
+    .subj-row {
+      display: grid; grid-template-columns: 1fr repeat(3, auto);
+      gap: 4px; padding: 10px 14px;
+      border-top: 1px solid var(--border);
+      align-items: center;
+      transition: background .12s;
+    }
+    .subj-row:hover { background: #FAFAF8; }
+    .subj-name { font-size: 13.5px; font-weight: 500; line-height: 1.3; }
+
+    .subj-opt {
+      min-width: 80px; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Custom radio button per column */
+    .subj-radio { display: none; }
+    .subj-radio-label {
+      width: 22px; height: 22px; border-radius: 50%;
+      border: 1.5px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; transition: all .15s;
+      font-size: 12px;
+    }
+    .subj-radio:checked + .subj-radio-label {
+      border-color: var(--col-color, var(--accent));
+      background: var(--col-color, var(--accent));
+      color: white;
+    }
+
+    /* Column color overrides */
+    .col-gusta    { --col-color: #85B882; }
+    .col-indif    { --col-color: #B2ADA6; }
+    .col-quemado  { --col-color: #E07070; }
+    .col-nunca    { --col-color: #C4AE5A; }
+
+    /* ── Footnote ── */
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      font-size: 11.5px; color: var(--soft);
+    }
+    .legend-item { display: flex; align-items: center; gap: 5px; }
+    .legend-dot  { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* ── Continue button ── */
+    .footer-bar {
+      position: sticky; bottom: 0; z-index: 10;
+      background: linear-gradient(transparent, var(--bg) 40%);
+      padding: 12px 16px 28px;
+    }
+    .btn-continue {
+      display: block; width: 100%;
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 14px;
+      padding: 15px 20px; font-size: 15px; font-weight: 700;
+      font-family: inherit; letter-spacing: -.1px;
+      cursor: pointer; transition: opacity .15s, transform .1s;
+      opacity: .35; pointer-events: none;
+    }
+    .btn-continue.ready { opacity: 1; pointer-events: auto; }
+    .btn-continue.ready:hover  { opacity: .88; }
+    .btn-continue.ready:active { transform: scale(.98); }
+
+    /* ── Completion ── */
+    .completion {
+      display: none; flex-direction: column;
+      align-items: center; justify-content: center;
+      text-align: center; flex: 1;
+      padding: 60px 24px 40px;
+    }
+    .completion.visible { display: flex; }
+    .completion-icon  { font-size: 52px; margin-bottom: 24px; }
+    .completion-title { font-size: 26px; font-weight: 700; letter-spacing: -.04em; margin-bottom: 10px; }
+    .completion-sub   { font-size: 15px; color: var(--soft); margin-bottom: 36px; line-height: 1.5; }
+    .btn-back {
+      background: var(--accent); color: white;
+      padding: 14px 32px; border-radius: 999px;
+      font-size: 15px; font-weight: 700;
+      text-decoration: none; display: inline-block;
+      font-family: inherit; transition: opacity .15s;
+    }
+    .btn-back:hover { opacity: .85; }
+
+    /* ── Web nav ── */
+    .web-nav { display: none; }
+
+    /* ── Responsive ── */
+    @media (min-width: 640px) {
+      html, body {
+        background: #DDD9D1;
+        display: flex; flex-direction: column; align-items: center;
+        padding: 40px 24px 60px; min-height: 100svh;
+      }
+      .web-nav {
+        display: flex; align-items: center; justify-content: space-between;
+        width: 100%; max-width: 820px; padding: 0 4px; margin-bottom: 16px;
+        flex-shrink: 0;
+      }
+      .web-nav-brand { font-size: 15px; font-weight: 700; color: rgba(249,248,246,.9); letter-spacing: -.04em; }
+      .web-nav-tag   { font-size: 11px; font-weight: 500; color: rgba(249,248,246,.45); text-transform: uppercase; letter-spacing: 1.2px; }
+      .screen {
+        width: 100%; max-width: 820px; min-height: auto;
+        border-radius: 24px;
+        box-shadow: 0 12px 56px rgba(0,0,0,.16), 0 0 0 1px rgba(0,0,0,.05);
+        overflow: hidden;
+      }
+      .top-bar { padding: 18px 28px 14px; }
+      .content { padding: 28px 28px 24px; }
+      .footer-bar { padding: 12px 28px 28px; }
+      .subj-header .col-opt, .subj-opt { min-width: 86px; }
+      .subj-name { font-size: 14px; }
+    }
+    @media (min-width: 1024px) {
+      .web-nav { display: none; }
+      html {
+        display: block;
+        padding: 0;
+        background: #DDD9D1;
+      }
+      body {
+        display: block;
+        width: 100%;
+        padding: 64px 0 80px;
+        background: #DDD9D1;
+        min-height: 100svh;
+      }
+      .screen {
+        width: 80%;
+        max-width: 1100px;
+        min-height: auto;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+        border-radius: 28px;
+        box-shadow: 0 20px 80px rgba(0,0,0,.22), 0 0 0 1px rgba(0,0,0,.06);
+      }
+      .top-bar    { padding: 24px 52px 20px; }
+      .content    { padding: 36px 52px 40px; }
+      .footer-bar { padding: 16px 52px 40px; display: flex; justify-content: flex-end; }
+      .btn-continue { width: auto; min-width: 240px; max-width: 360px; }
+      .subj-header .col-opt, .subj-opt { min-width: 100px; }
+      .subj-name  { font-size: 14.5px; }
+    }
+  </style>
+</head>
+<body>
+
+<nav class="web-nav">
+  <span class="web-nav-brand">Timón ✦</span>
+  <span class="web-nav-tag">Vos y el Colegio</span>
+</nav>
+
+<div class="screen">
+
+  <div class="top-bar">
+    <a href="dashboard.html" class="top-back">←</a>
+    <span class="top-title">Vos y el colegio</span>
+    <span class="top-step" id="topStep">Módulo 2</span>
+  </div>
+  <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+
+  <div class="content" id="mainContent">
+
+    <!-- ── Pregunta 1: Quemado/a ── -->
+    <div class="sec-card">
+      <div class="sec-head">
+        <div class="sec-icon">01</div>
+        <div>
+          <div class="sec-title">El termómetro familiar</div>
+          <div class="sec-subtitle">Cómo te llega la pregunta del millón</div>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="q-block">
+          <div class="q-label">Del 1 al 10, ¿qué tan quemado/a te tiene la típica pregunta de "¿y vos qué vas a estudiar/hacer de tu vida?" en las reuniones familiares?</div>
+          <div class="scale-wrap">
+            <div class="scale-value" id="scaleVal">—</div>
+            <input type="range" id="burnSlider" min="1" max="10" step="1"
+                   oninput="updateSlider(this)" style="--pct:0%">
+            <div class="scale-labels">
+              <span>1 · Me chupa un huevo</span>
+              <span>10 · Me quiero ir del país</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Pregunta 2: Contenido digital ── -->
+    <div class="sec-card">
+      <div class="sec-head">
+        <div class="sec-icon">02</div>
+        <div>
+          <div class="sec-title">Tu consumo real</div>
+          <div class="sec-subtitle">Lo que mirás cuando nadie te mira</div>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="q-block">
+          <div class="q-label">Cuando abrís YouTube, TikTok o Instagram y te perdés mirando algo por horas sin darte cuenta del tiempo... ¿de qué trata ese contenido?</div>
+          <div class="q-hint">Pueden ser varios temas. Sé específico/a — no "entretenimiento" sino qué tipo.</div>
+          <textarea class="q-textarea" id="contentAnswer"
+            placeholder="Ej: tutoriales de diseño 3D, partidas de League of Legends, videos de cocina rara, true crime..."
+            oninput="checkReady()"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Pregunta 3: Materias ── -->
+    <div class="sec-card">
+      <div class="sec-head">
+        <div class="sec-icon">03</div>
+        <div>
+          <div class="sec-title">Tus materias</div>
+          <div class="sec-subtitle">Marcá con honestidad — no hay respuesta incorrecta</div>
+        </div>
+      </div>
+      <div class="sec-body">
+        <div class="legend">
+          <div class="legend-item"><div class="legend-dot" style="background:#85B882"></div>Me gusta</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#B2ADA6"></div>Me es indiferente</div>
+          <div class="legend-item"><div class="legend-dot" style="background:#E07070"></div>No me gusta</div>
+        </div>
+
+        <div class="subjects-table">
+          <div class="subj-header">
+            <span>Materia</span>
+            <span class="col-opt">Me gusta</span>
+            <span class="col-opt">Indiferente</span>
+            <span class="col-opt">No me gusta</span>
+          </div>
+          <!-- Rows rendered by JS -->
+          <div id="subjectRows"></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+
+  <div class="footer-bar">
+    <button class="btn-continue" id="btnContinue" onclick="guardarYContinuar()">
+      Guardar y continuar →
+    </button>
+  </div>
+
+  <div class="completion" id="completionScreen">
+    <div class="completion-icon">🏫</div>
+    <div class="completion-title">¡Listo!</div>
+    <div class="completion-sub">Tu perfil escolar quedó guardado.<br>Seguimos con el siguiente módulo.</div>
+    <a href="dashboard.html" class="btn-back">Volver al camino →</a>
+  </div>
+
+</div><!-- /screen -->
+
+<script>
+const MATERIAS = [
+  'Matemática', 'Lengua y Literatura', 'Historia', 'Geografía',
+  'Biología', 'Física', 'Química', 'Inglés', 'Educación Física',
+  'Formación Ética y Ciudadana', 'Filosofía', 'Economía / Economía Política',
+  'Contabilidad / Administración', 'Informática / Tecnología',
+  'Arte / Educación Artística', 'Música',
+  'Construcción de Ciudadanía / Sociales',
+];
+
+const OPTS = [
+  { val: 'gusta',   cls: 'col-gusta',   icon: '●' },
+  { val: 'indif',   cls: 'col-indif',   icon: '●' },
+  { val: 'quemado', cls: 'col-quemado', icon: '●' },
+];
+
+/* ── Render subject rows ── */
+function renderMaterias() {
+  const container = document.getElementById('subjectRows');
+  container.innerHTML = MATERIAS.map((mat, idx) => `
+    <div class="subj-row" id="row-${idx}">
+      <span class="subj-name">${mat}</span>
+      ${OPTS.map(opt => `
+        <div class="subj-opt ${opt.cls}">
+          <input type="radio" class="subj-radio" name="mat-${idx}"
+                 id="mat-${idx}-${opt.val}" value="${opt.val}"
+                 onchange="checkReady()">
+          <label class="subj-radio-label" for="mat-${idx}-${opt.val}">${opt.icon}</label>
+        </div>
+      `).join('')}
+    </div>
+  `).join('');
+}
+
+/* ── Slider ── */
+function updateSlider(el) {
+  const v = el.value;
+  const pct = ((v - 1) / 9 * 100).toFixed(1) + '%';
+  el.style.setProperty('--pct', pct);
+  document.getElementById('scaleVal').textContent = v;
+  checkReady();
+}
+
+/* ── Enable continue when minimum filled ── */
+function checkReady() {
+  const sliderFilled  = document.getElementById('scaleVal').textContent !== '—';
+  const textFilled    = document.getElementById('contentAnswer').value.trim().length > 3;
+  // At least 10 of 17 subjects rated
+  const rated = document.querySelectorAll('.subj-radio:checked').length;
+  const enough = rated >= 10;
+
+  document.getElementById('btnContinue').classList.toggle('ready', sliderFilled && textFilled && enough);
+
+  // Progress bar based on subjects rated
+  const pct = Math.min(100, Math.round((rated / MATERIAS.length) * 100));
+  document.getElementById('progFill').style.width = pct + '%';
+}
+
+/* ── Save & continue ── */
+function guardarYContinuar() {
+  const burnVal = document.getElementById('burnSlider').value;
+  const content = document.getElementById('contentAnswer').value.trim();
+
+  const materiaResults = {};
+  MATERIAS.forEach((mat, idx) => {
+    const checked = document.querySelector(`input[name="mat-${idx}"]:checked`);
+    if (checked) materiaResults[mat] = checked.value;
+  });
+
+  localStorage.setItem('voscolegio_done', 'done');
+  localStorage.setItem('voscolegio_data', JSON.stringify({
+    quemado:  burnVal,
+    contenido: content,
+    materias:  materiaResults,
+    timestamp: Date.now(),
+  }));
+
+  document.getElementById('mainContent').style.display  = 'none';
+  document.querySelector('.footer-bar').style.display   = 'none';
+  document.getElementById('completionScreen').classList.add('visible');
+}
+
+/* ── Load previous state ── */
+function loadPrev() {
+  const raw = localStorage.getItem('voscolegio_data');
+  if (!raw) return;
+  try {
+    const data = JSON.parse(raw);
+    if (data.quemado) {
+      const slider = document.getElementById('burnSlider');
+      slider.value = data.quemado;
+      updateSlider(slider);
+    }
+    if (data.contenido) {
+      document.getElementById('contentAnswer').value = data.contenido;
+    }
+    if (data.materias) {
+      MATERIAS.forEach((mat, idx) => {
+        const val = data.materias[mat];
+        if (val) {
+          const input = document.querySelector(`input[name="mat-${idx}"][value="${val}"]`);
+          if (input) input.checked = true;
+        }
+      });
+    }
+    checkReady();
+  } catch(e) {}
+}
+
+renderMaterias();
+loadPrev();
+</script>
+</body>
+</html>

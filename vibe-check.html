@@ -1,0 +1,801 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timón · Vibe Check</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:    #FAF7F2;
+      --text:  #2C2A27;
+      --sub:   #7A7570;
+      --muted: #B2ADA6;
+      --line:  #EDE8E0;
+      --card:  #FFFFFF;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: var(--bg);
+      font-family: 'Inter', -apple-system, sans-serif;
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── NAV ── */
+    .nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(250,247,242,.92);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--line);
+      padding: 16px 24px;
+      display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    }
+    .nav-back {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 13.5px; font-weight: 600; color: var(--text);
+      text-decoration: none;
+      background: var(--card); border: 1.5px solid var(--line);
+      border-radius: 99px; padding: 8px 18px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.08);
+      transition: background .15s, box-shadow .15s;
+    }
+    .nav-back:hover { background: #edeae4; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+    .nav-brand { font-size: 15px; font-weight: 700; letter-spacing: -.04em; }
+    .nav-step  { font-size: 12px; color: var(--muted); font-weight: 500; }
+
+    /* ── HERO ── */
+    .hero {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 52px 24px 40px;
+      text-align: center;
+    }
+    .hero-tag {
+      display: inline-block;
+      font-size: 10px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: var(--muted); background: var(--line); border-radius: 99px;
+      padding: 5px 14px; margin-bottom: 22px;
+    }
+    .hero-title {
+      font-size: clamp(24px, 3.8vw, 40px);
+      font-weight: 700; letter-spacing: -.8px; line-height: 1.18;
+      margin-bottom: 16px;
+    }
+    .hero-sub {
+      font-size: 15.5px; color: var(--sub); line-height: 1.72;
+      max-width: 520px; margin: 0 auto 28px;
+    }
+    /* Progress de lectura */
+    .hero-progress {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--card); border: 1.5px solid var(--line);
+      border-radius: 99px; padding: 8px 16px;
+      font-size: 12.5px; font-weight: 500; color: var(--sub);
+    }
+    .hero-progress-dots { display: flex; gap: 5px; }
+    .progress-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--line); border: 1.5px solid var(--line);
+      transition: background .3s, border-color .3s;
+    }
+    .progress-dot.seen   { background: var(--dot-color, #85B882); border-color: var(--dot-color, #85B882); }
+
+    /* ── DONE BANNER ── */
+    .done-banner {
+      max-width: 680px; margin: 0 auto 4px;
+      padding: 18px 24px;
+      background: var(--card); border-radius: 18px; border: 1.5px solid var(--line);
+      display: none; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+    }
+    .done-banner-left { display: flex; align-items: center; gap: 12px; }
+    .done-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #EEF5ED; color: #85B882; font-size: 17px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .done-text strong { font-size: 14px; font-weight: 600; display: block; }
+    .done-text span   { font-size: 12px; color: var(--sub); }
+    .done-redo {
+      padding: 8px 18px; background: transparent;
+      border: 1.5px solid var(--line); border-radius: 99px;
+      font-family: inherit; font-size: 12px; font-weight: 500; color: var(--sub);
+      cursor: pointer; transition: border-color .15s, color .15s;
+    }
+    .done-redo:hover { border-color: var(--text); color: var(--text); }
+
+    /* ── PERSONAS GRID ── */
+    .personas-wrap {
+      max-width: 1280px; margin: 0 auto; padding: 0 24px 72px;
+    }
+    .personas-grid {
+      display: grid; grid-template-columns: 1fr; gap: 18px;
+    }
+
+    /* ── PERSONA CARD ── */
+    .persona-card {
+      background: var(--card);
+      border-radius: 24px;
+      border: 2px solid transparent;
+      border-top: 4px solid var(--accent, var(--line));
+      box-shadow: 0 2px 12px rgba(0,0,0,.06), 0 1px 3px rgba(0,0,0,.04);
+      overflow: hidden;
+      transition: transform .28s cubic-bezier(.34,1.56,.64,1),
+                  box-shadow .22s ease,
+                  border-color .22s ease,
+                  opacity .22s ease;
+    }
+    .persona-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 44px rgba(0,0,0,.11), 0 3px 10px rgba(0,0,0,.06);
+    }
+    .persona-card.is-selected {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--glow, rgba(0,0,0,.1)), 0 14px 44px rgba(0,0,0,.11);
+      transform: translateY(-2px);
+    }
+    .persona-card.is-dimmed {
+      opacity: .35; pointer-events: none; transform: none !important;
+    }
+
+    /* Always-visible top section */
+    .card-top {
+      padding: 24px 24px 0;
+      cursor: pointer;
+    }
+
+    /* Header row: emoji + name + status badge */
+    .card-header {
+      display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px;
+    }
+    .card-emoji {
+      width: 48px; height: 48px; border-radius: 13px;
+      background: var(--accent-bg, #F0EDE8);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; flex-shrink: 0;
+      color: var(--accent);
+    }
+    .card-meta { flex: 1; min-width: 0; }
+    .card-tag  {
+      font-size: 9px; font-weight: 700; letter-spacing: 1.8px;
+      text-transform: uppercase; color: var(--accent, var(--muted));
+      display: block; margin-bottom: 3px;
+    }
+    .card-name { font-size: 17px; font-weight: 700; letter-spacing: -.3px; }
+
+    /* "Visto" / "No leído" badge */
+    .card-status-badge {
+      flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10.5px; font-weight: 600;
+      border-radius: 99px; padding: 4px 10px;
+      border: 1.5px solid var(--line);
+      color: var(--muted);
+      transition: background .25s, color .25s, border-color .25s;
+      white-space: nowrap;
+    }
+    .card-status-badge .badge-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--muted); flex-shrink: 0;
+      transition: background .25s;
+    }
+    .card-status-badge.is-seen {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-bg, #f0ede8);
+    }
+    .card-status-badge.is-seen .badge-dot { background: var(--accent); }
+
+    /* Summary (always shown) */
+    .card-summary {
+      font-size: 14px; color: var(--sub); line-height: 1.65;
+      padding-bottom: 18px;
+    }
+
+    /* Read more button */
+    .card-readmore {
+      width: 100%; text-align: left;
+      padding: 14px 24px;
+      background: var(--accent-bg, #F8F6F2);
+      border: none; border-top: 1px solid var(--line);
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      color: var(--accent, var(--sub));
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      transition: background .15s, color .15s;
+    }
+    .card-readmore:hover { background: var(--accent); color: #fff; }
+    .card-readmore .rm-icon {
+      transition: transform .3s ease;
+      flex-shrink: 0;
+    }
+    .card-readmore.is-open .rm-icon { transform: rotate(180deg); }
+    /* Hide the button when fully open and selected */
+    .persona-card.is-selected .card-readmore { display: none; }
+
+    /* Expandable content */
+    .card-expand {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height .45s cubic-bezier(.4,0,.2,1),
+                  padding .3s ease;
+    }
+    .card-expand.is-open {
+      max-height: 600px;
+    }
+    .card-expand-inner {
+      padding: 20px 24px 24px;
+      border-top: 1px solid var(--line);
+      display: flex; flex-direction: column; gap: 18px;
+    }
+
+    /* Full quote */
+    .card-quote {
+      font-size: 14px; line-height: 1.78; color: var(--sub); font-style: italic;
+      border-left: 3px solid var(--accent-bg, var(--line));
+      padding-left: 14px;
+    }
+
+    /* Selection button (only after reading) */
+    .card-select-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 22px;
+      background: var(--accent-bg, #F0EDE8);
+      color: var(--accent, var(--text));
+      border: none; border-radius: 99px;
+      font-family: inherit; font-size: 13px; font-weight: 600;
+      cursor: pointer; align-self: flex-start;
+      transition: background .15s, color .15s, transform .1s;
+    }
+    .card-select-btn:hover  { background: var(--accent); color: #fff; }
+    .card-select-btn:active { transform: scale(.96); }
+    .is-selected .card-select-btn {
+      background: var(--accent); color: #fff;
+    }
+
+    /* Selected checkmark */
+    .card-selected-indicator {
+      display: none;
+      align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 600; color: var(--accent);
+    }
+    .is-selected .card-selected-indicator { display: flex; }
+    .is-selected .card-select-btn { display: none; }
+
+    /* ── FOLLOW-UP SECTION ── */
+    .followup-wrap {
+      max-width: 660px; margin: 0 auto; padding: 0 24px 88px;
+      display: none;
+    }
+    .followup-card {
+      background: var(--card);
+      border-radius: 28px;
+      border: 2px solid var(--f-accent, #C4848A);
+      border-top: 5px solid var(--f-accent, #C4848A);
+      padding: 36px 36px 32px;
+      box-shadow: 0 10px 44px rgba(0,0,0,.12), 0 3px 10px rgba(0,0,0,.07);
+    }
+    .fu-from { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+    .fu-avatar {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--f-accent, #C4848A); color: #fff;
+      font-size: 20px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .fu-name { font-size: 14px; font-weight: 600; display: block; }
+    .fu-tag  { font-size: 12px; color: var(--sub); }
+    .fu-question {
+      font-size: 18px; font-weight: 600;
+      letter-spacing: -.25px; line-height: 1.52; margin-bottom: 24px;
+    }
+    .fu-textarea {
+      width: 100%; min-height: 130px;
+      background: var(--bg); border: 1.5px solid var(--line);
+      border-radius: 16px; padding: 16px 18px;
+      font-family: inherit; font-size: 15px; color: var(--text);
+      outline: none; resize: vertical; line-height: 1.65;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .fu-textarea::placeholder { color: var(--muted); }
+    .fu-textarea:focus {
+      border-color: var(--f-accent, #C4848A);
+      box-shadow: 0 0 0 4px var(--f-glow, rgba(196,132,138,.12));
+    }
+    .fu-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; margin-top: 20px;
+    }
+    .fu-hint { font-size: 12px; color: var(--muted); max-width: 320px; line-height: 1.5; }
+    .fu-submit {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 30px;
+      background: var(--f-accent, #C4848A); color: #fff;
+      border: none; border-radius: 99px;
+      font-family: inherit; font-size: 14px; font-weight: 700;
+      cursor: pointer; letter-spacing: -.1px;
+      box-shadow: 0 4px 18px var(--f-glow, rgba(196,132,138,.4));
+      transition: opacity .15s, transform .15s;
+    }
+    .fu-submit:hover   { opacity: .9; }
+    .fu-submit:active  { transform: scale(.97); }
+    .fu-submit:disabled {
+      opacity: .4; cursor: not-allowed; box-shadow: none; transform: none;
+    }
+
+    /* ── CLOSE BUTTON inside expanded card ── */
+    .card-close-btn {
+      align-self: flex-end;
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 6px 14px;
+      background: none; border: 1.5px solid var(--line);
+      border-radius: 99px;
+      font-family: inherit; font-size: 12px; font-weight: 600;
+      color: var(--sub); cursor: pointer;
+      transition: color .15s, border-color .15s, background .15s;
+    }
+    .card-close-btn:hover { color: var(--text); border-color: var(--text); background: var(--line); }
+
+    /* ── SCROLL HINT ── */
+    .scroll-hint {
+      display: flex; flex-direction: column; align-items: center;
+      gap: 6px; padding: 0 24px 40px;
+      color: var(--muted); font-size: 12.5px; font-weight: 500;
+      pointer-events: none;
+    }
+    .scroll-hint svg { animation: bounce-down 1.8s ease-in-out infinite; }
+    @keyframes bounce-down {
+      0%, 100% { transform: translateY(0); opacity: .45; }
+      50%       { transform: translateY(6px); opacity: 1; }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (min-width: 580px) {
+      .personas-grid { grid-template-columns: repeat(2, 1fr); gap: 20px; }
+    }
+    @media (min-width: 900px) {
+      .nav { padding: 18px 64px; }
+      .hero { padding: 64px 24px 44px; }
+      .personas-wrap { padding: 0 64px 80px; }
+      .personas-grid { grid-template-columns: repeat(3, 1fr); gap: 24px; }
+      .followup-wrap { padding: 0 64px 96px; }
+      .card-quote { font-size: 14.5px; }
+    }
+    @media (min-width: 1280px) {
+      .personas-wrap { padding: 0 80px 80px; }
+      .followup-wrap { padding: 0 80px 96px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <a class="nav-back" href="dashboard.html">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+      <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    Volver
+  </a>
+  <span class="nav-brand">Timón ✦</span>
+  <span class="nav-step">Módulo 1 · Vibe Check</span>
+</nav>
+
+<!-- HERO -->
+<div class="hero" id="heroSection">
+  <span class="hero-tag">Módulo 1</span>
+  <h1 class="hero-title">¿Con quién te<br>sentís identificado/a?</h1>
+  <p class="hero-sub">
+    Estas son historias de personas en el mismo momento que vos.
+    Ninguna te va a describir exactamente —
+    simplemente encontrá la que más resuena con lo que estás viviendo hoy.
+  </p>
+  <div class="hero-progress" id="heroProgress">
+    <div class="hero-progress-dots" id="progressDots"></div>
+    <span id="progressLabel">0 de 7 leídas</span>
+  </div>
+</div>
+
+<!-- SCROLL HINT -->
+<div class="scroll-hint" id="scrollHint">
+  <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+    <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  Deslizá para explorar los 7 perfiles
+</div>
+
+<!-- DONE BANNER -->
+<div class="done-banner" id="doneBanner">
+  <div class="done-banner-left">
+    <div class="done-icon">✓</div>
+    <div class="done-text">
+      <strong>Ya completaste el Vibe Check</strong>
+      <span id="doneLabel">Tu perfil fue guardado.</span>
+    </div>
+  </div>
+  <button class="done-redo" onclick="resetAndRedo()">Volver a hacerlo</button>
+</div>
+
+<!-- PERSONAS GRID -->
+<div class="personas-wrap">
+  <div class="personas-grid" id="personasGrid"></div>
+</div>
+
+<!-- Follow-up eliminado: el módulo es 1 paso (selección directa) -->
+
+<script>
+/* ══════════════════════════════════════
+   DATA
+══════════════════════════════════════ */
+const PERSONAS = [
+  {
+    id: 'desorientado', titulo: 'El Desorientado', nombre: 'Julián Cortés',
+    emoji: '🧭', accent: '#85B882', accentBg: '#EEF5ED', glow: 'rgba(133,184,130,.16)',
+    resumen: 'No sabe qué quiere ni por dónde arrancar.',
+    descripcion: '"A mí me pasa que realmente no sé por dónde arrancar. Tengo clarísimo lo que me cuesta y lo que odio —por ejemplo, sentarme a estudiar historia o las manualidades—, pero si me preguntás en qué soy bueno, me quedo en blanco. Me paraliza pensar en el futuro. Siento que necesito urgente una brújula o alguien que me ordene este caos mental y me diga cuál es el primer paso."',
+    pregunta: '¿Cuál dirías que es tu mayor miedo hoy a la hora de pensar en el futuro, o qué es lo primero que necesitás que te ayuden a destrabar?',
+  },
+  {
+    id: 'multipotencial', titulo: 'La Multipotencial', nombre: 'Sofía Herrera',
+    emoji: '⚡', accent: '#9B8EC4', accentBg: '#F2EFF8', glow: 'rgba(155,142,196,.16)',
+    resumen: 'Le va bien en todo y no puede elegir uno.',
+    descripcion: '"Mi problema es que me entusiasma todo y me va bien en cosas que no tienen nada que ver entre sí. Me encanta la biología, pero también el diseño y la escritura. Siento que elegir una sola carrera es \'matar\' mis otras pasiones y encerrarme en una caja. Mi mayor miedo no es equivocarme de decisión, es aburrirme a los dos años de estar haciendo siempre lo mismo."',
+    pregunta: '¿Cuáles son esos dos o tres intereses o hobbies tuyos que parecen no tener nada que ver entre sí, pero que en el fondo te encantaría combinar?',
+  },
+  {
+    id: 'detallista', titulo: 'El Detallista', nombre: 'Martín Navarro',
+    emoji: '🔍', accent: '#5CA0C8', accentBg: '#EAF3F8', glow: 'rgba(92,160,200,.16)',
+    resumen: 'Ya filtró el área pero no puede desempatar opciones.',
+    descripcion: '"Yo ya filtré lo grueso; sé que lo mío son los negocios y los números. Pero me quedé trabado en lo fino. Leo los programas y no entiendo la diferencia real en el día a día entre Administración, Economía Empresarial o Finanzas. Son primas hermanas. Me da pánico estudiar \'casi\' lo que quería y pifiarle por milímetros. Necesito poner los planes de estudio lado a lado y ver la salida laboral exacta."',
+    pregunta: '¿Cuáles son exactamente esas dos o tres carreras que tenés en mente y que hoy necesitás desempatar con urgencia?',
+  },
+  {
+    id: 'desconectado', titulo: 'La Desconectada', nombre: 'Valentina Rojas',
+    emoji: '💻', accent: '#C4826E', accentBg: '#F8EDEA', glow: 'rgba(196,130,110,.16)',
+    resumen: 'Sus talentos reales no encajan en el sistema educativo.',
+    descripcion: '"Siento que el sistema educativo tradicional no es para mí. Veo las materias teóricas de la facultad y no me veo ahí ni a palos. En el colegio me decían que me faltaba ambición, pero la realidad es que me paso horas programando, armando setups o editando videos y soy una crack en eso. No encajo en el molde del estudiante de biblioteca, y quiero saber si lo que yo sé hacer sirve para armar una carrera en el mundo real."',
+    pregunta: '¿Cuál es esa habilidad, tema o proyecto fuera del colegio en el que sabés que le ponés garra y te gustaría descubrir si tiene salida en el mundo real?',
+  },
+  {
+    id: 'convencido', titulo: 'El Convencido', nombre: 'Lucas Benítez',
+    emoji: '🎯', accent: '#70B0A0', accentBg: '#EEF5F2', glow: 'rgba(112,176,160,.16)',
+    resumen: 'Ya lo tiene decidido y solo busca confirmación externa.',
+    descripcion: '"Yo lo tengo decidido desde que tengo uso de razón: voy a ser Odontólogo. En mi familia y en mi grupo de amigos ya me presentan así, es parte de quién soy. No vengo a buscar un test que me tire cinco opciones distintas ni a explorar cosas nuevas. Vengo a que un profesional con experiencia confirme que el camino que elegí está bien y me dé la tranquilidad de que me va a ir excelente."',
+    pregunta: '¿Cuál es esa carrera que ya elegiste y qué duda puntual necesitás que te respondan hoy para irte 100% tranquilo?',
+  },
+  {
+    id: 'confirmado', titulo: 'La Confirmada', nombre: 'Camila Silva',
+    emoji: '🚀', accent: '#6888B4', accentBg: '#EBF0F6', glow: 'rgba(104,136,180,.16)',
+    resumen: 'Sabe qué quiere, ahora optimiza el cómo y el dónde.',
+    descripcion: '"La vocación y las habilidades ya las tengo alineadas: voy por Ingeniería. No tengo dudas sobre el \'qué\'. Mi tema ahora es optimizar. Busco el \'dónde\' y el \'cómo\' para ser la mejor. Quiero datos duros y objetivos: qué universidad tiene los mejores convenios, qué especialización rinde más a futuro y cómo planificar mis próximos años al detalle para asegurarme la excelencia."',
+    pregunta: '¿Qué carrera elegiste y qué dato duro necesitás comparar ahora mismo —universidades, especializaciones o proyección— para armar tu plan?',
+  },
+  {
+    id: 'tiburon', titulo: 'El Tiburón', nombre: 'Tomás Quiroga',
+    emoji: '📈', accent: '#C4AE5A', accentBg: '#F8F4E4', glow: 'rgba(196,174,90,.16)',
+    resumen: 'Ve la carrera como inversión pura, solo le importa la rentabilidad.',
+    descripcion: '"Siendo 100% sincero, para mí estudiar es estrictamente una inversión de tiempo y plata. No me mueve la \'pasión\' ni encontrar mi propósito espiritual en el trabajo; me mueve el crecimiento y la rentabilidad. Veo la facultad como un escalón necesario para alcanzar mis metas económicas. Le tengo terror a la mediocridad y a ganar un sueldo promedio. Solo quiero saber qué carreras tienen los sueldos más altos y mayor proyección."',
+    pregunta: '¿Tenés algún rubro en la mira, o querés ver directamente cuáles son las áreas con mejores sueldos y proyección hoy en día?',
+  },
+];
+
+/* ══════════════════════════════════════
+   ESTADO
+══════════════════════════════════════ */
+let selectedId = null;
+// Perfiles que el usuario ya expandió/leyó
+const seen = new Set(JSON.parse(localStorage.getItem('vc_seen') || '[]'));
+
+/* ══════════════════════════════════════
+   PROGRESS DOTS
+══════════════════════════════════════ */
+function renderProgressDots() {
+  const container = document.getElementById('progressDots');
+  const label     = document.getElementById('progressLabel');
+  container.innerHTML = PERSONAS.map(p =>
+    `<div class="progress-dot ${seen.has(p.id) ? 'seen' : ''}"
+          style="--dot-color:${p.accent}" title="${p.titulo}"></div>`
+  ).join('');
+  label.textContent = `${seen.size} de ${PERSONAS.length} leídas`;
+}
+
+function markSeen(id) {
+  if (seen.has(id)) return;
+  seen.add(id);
+  localStorage.setItem('vc_seen', JSON.stringify([...seen]));
+  // Actualizar badge de la card
+  const badge = document.getElementById('badge-' + id);
+  if (badge) {
+    badge.classList.add('is-seen');
+    badge.innerHTML = `<span class="badge-dot"></span> Leída`;
+  }
+  // Actualizar progress dots
+  renderProgressDots();
+}
+
+/* ══════════════════════════════════════
+   ANIMAL AVATARS
+══════════════════════════════════════ */
+function getAvatar(id) {
+  const s = {
+    // Turtle — lenta, buscando su camino
+    desorientado: `<svg viewBox="0 0 40 40" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="20" cy="25" rx="12" ry="7" fill="currentColor" opacity=".2"/>
+      <path d="M8 23 Q8 11 20 11 Q32 11 32 23Z" fill="currentColor"/>
+      <circle cx="20" cy="7" r="4" fill="currentColor"/>
+      <ellipse cx="9" cy="27" rx="2.5" ry="1.8" fill="currentColor" opacity=".6"/>
+      <ellipse cx="31" cy="27" rx="2.5" ry="1.8" fill="currentColor" opacity=".6"/>
+      <ellipse cx="10" cy="32" rx="2.5" ry="1.8" fill="currentColor" opacity=".6"/>
+      <ellipse cx="30" cy="32" rx="2.5" ry="1.8" fill="currentColor" opacity=".6"/>
+    </svg>`,
+    // Octopus — múltiples intereses, muchos brazos
+    multipotencial: `<svg viewBox="0 0 40 40" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="20" cy="16" r="9" fill="currentColor"/>
+      <circle cx="15.5" cy="14" r="1.8" fill="white" opacity=".5"/>
+      <circle cx="24.5" cy="14" r="1.8" fill="white" opacity=".5"/>
+      <path d="M11 24 Q9 29 11 33" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M15 25 Q14 31 16 34" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M20 25 Q20 31 20 35" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M25 25 Q26 31 24 34" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M29 24 Q31 29 29 33" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    </svg>`,
+    // Owl — analítico, ojos grandes
+    detallista: `<svg viewBox="0 0 40 40" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="11,15 7,4 17,12" fill="currentColor"/>
+      <polygon points="29,15 33,4 23,12" fill="currentColor"/>
+      <ellipse cx="20" cy="24" rx="12" ry="13" fill="currentColor"/>
+      <circle cx="15" cy="20" r="5.5" fill="white" opacity=".7"/>
+      <circle cx="25" cy="20" r="5.5" fill="white" opacity=".7"/>
+      <circle cx="15" cy="20" r="2.5" fill="currentColor"/>
+      <circle cx="25" cy="20" r="2.5" fill="currentColor"/>
+      <polygon points="20,25.5 17.5,29 22.5,29" fill="white" opacity=".5"/>
+    </svg>`,
+    // Cat — independiente, no sigue el molde
+    desconectado: `<svg viewBox="0 0 40 40" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="10,18 7,5 18,14" fill="currentColor"/>
+      <polygon points="30,18 33,5 22,14" fill="currentColor"/>
+      <circle cx="20" cy="23" r="13" fill="currentColor"/>
+      <ellipse cx="15" cy="21" rx="1.8" ry="2.5" fill="white" opacity=".6"/>
+      <ellipse cx="25" cy="21" rx="1.8" ry="2.5" fill="white" opacity=".6"/>
+      <path d="M9 27 L14 26" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity=".45"/>
+      <path d="M9 29 L14 28.5" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity=".45"/>
+      <path d="M31 27 L26 26" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity=".45"/>
+      <path d="M31 29 L26 28.5" stroke="white" stroke-width="1.2" stroke-linecap="round" opacity=".45"/>
+    </svg>`,
+    // Bull — decidido, recto, con fuerza
+    convencido: `<svg viewBox="0 0 40 40" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
+      <path d="M13 17 Q6 9 9 3" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M27 17 Q34 9 31 3" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <circle cx="20" cy="24" r="13" fill="currentColor"/>
+      <ellipse cx="20" cy="31" rx="7" ry="5" fill="white" opacity=".18"/>
+      <circle cx="15" cy="21" r="2" fill="white" opacity=".55"/>
+      <circle cx="25" cy="21" r="2" fill="white" opacity=".55"/>
+      <circle cx="17.5" cy="31" r="1.3" fill="currentColor" opacity=".5"/>
+      <circle cx="22.5" cy="31" r="1.3" fill="currentColor" opacity=".5"/>
+    </svg>`,
+    // Eagle — visión estratégica, alas extendidas
+    confirmado: `<svg viewBox="0 0 40 40" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
+      <path d="M20 21 Q10 12 1 16 Q7 20 12 24Z" fill="currentColor"/>
+      <path d="M20 21 Q30 12 39 16 Q33 20 28 24Z" fill="currentColor"/>
+      <ellipse cx="20" cy="28" rx="6" ry="8" fill="currentColor"/>
+      <circle cx="20" cy="14" r="5" fill="currentColor"/>
+      <polygon points="25,14 31,16 25,17.5" fill="currentColor" opacity=".55"/>
+      <path d="M16 36 Q20 40 24 36" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+    </svg>`,
+    // Shark — ambición pura, siempre en movimiento
+    tiburon: `<svg viewBox="0 0 40 40" width="26" height="26" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="19" cy="28" rx="16" ry="9" fill="currentColor"/>
+      <path d="M17 20 L21 8 L26 20Z" fill="currentColor"/>
+      <path d="M35 24 Q41 19 39 28 Q41 36 35 32Z" fill="currentColor" opacity=".65"/>
+      <path d="M7 31 Q19 36 32 31" stroke="white" stroke-width="1.3" fill="none" stroke-linecap="round" opacity=".3"/>
+      <circle cx="13" cy="26" r="1.5" fill="white" opacity=".6"/>
+    </svg>`,
+  };
+  return s[id] || '';
+}
+
+/* ══════════════════════════════════════
+   RENDER CARDS
+══════════════════════════════════════ */
+function renderPersonas() {
+  document.getElementById('personasGrid').innerHTML = PERSONAS.map(p => {
+    const isSeen = seen.has(p.id);
+    return `
+    <div class="persona-card" id="card-${p.id}"
+         style="--accent:${p.accent};--accent-bg:${p.accentBg};--glow:${p.glow}">
+
+      <div class="card-top" onclick="toggleExpand('${p.id}')">
+        <div class="card-header">
+          <div class="card-emoji">${getAvatar(p.id)}</div>
+          <div class="card-meta">
+            <span class="card-tag">${p.titulo}</span>
+            <div class="card-name">${p.nombre}</div>
+          </div>
+          <span class="card-status-badge ${isSeen ? 'is-seen' : ''}" id="badge-${p.id}">
+            <span class="badge-dot"></span>
+            ${isSeen ? 'Leída' : 'Sin leer'}
+          </span>
+        </div>
+        <p class="card-summary">${p.resumen}</p>
+      </div>
+
+      <button class="card-readmore" id="readmore-${p.id}"
+              onclick="toggleExpand('${p.id}')">
+        Leer historia completa
+        <svg class="rm-icon" width="16" height="16" viewBox="0 0 24 24" fill="none">
+          <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      <div class="card-expand" id="expand-${p.id}">
+        <div class="card-expand-inner">
+          <p class="card-quote">${p.descripcion}</p>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+              <button class="card-select-btn" onclick="selectPersona('${p.id}')">
+                Me resuena esta historia
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                  <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor"
+                        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </button>
+              <div class="card-selected-indicator" id="selected-ind-${p.id}">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5"
+                        stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Elegiste esta
+              </div>
+            </div>
+            <button class="card-close-btn" onclick="toggleExpand('${p.id}')">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2.2"
+                      stroke-linecap="round"/>
+              </svg>
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>`;
+  }).join('');
+
+  renderProgressDots();
+}
+
+/* ══════════════════════════════════════
+   EXPAND / COLLAPSE
+══════════════════════════════════════ */
+function toggleExpand(id) {
+  const expand  = document.getElementById('expand-' + id);
+  const readBtn = document.getElementById('readmore-' + id);
+  const isOpen  = expand.classList.contains('is-open');
+
+  if (isOpen) {
+    // Colapsar
+    expand.classList.remove('is-open');
+    readBtn.classList.remove('is-open');
+  } else {
+    // Expandir
+    expand.classList.add('is-open');
+    readBtn.classList.add('is-open');
+    markSeen(id);
+  }
+}
+
+/* ══════════════════════════════════════
+   SELECCIÓN
+══════════════════════════════════════ */
+function selectPersona(id) {
+  selectedId = id;
+  const persona = PERSONAS.find(p => p.id === id);
+  if (!persona) return;
+
+  markSeen(id);
+
+  // Visual: resaltar seleccionada, atenuar el resto
+  PERSONAS.forEach(p => {
+    const card = document.getElementById('card-' + p.id);
+    if (!card) return;
+    card.classList.remove('is-selected', 'is-dimmed');
+    if (p.id === id) card.classList.add('is-selected');
+    else             card.classList.add('is-dimmed');
+  });
+
+  // 1 PASO: guardar y redirigir directamente (sin pregunta follow-up)
+  localStorage.setItem('vibecheck_done',    'done');
+  localStorage.setItem('vibecheck_persona', id);
+  localStorage.setItem('vibecheck_data',    JSON.stringify({
+    persona: id, titulo: persona.titulo,
+    nombre: persona.nombre, timestamp: Date.now(),
+  }));
+
+  // Breve feedback visual antes de salir
+  const btn = document.querySelector(`#card-${id} .card-select-btn`);
+  if (btn) { btn.innerHTML = '✓ ¡Listo!'; btn.style.background = persona.accent; btn.style.color = '#fff'; }
+
+  setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+}
+
+/* ══════════════════════════════════════
+   MOSTRAR SELECCIÓN PREVIA (sin guardar ni redirigir)
+══════════════════════════════════════ */
+function showSelectionOnly(id) {
+  selectedId = id;
+  markSeen(id);
+
+  // Highlight selected card; leave others normal (clickable, no dimming)
+  PERSONAS.forEach(p => {
+    const card = document.getElementById('card-' + p.id);
+    if (!card) return;
+    card.classList.remove('is-selected', 'is-dimmed');
+    if (p.id === id) card.classList.add('is-selected');
+  });
+
+  // Open previously selected card
+  const expand = document.getElementById('expand-' + id);
+  if (expand && !expand.classList.contains('is-open')) {
+    toggleExpand(id);
+  }
+}
+
+/* ══════════════════════════════════════
+   ESTADO PREVIO
+══════════════════════════════════════ */
+function checkPreviousState() {
+  const done   = localStorage.getItem('vibecheck_done') === 'done';
+  const prevId = localStorage.getItem('vibecheck_persona');
+  const prev   = PERSONAS.find(p => p.id === prevId);
+
+  if (done && prev) {
+    document.getElementById('doneBanner').style.display = 'flex';
+    document.getElementById('doneLabel').textContent =
+      'Elegiste: ' + prev.titulo + ' · ' + prev.nombre;
+    // Show selection visually without saving or redirecting
+    setTimeout(() => showSelectionOnly(prevId), 200);
+  }
+}
+
+function resetAndRedo() {
+  ['vibecheck_done','vibecheck_persona','vibecheck_answer','vibecheck_data']
+    .forEach(k => localStorage.removeItem(k));
+
+  document.getElementById('doneBanner').style.display = 'none';
+
+  PERSONAS.forEach(p => {
+    const card = document.getElementById('card-' + p.id);
+    if (card) card.classList.remove('is-selected', 'is-dimmed');
+    const exp = document.getElementById('expand-' + p.id);
+    if (exp) exp.classList.remove('is-open');
+    const rm = document.getElementById('readmore-' + p.id);
+    if (rm) rm.classList.remove('is-open');
+  });
+
+  selectedId = null;
+  document.getElementById('heroSection').scrollIntoView({ behavior: 'smooth' });
+}
+
+/* ══════════════════════════════════════
+   INIT
+══════════════════════════════════════ */
+renderPersonas();
+checkPreviousState();
+
+// Hide scroll hint once user scrolls
+(function() {
+  const hint = document.getElementById('scrollHint');
+  if (!hint) return;
+  const obs = new IntersectionObserver(([e]) => {
+    if (!e.isIntersecting) hint.style.display = 'none';
+  }, { threshold: 0 });
+  obs.observe(hint);
+})();
+</script>
+</body>
+</html>

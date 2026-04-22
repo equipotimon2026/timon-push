@@ -54,12 +54,50 @@
     }
 
     /* Sticky section header */
+    /* ── Header navigation row ── */
+    .header-toprow {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 8px; margin-bottom: 14px;
+    }
+    .header-back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 600; color: var(--text);
+      text-decoration: none;
+      background: var(--card); border: 1.5px solid var(--border);
+      border-radius: 99px; padding: 7px 16px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.07);
+      transition: background .15s, box-shadow .15s;
+    }
+    .header-back-link:hover { background: #edeae4; box-shadow: 0 2px 8px rgba(0,0,0,.12); }
+    .header-prev-btn {
+      display: none; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 600; color: var(--gray);
+      background: none; border: 1.5px solid var(--border);
+      border-radius: 99px; padding: 7px 16px;
+      cursor: pointer; font-family: inherit;
+      transition: color .15s, border-color .15s;
+    }
+    .header-prev-btn.visible { display: inline-flex; }
+    .header-prev-btn:hover { color: var(--text); border-color: var(--text); }
+
+    /* ── Scroll fade ── */
+    .scroll-fade {
+      position: sticky;
+      bottom: 148px; /* above fixed mobile panel */
+      height: 52px;
+      margin-top: -52px;
+      background: linear-gradient(transparent, var(--bg) 85%);
+      pointer-events: none;
+      z-index: 5;
+      flex-shrink: 0;
+    }
+
     .section-header {
       position: sticky;
       top: 0;
       background: var(--bg);
       z-index: 10;
-      padding: 48px 24px 20px;
+      padding: 16px 24px 20px;
       border-bottom: 1px solid var(--border);
     }
 
@@ -525,6 +563,7 @@
 
       .mini-bars { display: none; } /* hidden on desktop */
       .mobile-next { display: none; } /* next btn moved to desktop-footer */
+      .scroll-fade { display: none; } /* not needed on desktop */
 
       /* Full desktop bars (shown in panel) */
       .desktop-bars {
@@ -648,6 +687,10 @@
     <div class="content-area" id="contentArea">
 
       <div class="section-header">
+        <div class="header-toprow">
+          <a href="dashboard.html" class="header-back-link">← Inicio</a>
+          <button class="header-prev-btn" id="prevBtn" onclick="prevSection()">← Anterior</button>
+        </div>
         <div class="section-meta">
           <span class="section-index" id="sectionIndex">Sección 1 de 4</span>
           <div class="section-steps" id="sectionSteps"></div>
@@ -657,6 +700,7 @@
       </div>
 
       <div class="words-body" id="wordsBody"></div>
+      <div class="scroll-fade" id="scrollFade"></div>
 
       <!-- Desktop footer (hidden on mobile via CSS) -->
       <div class="desktop-footer" id="desktopFooter" style="display:none;">
@@ -735,10 +779,10 @@
         subtitle: 'Marcá las que sentís que te describen.',
         items: {
           R: ['Dinámico','Concreto','Conservador','Franco','Independiente','Persistente','Práctico','Bien coordinado','Rígido','Fuerte','Ahorrador','Tradicional','Individualista'],
-          I: ['Original','Metódico','Explorador','Independiente','Inquisidor','Intelectual','Lógico','Observador','Racional','Curioso','Reservado','Preciso','Investigativo'],
-          A: ['Idealista','Informal','Emocional','Impulsivo','Imaginativo','Original','Espontáneo','No conformista','Expresivo','Independiente','Poco práctico','Sensible','Creativo'],
-          S: ['Cálido','Sensitivo','Cooperativo','Ético','Amigable','Generoso','Responsable','Genuino','Perceptivo','Sociable','Comprensivo','Idealista','Prudente'],
-          E: ['Aventurero','Dinámico','Dominante','Popular','Seguro de sí','Sociable','Curioso','Extrovertido','Optimista','Colaborador','Persuasivo','Acometedor','Competitivo'],
+          I: ['Original','Metódico','Explorador','Independiente','Investigador','Intelectual','Lógico','Observador','Racional','Curioso','Reservado','Preciso','Investigativo'],
+          A: ['Soñador','Informal','Emocional','Impulsivo','Imaginativo','Original','Espontáneo','No conformista','Expresivo','Independiente','Práctico','Sensible','Creativo'],
+          S: ['Cálido','Sensible','Cooperativo','Honesto','Amigable','Generoso','Responsable','Genuino','Perceptivo','Sociable','Comprensivo','Soñador','Prudente'],
+          E: ['Aventurero','Dinámico','Dominante','Popular','Seguro de sí','Sociable','Curioso','Extrovertido','Optimista','Colaborador','Persuasivo','Decidido','Competitivo'],
           C: ['Preciso','Ordenado','Cuidadoso','Organizado','Conformista','Conservador','Eficiente','Prudente','Detallista','Responsable','Práctico','Predecible','Callado'],
         }
       },
@@ -746,10 +790,10 @@
         title: 'Habilidades',
         subtitle: 'Marcá las habilidades que reconocés en vos.',
         items: {
-          R: ['Mecánica','Atlética','Manual','Precisión','Practicidad','Estabilidad','Analítica','Crítica','Kinésica','Espacial'],
+          R: ['Mecánica','Atlética','Manual','Precisión','Practicidad','Estabilidad','Analítica','Crítica','Uso del cuerpo','Espacial'],
           I: ['Analítica','Abstracta','Matemática','Científica','Verbal','Resolutiva','Metódica','Observación','Paciencia','Investigación'],
           A: ['Creativa','Expresiva','Intuitiva','Introspectiva','Musical','Diseño','Espacial','Imaginación','Detalle','Innovación'],
-          S: ['Enseñanza','Comprensión','Escucha','Ayuda al otro','Comunicación','Imaginación','Responsabilidad','Conciliación','Persuasión','Sagacidad'],
+          S: ['Enseñanza','Comprensión','Escucha','Ayuda al otro','Comunicación','Imaginación','Responsabilidad','Mediador','Persuasión','Astucia'],
           E: ['Persuasión','Responsabilidad','Liderazgo','Comunicación','Expresión oral','Organización','Objetividad','Practicidad','Tolerancia','Ambición'],
           C: ['Cálculo','Finanzas','Prolijidad','Planificación','Método','Orden','Responsabilidad','Practicidad','Detalle','Exactitud'],
         }
@@ -758,9 +802,9 @@
         title: 'Intereses',
         subtitle: 'Marcá los que observás más en tu persona.',
         items: {
-          R: ['Cálculo','Científico','Manual','Exacto','Planificación'],
-          I: ['Clasificación','Numérico','Análisis/síntesis','Orden/precisión','Investigación'],
-          A: ['Estético','Armónico','Manual','Visual','Auditivo'],
+          R: ['Cálculo','Científico','Manual','Ser preciso','Planificación'],
+          I: ['Ordenar','Numérico','Análisis/síntesis','Orden/precisión','Investigación'],
+          A: ['Estético','Equilibrado','Manual','Visual','Auditivo'],
           S: ['Precisión verbal','Organización','Comunicación','Ayuda','Justicia'],
           E: ['Organización','Supervisión','Colaboración','Análisis/síntesis','Estrategias'],
           C: ['Orden','Supervisión','Computación','Detalle','Cálculo'],
@@ -775,7 +819,7 @@
           A: ['Ayuda','Arte','Lograr armonía','Observación','Expresión','La belleza'],
           S: ['Cooperación','Trabajo en equipo','Comunicación','Protección','Curar','El desarrollo personal'],
           E: ['Desafíos','Competencia','Organización','Poder/servicio','El estatus','Emprender'],
-          C: ['Seguridad','Precisión','Eficiencia','Estadística','Métodos','Pertenencia'],
+          C: ['Seguridad','Precisión','Eficiencia','Estadísticas','Métodos','Pertenencia'],
         }
       },
     ];
@@ -923,6 +967,9 @@
       mobileNextBtn.textContent   = btnLabel;
       updateStepDots(idx);
 
+      const prevBtn = document.getElementById('prevBtn');
+      if (prevBtn) prevBtn.classList.toggle('visible', idx > 0);
+
       // Build word groups
       wordsBody.innerHTML = '';
       TYPES.forEach(t => {
@@ -983,6 +1030,17 @@
     }
 
     // ─── Navigate ────────────────────────────────────────────────────
+    function prevSection() {
+      if (currentSection > 0) {
+        currentSection--;
+        wordsBody.style.opacity = '0';
+        setTimeout(() => {
+          renderSection(currentSection);
+          wordsBody.style.opacity = '1';
+        }, 200);
+      }
+    }
+
     function nextSection() {
       if (currentSection < sections.length - 1) {
         currentSection++;

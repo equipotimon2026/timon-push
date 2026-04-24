@@ -4,31 +4,36 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Timón · Dashboard</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg:    #FAF7F2;
-      --card:  #FFFFFF;
-      --text:  #2C2A27;
-      --sub:   #7A7570;
-      --muted: #B2ADA6;
-      --line:  #EDE8E0;
-      /* --accent, --accent-bg, --glow seteados por JS en cada .jstep */
+      --bg:      #EEF4FC;
+      --card:    #FFFFFF;
+      --text:    #1A1D3B;
+      --sub:     #5A6482;
+      --muted:   #94A3B8;
+      --line:    #DDE4F0;
+      --shadow-sm:      0 2px 12px rgba(67,97,238,.07), 0 1px 3px rgba(67,97,238,.04);
+      --shadow-current: 0 12px 40px rgba(67,97,238,.20), 0 4px 12px rgba(67,97,238,.08);
+      --font-display:   'Instrument Serif', Georgia, serif;
+      --font-body:      'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     html, body {
       min-height: 100%;
       background: var(--bg);
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-family: var(--font-body);
       color: var(--text);
       -webkit-font-smoothing: antialiased;
     }
 
     /* ════ LAYOUT ════ */
     .screen {
-      max-width: 420px;
+      max-width: 440px;
       min-height: 100svh;
       margin: 0 auto;
       background: var(--bg);
@@ -36,47 +41,88 @@
       flex-direction: column;
     }
 
+    /* ════ NAV ════ */
+    .web-nav { display: none; }
+
     /* ════ HEADER ════ */
-    .header { padding: 52px 24px 24px; }
+    .header { padding: 56px 28px 24px; }
 
-    .greeting {
-      font-size: 30px; font-weight: 700;
-      letter-spacing: -.5px; line-height: 1.15;
+    .header-brand {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      margin-bottom: 36px;
     }
 
-    .header-meta {
-      display: flex; align-items: center;
-      justify-content: space-between; margin-top: 8px;
+    .greeting-label {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--sub);
+      letter-spacing: 0.1px;
+      margin-bottom: 2px;
     }
 
-    .header-sub { font-size: 13px; color: var(--sub); }
-    .header-pct { font-size: 13px; font-weight: 600; color: #C4848A; }
-
-    .dash-progress-track {
-      height: 4px; background: var(--line);
-      border-radius: 99px; margin-top: 10px; overflow: hidden;
-    }
-    .dash-progress-fill {
-      height: 100%; background: #C4848A;
-      border-radius: 99px; width: 0%;
-      transition: width .6s ease;
+    .greeting-name {
+      font-family: var(--font-display);
+      font-style: italic;
+      font-size: 52px;
+      letter-spacing: -0.03em;
+      line-height: 1.04;
+      color: var(--text);
     }
 
-    /* ════ MODULES SECTION ════ */
-    .modules { padding: 0 20px 64px; flex: 1; }
+    .progress-section {
+      margin-top: 22px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .progress-label { font-size: 12.5px; color: var(--muted); white-space: nowrap; }
+
+    .progress-track {
+      flex: 1;
+      height: 5px;
+      background: var(--line);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4361EE, #7C3AED);
+      border-radius: 99px;
+      width: 0%;
+      transition: width .8s cubic-bezier(.25,1,.5,1);
+    }
+
+    .progress-pct {
+      font-size: 13px;
+      font-weight: 600;
+      color: #4361EE;
+      min-width: 36px;
+      text-align: right;
+    }
+
+    /* ════ MODULES ════ */
+    .modules { padding: 0 24px 80px; flex: 1; }
 
     .section-label {
-      font-size: 10px; font-weight: 600; color: var(--muted);
-      letter-spacing: 1.6px; text-transform: uppercase;
-      padding: 12px 0 32px;
+      font-size: 10px;
+      font-weight: 700;
+      color: #4361EE;
+      letter-spacing: 2.4px;
+      text-transform: uppercase;
+      padding: 20px 0 36px;
+      opacity: .7;
     }
 
-    /* ═══════════════════════════════════════════════════════
+    /* ════════════════════════════════════════════════
        JOURNEY PATH
-       --accent, --accent-bg, --glow → inyectados por JS
-       en cada .jstep vía style.setProperty().
-       Cero selectores por módulo en CSS.
-    ═══════════════════════════════════════════════════════ */
+       --accent, --accent-bg, --glow → set per .jstep via JS
+    ════════════════════════════════════════════════ */
     .jpath { position: relative; }
 
     .jpath-svg {
@@ -85,241 +131,444 @@
       pointer-events: none; z-index: 0; overflow: visible;
     }
 
-    /* ── Espaciador entre pasos ── */
-    .jconn { height: 36px; }
+    .jconn { height: 40px; }
 
-    /* ── Fila del camino ── */
+    /* ── Step row ── */
     .jstep {
-      display: flex; align-items: center; gap: 18px;
-      position: relative; z-index: 1; width: 82%;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      z-index: 1;
+      width: 84%;
       -webkit-tap-highlight-color: transparent;
     }
+
     .jstep.jstep--even {
       flex-direction: row-reverse;
       margin-left: auto;
     }
-    /* Badge siempre hacia el exterior en pasos pares */
+
+    /* Badge side matches node side for even steps */
     .jstep.jstep--even .jcard { flex-direction: row-reverse; }
 
-    /* ─────────────────── NODO ─────────────────── */
+    /* ── NODE ── */
     .jnode {
-      width: 64px; height: 64px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0; position: relative; z-index: 2;
-      font-size: 18px; font-weight: 700;
-      background: var(--accent-bg, #F0EDE8);
-      border: 2.5px solid var(--accent, var(--line));
-      color: var(--accent, var(--muted));
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+      font-family: var(--font-body);
+      font-size: 15px;
+      font-weight: 700;
+      background: var(--card);
+      border: 2px solid var(--line);
+      color: var(--muted);
       user-select: none;
       transition: transform .22s ease, box-shadow .3s ease;
     }
-    /* Click feedback */
+
     .jnode:active { transform: scale(.94); }
 
-    /* DONE — círculo sólido */
+    /* DONE — solid filled */
     .js-done .jnode {
-      background: var(--accent, #888);
-      border-color: var(--accent, #888);
+      background: var(--accent, #4361EE);
+      border-color: var(--accent, #4361EE);
       color: #fff;
-      font-size: 22px; font-weight: 400;
+      font-size: 18px;
+      font-weight: 400;
+      box-shadow: 0 4px 14px var(--glow, rgba(67,97,238,.30));
     }
 
-    /* CURRENT — blanco con halo de color */
+    /* CURRENT — white with accent ring + animated glow */
     .js-current .jnode {
-      background: #fff;
-      border-width: 3px;
-      color: var(--accent, #555);
-      box-shadow: 0 0 0 9px var(--glow, rgba(0,0,0,.09));
+      background: var(--card);
+      border: 2.5px solid var(--accent, #4361EE);
+      color: var(--accent, #4361EE);
+      font-weight: 700;
+      box-shadow: 0 0 0 6px var(--glow, rgba(67,97,238,.12)), 0 4px 16px var(--glow, rgba(67,97,238,.20));
     }
 
-    /* LOCKED — no bloquea el click, solo atenúa */
-    .js-locked { opacity: .48; }
+    /* ACTIVE — muted */
+    .js-active .jnode {
+      background: var(--card);
+      border: 2px solid var(--line);
+      color: var(--muted);
+    }
 
-    /* ─────────────────── TARJETA ─────────────────── */
+    .js-locked { opacity: .35; pointer-events: none; }
+
+    /* ── CARD ──
+       Left-side accent stripe via inset box-shadow (odd steps).
+       Right-side accent stripe for even steps. No border tricks needed.
+    ── */
     .jcard {
       flex: 1;
-      background: #fff;
-      border-radius: 22px;
-      padding: 18px 24px;
-      /* Raya de acento superior = identidad de módulo */
-      border: 1.5px solid rgba(0,0,0,.07);
-      border-top: 4px solid var(--accent, #D8D2C8);
-      display: flex; align-items: center; gap: 16px;
-      box-shadow: 0 2px 12px rgba(0,0,0,.065), 0 1px 3px rgba(0,0,0,.04);
-      text-decoration: none; color: inherit;
-      min-height: 78px;
+      background: var(--card);
+      border-radius: 20px;
+      padding: 18px 20px;
+      border: 1.5px solid var(--line);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 76px;
       cursor: pointer;
-      /* Spring bounce sutil para el hover */
-      transition: transform .3s cubic-bezier(.34,1.56,.64,1),
-                  box-shadow .22s ease;
+      text-decoration: none;
+      color: inherit;
+      box-shadow: inset 4px 0 0 var(--accent, transparent), var(--shadow-sm);
+      transition: transform .3s cubic-bezier(.34,1.56,.64,1), box-shadow .22s ease;
     }
 
-    /* DONE — fondo tintado muy suave */
+    /* Even steps: accent stripe on right (toward node) */
+    .jstep--even .jcard {
+      box-shadow: inset -4px 0 0 var(--accent, transparent), var(--shadow-sm);
+    }
+
+    /* DONE */
     .js-done .jcard {
-      background: var(--accent-bg, #F6F4F0);
+      background: var(--accent-bg, #EEF2FF);
+      border-color: transparent;
     }
 
-    /* CURRENT — el protagonista de la pantalla */
+    /* CURRENT */
     .js-current .jcard {
-      background: #fff;
-      border-top-width: 5px;
-      box-shadow: 0 10px 40px rgba(0,0,0,.13), 0 2px 10px rgba(0,0,0,.07);
+      background: var(--card);
+      border-color: transparent;
+      box-shadow: inset 5px 0 0 var(--accent, #4361EE), var(--shadow-current);
     }
 
-    /* ACTIVE/PENDING — invita sin imponerse */
+    .jstep--even.js-current .jcard {
+      box-shadow: inset -5px 0 0 var(--accent, #4361EE), var(--shadow-current);
+    }
+
+    /* ACTIVE */
     .js-active .jcard {
-      background: var(--accent-bg, #FAF8F5);
-      box-shadow: 0 1px 6px rgba(0,0,0,.05);
+      background: var(--card);
+      box-shadow: inset 4px 0 0 var(--accent, transparent);
+      border-color: var(--line);
     }
 
-    /* Hover universal — todos los módulos responden */
+    .jstep--even.js-active .jcard {
+      box-shadow: inset -4px 0 0 var(--accent, transparent);
+    }
+
+    /* Hover */
     .jcard:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 20px 52px rgba(0,0,0,.13), 0 4px 12px rgba(0,0,0,.07);
+      transform: translateY(-4px);
+      box-shadow: inset 4px 0 0 var(--accent, transparent), 0 16px 40px rgba(67,97,238,.13), 0 4px 12px rgba(67,97,238,.06);
     }
-    .jcard:active { transform: translateY(-2px); }
 
-    /* ── Contenido de la tarjeta ── */
+    .jstep--even .jcard:hover {
+      box-shadow: inset -4px 0 0 var(--accent, transparent), 0 16px 40px rgba(67,97,238,.13), 0 4px 12px rgba(67,97,238,.06);
+    }
+
+    .jcard:active { transform: translateY(-1px); }
+
+    /* ── Card content ── */
     .jcard-body  { flex: 1; min-width: 0; }
+
     .jcard-title {
-      font-size: 15px; font-weight: 600;
-      letter-spacing: -.2px; line-height: 1.35; color: var(--text);
-    }
-    .jcard-sub {
-      font-size: 13px; color: var(--sub);
-      margin-top: 4px; line-height: 1.5;
+      font-size: 14.5px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+      line-height: 1.3;
+      color: var(--text);
     }
 
-    /* ─────────────────── BADGE ─────────────────── */
+    .jcard-sub {
+      font-size: 12px;
+      color: var(--sub);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    /* ── Badge ── */
     .jbadge {
       flex-shrink: 0;
-      font-family: inherit; font-size: 11.5px; font-weight: 600;
-      border-radius: 99px; padding: 6px 14px;
-      white-space: nowrap; letter-spacing: .1px;
+      font-family: var(--font-body);
+      font-size: 11px;
+      font-weight: 600;
+      border-radius: 99px;
+      padding: 5px 12px;
+      white-space: nowrap;
+      letter-spacing: 0.3px;
     }
-    /* Sin selectores por módulo — todo vía custom property */
-    .jbadge--done   { background: var(--accent-bg, rgba(0,0,0,.06)); color: var(--sub); }
-    .jbadge--start  { background: var(--accent, #555); color: #fff; }
+
+    .jbadge--done   { background: rgba(67,97,238,.08); color: var(--sub); }
+    .jbadge--start  { background: var(--accent, #4361EE); color: #fff; box-shadow: 0 2px 8px var(--glow, rgba(67,97,238,.30)); }
     .jbadge--active { border: 1.5px solid var(--line); color: var(--muted); font-weight: 500; }
     .jbadge--locked { border: 1.5px solid var(--line); color: var(--muted); font-weight: 500; }
 
-    /* ════ WEB NAV ════ */
-    .web-nav { display: none; }
+    /* ════ MOBILE ONLY ≤639px ════ */
+    @media (max-width: 639px) {
+      /* ── Nav móvil ── */
+      .web-nav {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 20px 24px 0;
+        background: transparent;
+      }
+      .web-nav-brand {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 16px;
+        letter-spacing: -0.02em;
+        color: var(--text);
+      }
+      .web-nav-tag {
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--sub);
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        cursor: pointer;
+      }
 
+      /* ── Header ── */
+      .header-brand { display: none; }
+      .header { padding: 20px 24px 20px; }
+      .progress-label { text-transform: uppercase; letter-spacing: 1px; font-size: 11px; }
+
+      /* ── Módulos ── */
+      .modules { padding: 0 16px 80px; }
+
+      /* ── Deshabilitar zigzag: todos izquierda ── */
+      .jstep,
+      .jstep.jstep--even {
+        flex-direction: row !important;
+        margin-left: 0 !important;
+        width: 100%;
+        gap: 12px;
+      }
+
+      /* ── Nodos ── */
+      .jnode { width: 44px; height: 44px; font-size: 13px; flex-shrink: 0; }
+      .js-done .jnode { font-size: 16px; }
+
+      /* ── Cards: columna, franja izquierda siempre ── */
+      .jcard,
+      .jstep--even .jcard,
+      .js-active .jcard,
+      .jstep--even.js-active .jcard {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 14px 16px;
+        min-height: auto;
+        border-radius: 16px;
+        gap: 4px;
+        box-shadow: inset 4px 0 0 var(--accent, transparent), var(--shadow-sm);
+      }
+
+      .js-current .jcard,
+      .jstep--even.js-current .jcard {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 14px 16px;
+        min-height: auto;
+        border-radius: 16px;
+        gap: 4px;
+        box-shadow: inset 5px 0 0 var(--accent, #4361EE), var(--shadow-current);
+      }
+
+      .jcard-body { width: 100%; }
+
+      /* ── Mostrar subtítulo ── */
+      .jcard-sub { display: block; font-size: 12px; }
+      .jcard-title { font-size: 14px; letter-spacing: -0.1px; }
+
+      /* ── Botón Empezar: píldora ancha en step actual ── */
+      .js-current .jbadge--start {
+        display: block;
+        width: 100%;
+        text-align: center;
+        padding: 11px 16px;
+        font-size: 13px;
+        font-weight: 600;
+        border-radius: 99px;
+        margin-top: 10px;
+      }
+
+      /* ── Ocultar badges secundarios ── */
+      .jbadge--active,
+      .jbadge--locked,
+      .jbadge--done { display: none; }
+
+      /* ── Conectores ── */
+      .jconn { height: 24px; }
+    }
 
     /* ════ TABLET ≥640px ════ */
     @media (min-width: 640px) {
       html, body {
-        background: #DDD9D1;
-        display: flex; flex-direction: column;
-        align-items: center; padding: 48px 24px 64px; min-height: 100svh;
+        background: #D4E2F5;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 48px 24px 64px;
+        min-height: 100svh;
       }
+
       .web-nav {
-        display: flex; align-items: center; justify-content: space-between;
-        width: 100%; max-width: 840px; padding: 0 4px; margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        max-width: 860px;
+        padding: 0 4px;
+        margin-bottom: 16px;
       }
-      .web-nav-brand { font-size: 15px; font-weight: 700; color: rgba(249,248,246,.9); letter-spacing: -.04em; }
-      .web-nav-tag   { font-size: 11px; font-weight: 500; color: rgba(249,248,246,.45); text-transform: uppercase; letter-spacing: 1.2px; }
+
+      .web-nav-brand {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 16px;
+        color: rgba(26,29,59,.80);
+        letter-spacing: -0.02em;
+      }
+
+      .web-nav-tag {
+        font-size: 11px;
+        font-weight: 500;
+        color: rgba(26,29,59,.40);
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+      }
+
       .screen {
-        width: 100%; max-width: 840px; min-height: auto;
+        width: 100%;
+        max-width: 860px;
+        min-height: auto;
         border-radius: 28px;
-        box-shadow: 0 12px 60px rgba(0,0,0,.18), 0 0 0 1px rgba(0,0,0,.05);
+        box-shadow: 0 16px 64px rgba(67,97,238,.16), 0 0 0 1px rgba(67,97,238,.08);
         overflow: hidden;
       }
-      .header { padding: 44px 52px 24px; }
-      .greeting { font-size: 36px; }
-      .modules { padding: 0 52px 52px; }
-      /* Journey */
-      .jstep { width: 78%; gap: 18px; }
-      .jconn { height: 40px; }
+
+      .header { padding: 48px 56px 24px; }
+      .header-brand { display: none; }
+      .greeting-name { font-size: 58px; }
+      .modules { padding: 0 56px 56px; }
+      .jstep { width: 80%; gap: 20px; }
+      .jconn { height: 44px; }
     }
 
-    /* ════ DESKTOP ≥1024px — full width ════ */
+    /* ════ DESKTOP ≥1024px ════ */
     @media (min-width: 1024px) {
       html, body {
         background: var(--bg);
-        display: block; padding: 0; min-height: 100svh;
+        display: block;
+        padding: 0;
+        min-height: 100svh;
       }
-      /* Nav sticky, full width */
+
       .web-nav {
-        display: flex; align-items: center; justify-content: space-between;
-        width: 100%; max-width: none;
-        padding: 18px 72px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        max-width: none;
+        padding: 20px 80px;
         border-bottom: 1px solid var(--line);
-        background: rgba(250,247,242,.92);
-        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-        position: sticky; top: 0; z-index: 10;
+        background: rgba(238,244,252,.92);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        margin-bottom: 0;
       }
-      .web-nav-brand { color: var(--text); font-size: 16px; font-weight: 700; letter-spacing: -.04em; }
-      .web-nav-tag   { color: var(--sub); cursor: pointer; transition: color .15s; }
+
+      .web-nav-brand {
+        font-family: var(--font-display);
+        font-style: italic;
+        font-size: 18px;
+        color: var(--text);
+        letter-spacing: -0.02em;
+      }
+
+      .web-nav-tag {
+        font-size: 11.5px;
+        font-weight: 500;
+        color: var(--sub);
+        text-transform: uppercase;
+        letter-spacing: 1.4px;
+        cursor: pointer;
+        transition: color .15s;
+      }
+
       .web-nav-tag:hover { color: var(--text); }
-      /* Screen full width, sin card flotante */
+
       .screen {
-        max-width: none; width: 100%;
-        min-height: calc(100svh - 57px);
-        border-radius: 0; box-shadow: none; overflow: visible;
+        max-width: none;
+        width: 100%;
+        min-height: calc(100svh - 63px);
+        border-radius: 0;
+        box-shadow: none;
+        overflow: visible;
       }
-      .header {
-        padding: 52px 72px 32px;
-        max-width: 860px; /* texto no se estira al infinito */
-      }
-      .greeting { font-size: 40px; letter-spacing: -.8px; }
-      .modules { padding: 8px 72px 80px; }
-      /* Journey desktop */
-      .jstep { width: 60%; gap: 22px; }
-      .jconn { height: 60px; }
-      .jnode { width: 70px; height: 70px; font-size: 19px; }
-      .js-done .jnode { font-size: 24px; }
-      .jcard { padding: 20px 28px; min-height: 84px; border-radius: 24px; }
-      .jcard-title { font-size: 16px; }
-      .jcard-sub   { font-size: 13.5px; }
-      .jbadge      { font-size: 12px; padding: 6px 16px; }
+
+      .header { padding: 56px 96px 28px; max-width: 900px; }
+      .header-brand { display: none; }
+      .greeting-label { font-size: 15px; }
+      .greeting-name { font-size: 68px; }
+      .modules { padding: 4px 96px 96px; }
+      .jstep { width: 60%; gap: 24px; }
+      .jconn { height: 64px; }
+      .jnode { width: 62px; height: 62px; font-size: 15px; }
+      .js-done .jnode { font-size: 22px; }
+      .jcard { padding: 20px 24px; min-height: 80px; border-radius: 20px; }
+      .jcard-title { font-size: 15px; }
+      .jcard-sub { font-size: 13px; }
+      .jbadge { font-size: 11.5px; padding: 6px 14px; }
     }
 
     /* ════ LARGE ≥1400px ════ */
     @media (min-width: 1400px) {
-      .web-nav { padding: 18px 96px; }
-      .header  { padding: 56px 96px 32px; }
-      .modules { padding: 8px 96px 96px; }
-      /* Paso más estrecho = zigzag más dramático en pantallas grandes */
-      .jstep { width: 54%; gap: 24px; }
-      .jconn { height: 72px; }
-      .jnode { width: 74px; height: 74px; }
-      .jcard { padding: 22px 32px; min-height: 88px; }
+      .web-nav { padding: 20px 120px; }
+      .header  { padding: 60px 120px 28px; }
+      .modules { padding: 4px 120px 96px; }
+      .jstep   { width: 54%; gap: 28px; }
+      .jconn   { height: 80px; }
+      .jnode   { width: 66px; height: 66px; }
+      .jcard   { padding: 22px 28px; min-height: 86px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ══ DASHBOARD ══ -->
 <nav class="web-nav">
   <span class="web-nav-brand">Timón ✦</span>
-  <span class="web-nav-tag" onclick="cerrarSesion()" style="cursor:pointer">Cerrar sesión</span>
+  <span class="web-nav-tag" onclick="cerrarSesion()">Cerrar sesión</span>
 </nav>
 
 <div class="screen">
 
   <header class="header">
-    <div class="greeting" id="greeting-name">Hola</div>
-    <div class="header-meta">
-      <span class="header-sub">Tu perfil está al</span>
-      <span class="header-pct" id="headerPct">0%</span>
-    </div>
-    <div class="dash-progress-track">
-      <div class="dash-progress-fill" id="dashProgressFill"></div>
+    <div class="header-brand">Timón ✦</div>
+    <div class="greeting-label">Hola,</div>
+    <div class="greeting-name" id="greeting-name">Felipe</div>
+    <div class="progress-section">
+      <span class="progress-label">Perfil al</span>
+      <div class="progress-track">
+        <div class="progress-fill" id="dashProgressFill"></div>
+      </div>
+      <span class="progress-pct" id="headerPct">0%</span>
     </div>
   </header>
 
   <section class="modules">
     <div class="section-label">Tu camino</div>
 
-    <!-- ══ JOURNEY PATH ══ -->
     <div class="jpath" id="jpath">
 
-      <!-- SVG connector dibujado por JS -->
       <svg class="jpath-svg" id="jpathSvg" aria-hidden="true"></svg>
 
-      <!-- 01 · Con quién te sentís identificado -->
+      <!-- 01 -->
       <div class="jstep" id="jstep-vibecheck">
         <div class="jnode" id="jnode-vibecheck">1</div>
         <a class="jcard" id="jcard-vibecheck" href="vibe-check.html">
@@ -332,7 +581,7 @@
       </div>
       <div class="jconn" id="jconn-0"></div>
 
-      <!-- 02 · Vos y el colegio -->
+      <!-- 02 -->
       <div class="jstep jstep--even" id="jstep-voscolegio">
         <div class="jnode" id="jnode-voscolegio">2</div>
         <a class="jcard" id="jcard-voscolegio" href="vos-colegio.html">
@@ -345,9 +594,9 @@
       </div>
       <div class="jconn" id="jconn-nuevo"></div>
 
-      <!-- 03 · Contexto Familiar -->
+      <!-- 03 -->
       <div class="jstep jstep--even" id="jstep-familia">
-        <div class="jnode" id="jnode-familia">2</div>
+        <div class="jnode" id="jnode-familia">3</div>
         <a class="jcard" id="jcard-familia" href="familia.html">
           <div class="jcard-body">
             <div class="jcard-title">Contexto Familiar</div>
@@ -358,9 +607,9 @@
       </div>
       <div class="jconn" id="jconn-1"></div>
 
-      <!-- 03 · Dominancia -->
+      <!-- 04 -->
       <div class="jstep" id="jstep-dominancia">
-        <div class="jnode" id="jnode-dominancia">3</div>
+        <div class="jnode" id="jnode-dominancia">4</div>
         <a class="jcard" id="jcard-dominancia" href="dominancia.html">
           <div class="jcard-body">
             <div class="jcard-title">Dominancia</div>
@@ -371,9 +620,9 @@
       </div>
       <div class="jconn" id="jconn-2"></div>
 
-      <!-- 04 · RIASEC Holland -->
+      <!-- 05 -->
       <div class="jstep jstep--even" id="jstep-riasec">
-        <div class="jnode" id="jnode-riasec">4</div>
+        <div class="jnode" id="jnode-riasec">5</div>
         <a class="jcard" id="jcard-riasec" href="sobrevivientes.html">
           <div class="jcard-body">
             <div class="jcard-title">RIASEC Holland</div>
@@ -384,9 +633,9 @@
       </div>
       <div class="jconn" id="jconn-3"></div>
 
-      <!-- 05 · Inteligencias Múltiples -->
+      <!-- 06 -->
       <div class="jstep" id="jstep-termometro">
-        <div class="jnode" id="jnode-termometro">5</div>
+        <div class="jnode" id="jnode-termometro">6</div>
         <a class="jcard" id="jcard-termometro" href="termometro.html">
           <div class="jcard-body">
             <div class="jcard-title">Inteligencias Múltiples</div>
@@ -397,48 +646,35 @@
       </div>
       <div class="jconn" id="jconn-4"></div>
 
-      <!-- 06 · Chatiemos · Parte 1 -->
+      <!-- 07 -->
       <div class="jstep jstep--even" id="jstep-charla1">
-        <div class="jnode" id="jnode-charla1">6</div>
+        <div class="jnode" id="jnode-charla1">7</div>
         <a class="jcard" id="jcard-charla1" href="orientacion-vocacional.html?parte=1">
           <div class="jcard-body">
             <div class="jcard-title">Chatiemos · Parte 1</div>
-            <div class="jcard-sub">Personalidad y proyectivas — primera parte.</div>
+            <div class="jcard-sub">Preguntas de personalidad con opciones.</div>
           </div>
           <span class="jbadge" id="jbadge-charla1">Empezar</span>
         </a>
       </div>
       <div class="jconn" id="jconn-5a"></div>
 
-      <!-- 07 · Chatiemos · Parte 2 -->
+      <!-- 08 -->
       <div class="jstep" id="jstep-charla2">
-        <div class="jnode" id="jnode-charla2">7</div>
+        <div class="jnode" id="jnode-charla2">8</div>
         <a class="jcard" id="jcard-charla2" href="orientacion-vocacional.html?parte=2">
           <div class="jcard-body">
             <div class="jcard-title">Chatiemos · Parte 2</div>
-            <div class="jcard-sub">Personalidad y proyectivas — segunda parte.</div>
+            <div class="jcard-sub">Preguntas abiertas para desarrollar.</div>
           </div>
           <span class="jbadge" id="jbadge-charla2">Empezar</span>
         </a>
       </div>
       <div class="jconn" id="jconn-5b"></div>
 
-      <!-- 08 · Chatiemos · Parte 3 -->
-      <div class="jstep jstep--even" id="jstep-charla3">
-        <div class="jnode" id="jnode-charla3">8</div>
-        <a class="jcard" id="jcard-charla3" href="orientacion-vocacional.html?parte=3">
-          <div class="jcard-body">
-            <div class="jcard-title">Chatiemos · Parte 3</div>
-            <div class="jcard-sub">Proyectivas finales y visión a futuro.</div>
-          </div>
-          <span class="jbadge" id="jbadge-charla3">Empezar</span>
-        </a>
-      </div>
-      <div class="jconn" id="jconn-5c"></div>
-
-      <!-- 07 · Autobiografía -->
+      <!-- 09 -->
       <div class="jstep" id="jstep-autobiografia">
-        <div class="jnode" id="jnode-autobiografia">7</div>
+        <div class="jnode" id="jnode-autobiografia">10</div>
         <a class="jcard" id="jcard-autobiografia" href="autobiografia.html">
           <div class="jcard-body">
             <div class="jcard-title">Autobiografía</div>
@@ -449,9 +685,9 @@
       </div>
       <div class="jconn" id="jconn-6"></div>
 
-      <!-- 08 · Estilo de Vida -->
+      <!-- 11 -->
       <div class="jstep jstep--even" id="jstep-estilovida">
-        <div class="jnode" id="jnode-estilovida">8</div>
+        <div class="jnode" id="jnode-estilovida">11</div>
         <a class="jcard" id="jcard-estilovida" href="estilo-vida.html">
           <div class="jcard-body">
             <div class="jcard-title">Estilo de Vida</div>
@@ -462,9 +698,9 @@
       </div>
       <div class="jconn" id="jconn-7"></div>
 
-      <!-- 09 · Profesionales -->
+      <!-- 12 -->
       <div class="jstep" id="jstep-profesionales">
-        <div class="jnode" id="jnode-profesionales">9</div>
+        <div class="jnode" id="jnode-profesionales">12</div>
         <a class="jcard" id="jcard-profesionales" href="profesionales.html">
           <div class="jcard-body">
             <div class="jcard-title">Hablemos con Profesionales</div>
@@ -475,9 +711,9 @@
       </div>
       <div class="jconn" id="jconn-8"></div>
 
-      <!-- 10 · Universidad -->
+      <!-- 13 -->
       <div class="jstep jstep--even" id="jstep-universidad">
-        <div class="jnode" id="jnode-universidad">10</div>
+        <div class="jnode" id="jnode-universidad">13</div>
         <a class="jcard" id="jcard-universidad" href="universidad.html">
           <div class="jcard-body">
             <div class="jcard-title">Universidad</div>
@@ -489,10 +725,6 @@
 
     </div><!-- /jpath -->
   </section>
-
-  <p style="text-align:center;font-size:12px;color:var(--muted);padding:0 24px 40px;line-height:1.5">
-    Completá cada módulo para avanzar al siguiente.
-  </p>
 
 </div><!-- /screen -->
 
@@ -507,7 +739,7 @@
   try {
     const user = JSON.parse(localStorage.getItem('timon_session'));
     const name = (user.nombre || '').split(' ')[0] || '';
-    if (name) document.getElementById('greeting-name').textContent = 'Hola, ' + name;
+    if (name) document.getElementById('greeting-name').textContent = name;
   } catch(e) {}
 })();
 
@@ -517,10 +749,10 @@ function cerrarSesion() {
 }
 
 // ════════════════════════════════════════════════════
-// JOURNEY — estado visual de cada paso
+// JOURNEY
 // ════════════════════════════════════════════════════
 const MODULES = [
-  { id: 'vibecheck',     href: null },
+  { id: 'vibecheck',     href: 'vibe-check.html' },
   { id: 'voscolegio',    href: 'vos-colegio.html' },
   { id: 'familia',       href: 'familia.html' },
   { id: 'dominancia',    href: 'dominancia.html' },
@@ -528,7 +760,6 @@ const MODULES = [
   { id: 'termometro',    href: 'termometro.html' },
   { id: 'charla1',       href: 'orientacion-vocacional.html?parte=1' },
   { id: 'charla2',       href: 'orientacion-vocacional.html?parte=2' },
-  { id: 'charla3',       href: 'orientacion-vocacional.html?parte=3' },
   { id: 'autobiografia', href: 'autobiografia.html' },
   { id: 'estilovida',    href: 'estilo-vida.html' },
   { id: 'profesionales', href: 'profesionales.html' },
@@ -544,8 +775,7 @@ function isDone(id) {
     case 'riasec':        return localStorage.getItem('riasec_done') === 'done';
     case 'termometro':    return localStorage.getItem('termometro_done') === 'done';
     case 'charla1':       return localStorage.getItem('orientacion_parte1_done') === 'done';
-    case 'charla2':       return localStorage.getItem('orientacion_parte2_done') === 'done';
-    case 'charla3':       return localStorage.getItem('orientacion_done') === 'done';
+    case 'charla2':       return localStorage.getItem('orientacion_done') === 'done';
     case 'autobiografia': return parseInt(localStorage.getItem('autobiografia_progress') || '0') === 4;
     case 'estilovida':    return localStorage.getItem('estilovida_done') === 'done';
     case 'profesionales': return ['negocios','sociales','humanidades','salud','juridicas','ecologia','exactas','comunicacion','arte']
@@ -575,25 +805,23 @@ function getBadgeDetail(id) {
   return null;
 }
 
-// Paleta de colores por módulo — usados como CSS custom properties
+// Module palette — cool, modern
 const COLORS = {
-  vibecheck:     { accent: '#85B882', bg: '#EEF5ED', glow: 'rgba(133,184,130,.18)' },
-  voscolegio:    { accent: '#E8956D', bg: '#FDF0EA', glow: 'rgba(232,149,109,.18)' },
-  familia:       { accent: '#C4848A', bg: '#F8F0EF', glow: 'rgba(196,132,138,.18)' },
-  dominancia:    { accent: '#9B8EC4', bg: '#F2EFF8', glow: 'rgba(155,142,196,.18)' },
-  riasec:        { accent: '#70B0A0', bg: '#EEF5F2', glow: 'rgba(112,176,160,.18)' },
-  termometro:    { accent: '#C4AE5A', bg: '#F8F4E4', glow: 'rgba(196,174, 90,.18)' },
-  charla1:       { accent: '#5CA0C8', bg: '#EAF3F8', glow: 'rgba( 92,160,200,.18)' },
-  charla2:       { accent: '#4B8DB5', bg: '#E4EFF6', glow: 'rgba( 75,141,181,.18)' },
-  charla3:       { accent: '#3A7AA2', bg: '#DCE9F2', glow: 'rgba( 58,122,162,.18)' },
-  autobiografia: { accent: '#C4826E', bg: '#F8EDEA', glow: 'rgba(196,130,110,.18)' },
-  estilovida:    { accent: '#6888B4', bg: '#EBF0F6', glow: 'rgba(104,136,180,.18)' },
-  profesionales: { accent: '#C4A882', bg: '#F7F1EA', glow: 'rgba(196,168,130,.18)' },
-  universidad:   { accent: '#8AB882', bg: '#EFF5EE', glow: 'rgba(138,184,130,.18)' },
+  vibecheck:     { accent: '#10B981', bg: '#ECFDF5', glow: 'rgba(16,185,129,.15)' },
+  voscolegio:    { accent: '#F59E0B', bg: '#FFFBEB', glow: 'rgba(245,158,11,.15)' },
+  familia:       { accent: '#EC4899', bg: '#FDF2F8', glow: 'rgba(236,72,153,.15)' },
+  dominancia:    { accent: '#6366F1', bg: '#EEF2FF', glow: 'rgba(99,102,241,.15)' },
+  riasec:        { accent: '#0EA5E9', bg: '#E0F2FE', glow: 'rgba(14,165,233,.15)' },
+  termometro:    { accent: '#D97706', bg: '#FEF3C7', glow: 'rgba(217,119,6,.15)' },
+  charla1:       { accent: '#4361EE', bg: '#EEF2FF', glow: 'rgba(67,97,238,.15)' },
+  charla2:       { accent: '#7C3AED', bg: '#F5F3FF', glow: 'rgba(124,58,237,.15)' },
+  autobiografia: { accent: '#E11D48', bg: '#FFF1F2', glow: 'rgba(225,29,72,.15)' },
+  estilovida:    { accent: '#2563EB', bg: '#EFF6FF', glow: 'rgba(37,99,235,.15)' },
+  profesionales: { accent: '#9333EA', bg: '#FAF5FF', glow: 'rgba(147,51,234,.15)' },
+  universidad:   { accent: '#059669', bg: '#ECFDF5', glow: 'rgba(5,150,105,.15)' },
 };
 
 function initJourney() {
-  const vcDone = isDone('vibecheck');
   let currentAssigned = false;
   let doneCount = 0;
 
@@ -603,52 +831,39 @@ function initJourney() {
     const badgeEl = document.getElementById('jbadge-' + mod.id);
     if (!stepEl) return;
 
-    // Inyectar colores del módulo como CSS custom properties
-    const c = COLORS[mod.id] || { accent: '#9A9590', bg: '#F5F2EE', glow: 'rgba(154,149,144,.18)' };
-    stepEl.style.setProperty('--accent',     c.accent);
-    stepEl.style.setProperty('--accent-bg',  c.bg);
-    stepEl.style.setProperty('--glow',       c.glow);
+    const c = COLORS[mod.id] || { accent: '#6A6460', bg: '#F2EDE6', glow: 'rgba(106,100,96,.14)' };
+    stepEl.style.setProperty('--accent',    c.accent);
+    stepEl.style.setProperty('--accent-bg', c.bg);
+    stepEl.style.setProperty('--glow',      c.glow);
 
     const done = isDone(mod.id);
 
-    // Sin estado bloqueado — todos los módulos son accesibles
     let state;
-    if (done)                 { state = 'done';    doneCount++; }
-    else if (!currentAssigned){ state = 'current'; currentAssigned = true; }
-    else                      { state = 'active'; }
+    if (done)                  { state = 'done';    doneCount++; }
+    else if (!currentAssigned) { state = 'current'; currentAssigned = true; }
+    else                       { state = 'active'; }
 
-    // Preserve jstep--even
     const evenClass = stepEl.classList.contains('jstep--even') ? ' jstep--even' : '';
     stepEl.className = 'jstep js-' + state + evenClass;
 
-    if (nodeEl) {
-      nodeEl.textContent = state === 'done' ? '✓' : String(idx + 1);
-    }
+    if (nodeEl) nodeEl.textContent = state === 'done' ? '✓' : String(idx + 1);
 
     if (badgeEl) {
       const detail = !done ? getBadgeDetail(mod.id) : null;
       if (state === 'done') {
-        badgeEl.className = 'jbadge jbadge--done';   badgeEl.textContent = 'Completado';
+        badgeEl.className = 'jbadge jbadge--done';
+        badgeEl.textContent = 'Completado';
       } else if (state === 'current') {
-        badgeEl.className = 'jbadge jbadge--start';  badgeEl.textContent = 'Empezar →';
+        badgeEl.className = 'jbadge jbadge--start';
+        badgeEl.textContent = 'Empezar →';
       } else {
         badgeEl.className = 'jbadge jbadge--active';
         badgeEl.textContent = detail ? detail.text : 'Pendiente';
       }
     }
 
-    if (mod.id === 'vibecheck') {
-      const cardEl = document.getElementById('jcard-vibecheck');
-      if (cardEl) {
-        // Siempre navega a la página de Vibe Check (completado o no)
-        cardEl.setAttribute('href', 'vibe-check.html');
-        cardEl.onclick = null;
-      }
-    } else {
-      const cardEl = document.getElementById('jcard-' + mod.id);
-      // Siempre setear href — todos los módulos son navegables
-      if (cardEl && mod.href) { cardEl.setAttribute('href', mod.href); }
-    }
+    const cardEl = document.getElementById('jcard-' + mod.id);
+    if (cardEl && mod.href) cardEl.setAttribute('href', mod.href);
   });
 
   const pct = Math.round((doneCount / MODULES.length) * 100);
@@ -657,17 +872,16 @@ function initJourney() {
 }
 
 // ════════════════════════════════════════════════════
-// SVG BEZIER PATH — curva serpenteante entre nodos
+// SVG BEZIER PATH
 // ════════════════════════════════════════════════════
 function drawPathSVG() {
   const pathEl = document.getElementById('jpath');
   const svgEl  = document.getElementById('jpathSvg');
   if (!pathEl || !svgEl) return;
 
-  const cr       = pathEl.getBoundingClientRect();
-  const stepEls  = [...pathEl.querySelectorAll('.jstep')];
+  const cr      = pathEl.getBoundingClientRect();
+  const stepEls = [...pathEl.querySelectorAll('.jstep')];
 
-  // Centro de cada nodo relativo al contenedor .jpath
   const pts = stepEls.map(step => {
     const node = step.querySelector('.jnode');
     if (!node) return null;
@@ -683,42 +897,28 @@ function drawPathSVG() {
 
   svgEl.setAttribute('viewBox', `0 0 ${cr.width.toFixed(1)} ${cr.height.toFixed(1)}`);
 
-  let dAll   = '';   // track completo (fondo sutil)
-  let dSolid = '';   // tramos completados
-  let dDash  = '';   // tramos pendientes
+  let dAll = '', dSolid = '', dDash = '';
 
   for (let i = 1; i < pts.length; i++) {
-    const a = pts[i - 1];
-    const b = pts[i];
-
-    // S-curve real: CP1 = (bx, ay)  CP2 = (ax, by)
-    // Esto crea una curva que primero se desplaza horizontalmente
-    // al destino y luego baja — idéntico al patrón de Duolingo.
+    const a = pts[i - 1], b = pts[i];
     const seg = `M${f(a.x)},${f(a.y)} C${f(b.x)},${f(a.y)} ${f(a.x)},${f(b.y)} ${f(b.x)},${f(b.y)}`;
-
     dAll += seg + ' ';
     if (a.done && b.done) dSolid += seg + ' ';
     else                  dDash  += seg + ' ';
   }
 
   svgEl.innerHTML = [
-    // Carril guía: todo el recorrido, muy tenue
-    `<path d="${dAll.trim()}" fill="none" stroke="#E4DDD4" stroke-width="4" stroke-linecap="round" opacity=".55"/>`,
-    // Tramos completados: sólido + ligeramente brillante
-    dSolid
-      ? `<path d="${dSolid.trim()}" fill="none" stroke="#85B882" stroke-width="4" stroke-linecap="round" opacity=".85"/>`
-      : '',
-    // Tramos pendientes: puntos largos separados
-    dDash
-      ? `<path d="${dDash.trim()}" fill="none" stroke="#C4BDB5" stroke-width="3" stroke-dasharray="10 8" stroke-linecap="round" opacity=".7"/>`
-      : '',
+    `<path d="${dAll.trim()}" fill="none" stroke="#C8D6EE" stroke-width="7" stroke-linecap="round" opacity=".6"/>`,
+    dSolid ? `<path d="${dSolid.trim()}" fill="none" stroke="url(#pathGrad)" stroke-width="7" stroke-linecap="round" opacity=".9"/>` : '',
+    dDash  ? `<path d="${dDash.trim()}" fill="none" stroke="#B8C8E4" stroke-width="5" stroke-dasharray="7 11" stroke-linecap="round" opacity=".55"/>` : '',
+    `<defs><linearGradient id="pathGrad" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="#4361EE"/><stop offset="100%" stop-color="#7C3AED"/></linearGradient></defs>`,
   ].join('');
 }
 
 function f(n) { return n.toFixed(1); }
 
 // ════════════════════════════════════════════════════
-// ARRANQUE
+// INIT
 // ════════════════════════════════════════════════════
 (function() {
   initJourney();

@@ -297,7 +297,13 @@ const flow = [
   },
   {
     text: '¿Comenzaste y abandonaste alguna carrera en algún momento?',
-    inputType: 'text', placeholder: 'Contanos...', minChars: 50, delay: 800
+    inputType: 'options', options: ['Sí', 'No'],
+    nextStep: { 'Sí': 6, 'No': 7 }, delay: 800
+  },
+  {
+    text: '¿Cuál fue esa carrera y qué pasó? Contanos un poco más.',
+    inputType: 'text', placeholder: 'Contanos...', minChars: 50, delay: 700,
+    conditional: true
   },
   {
     text: '¿Te hubiese gustado realizar otra actividad o estudiar otra carrera? ¿Cuál? ¿Recordás por qué no lo hiciste?',
@@ -343,7 +349,7 @@ const flow = [
 const responses = [];
 const answerable = flow.filter(s => s.inputType === 'text' || (s.inputType === 'options' && !s.ackText?.includes('Perfecto')));
 // count steps that require an answer
-const totalAnswerable = flow.filter(s => s.inputType === 'text').length;
+const totalAnswerable = flow.filter(s => s.inputType === 'text' && !s.conditional).length;
 let answeredCount = 0;
 
 const messagesArea = document.getElementById('messagesArea');
@@ -523,7 +529,10 @@ async function processStep(idx) {
       if (step.ackText) {
         await addBotBubble(step.ackText, 700);
       }
-      processStep(idx + 1);
+      const nextIdx = (step.nextStep && step.nextStep[answer] !== undefined)
+        ? step.nextStep[answer]
+        : idx + 1;
+      processStep(nextIdx);
     });
     return;
   }

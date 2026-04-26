@@ -608,6 +608,19 @@
       <div class="jconn" id="jconn-1"></div>
 
       <!-- 04 -->
+      <div class="jstep jstep--even" id="jstep-padres">
+        <div class="jnode" id="jnode-padres">4</div>
+        <a class="jcard" id="jcard-padres" href="padres.html">
+          <div class="jcard-body">
+            <div class="jcard-title">Perspectiva Familiar</div>
+            <div class="jcard-sub">Para que lo complete un padre, tutor o familiar cercano.</div>
+          </div>
+          <span class="jbadge" id="jbadge-padres">Empezar</span>
+        </a>
+      </div>
+      <div class="jconn" id="jconn-padres"></div>
+
+      <!-- 05 -->
       <div class="jstep" id="jstep-dominancia">
         <div class="jnode" id="jnode-dominancia">4</div>
         <a class="jcard" id="jcard-dominancia" href="dominancia.html">
@@ -755,6 +768,7 @@ const MODULES = [
   { id: 'vibecheck',     href: 'vibe-check.html' },
   { id: 'voscolegio',    href: 'vos-colegio.html' },
   { id: 'familia',       href: 'familia.html' },
+  { id: 'padres',        href: 'padres.html' },
   { id: 'dominancia',    href: 'dominancia.html' },
   { id: 'riasec',        href: 'sobrevivientes.html' },
   { id: 'termometro',    href: 'termometro.html' },
@@ -771,6 +785,7 @@ function isDone(id) {
     case 'vibecheck':     return localStorage.getItem('vibecheck_done') === 'done';
     case 'voscolegio':    return localStorage.getItem('voscolegio_done') === 'done';
     case 'familia':       return localStorage.getItem('familia_done') === 'done';
+    case 'padres':        return localStorage.getItem('padres_done') === 'done';
     case 'dominancia':    return localStorage.getItem('dominancia_done') === 'done';
     case 'riasec':        return localStorage.getItem('riasec_done') === 'done';
     case 'termometro':    return localStorage.getItem('termometro_done') === 'done';
@@ -810,6 +825,7 @@ const COLORS = {
   vibecheck:     { accent: '#10B981', bg: '#ECFDF5', glow: 'rgba(16,185,129,.15)' },
   voscolegio:    { accent: '#F59E0B', bg: '#FFFBEB', glow: 'rgba(245,158,11,.15)' },
   familia:       { accent: '#EC4899', bg: '#FDF2F8', glow: 'rgba(236,72,153,.15)' },
+  padres:        { accent: '#D97706', bg: '#FFFBEB', glow: 'rgba(217,119,6,.15)'  },
   dominancia:    { accent: '#6366F1', bg: '#EEF2FF', glow: 'rgba(99,102,241,.15)' },
   riasec:        { accent: '#0EA5E9', bg: '#E0F2FE', glow: 'rgba(14,165,233,.15)' },
   termometro:    { accent: '#D97706', bg: '#FEF3C7', glow: 'rgba(217,119,6,.15)' },

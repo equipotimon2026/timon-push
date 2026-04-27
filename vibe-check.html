@@ -425,7 +425,31 @@
   <div class="personas-grid" id="personasGrid"></div>
 </div>
 
-<!-- Follow-up eliminado: el módulo es 1 paso (selección directa) -->
+<!-- FOLLOW-UP QUESTION -->
+<div class="followup-wrap" id="followupWrap">
+  <div class="followup-card" id="followupCard">
+    <div class="fu-from">
+      <div class="fu-avatar" id="fuAvatar"></div>
+      <div>
+        <span class="fu-name" id="fuName"></span>
+        <span class="fu-tag" id="fuTag"></span>
+      </div>
+    </div>
+    <p class="fu-question" id="fuQuestion"></p>
+    <textarea class="fu-textarea" id="fuTextarea"
+              placeholder="Escribí tu respuesta acá…" rows="4"></textarea>
+    <div class="fu-footer">
+      <span class="fu-hint" id="fuHint">0 / 50 · Tu respuesta queda guardada en tu perfil.</span>
+      <button class="fu-submit" id="fuSubmit" disabled onclick="submitFollowup()">
+        Guardar y continuar
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
+          <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</div>
 
 <script>
 /* ══════════════════════════════════════
@@ -708,19 +732,59 @@ function selectPersona(id) {
     else             card.classList.add('is-dimmed');
   });
 
-  // 1 PASO: guardar y redirigir directamente (sin pregunta follow-up)
-  localStorage.setItem('vibecheck_done',    'done');
+  // Guardar persona seleccionada (aún no done; se completa al responder follow-up)
   localStorage.setItem('vibecheck_persona', id);
-  localStorage.setItem('vibecheck_data',    JSON.stringify({
+
+  // Poblar follow-up con la pregunta de esta persona
+  const wrap = document.getElementById('followupWrap');
+  const card = document.getElementById('followupCard');
+  document.getElementById('fuAvatar').textContent  = persona.emoji;
+  document.getElementById('fuName').textContent    = persona.nombre;
+  document.getElementById('fuTag').textContent     = persona.titulo;
+  document.getElementById('fuQuestion').textContent = persona.pregunta;
+  card.style.setProperty('--f-accent', persona.accent);
+  card.style.setProperty('--f-glow',   persona.glow);
+
+  // Resetear textarea
+  const ta   = document.getElementById('fuTextarea');
+  const hint = document.getElementById('fuHint');
+  const sub  = document.getElementById('fuSubmit');
+  ta.value = '';
+  hint.textContent = '0 / 50 · Tu respuesta queda guardada en tu perfil.';
+  sub.disabled = true;
+
+  ta.oninput = () => {
+    const len = ta.value.trim().length;
+    hint.textContent = len >= 50
+      ? len + ' ✓  · Tu respuesta queda guardada en tu perfil.'
+      : len + ' / 50 · Tu respuesta queda guardada en tu perfil.';
+    hint.style.color = len >= 50 ? '#6BCB77' : '';
+    sub.disabled = len < 50;
+  };
+
+  wrap.style.display = 'block';
+  setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+}
+
+function submitFollowup() {
+  const id      = localStorage.getItem('vibecheck_persona');
+  const persona = PERSONAS.find(p => p.id === id);
+  if (!persona) return;
+  const answer = document.getElementById('fuTextarea').value.trim();
+  if (answer.length < 50) return;
+
+  localStorage.setItem('vibecheck_done',   'done');
+  localStorage.setItem('vibecheck_answer', answer);
+  localStorage.setItem('vibecheck_data',   JSON.stringify({
     persona: id, titulo: persona.titulo,
-    nombre: persona.nombre, timestamp: Date.now(),
+    nombre: persona.nombre, answer, timestamp: Date.now(),
   }));
 
-  // Breve feedback visual antes de salir
-  const btn = document.querySelector(`#card-${id} .card-select-btn`);
-  if (btn) { btn.innerHTML = '✓ ¡Listo!'; btn.style.background = persona.accent; btn.style.color = '#fff'; }
+  const btn = document.getElementById('fuSubmit');
+  btn.disabled = true;
+  btn.innerHTML = '✓ ¡Guardado!';
 
-  setTimeout(() => { window.location.href = 'dashboard.html'; }, 800);
+  setTimeout(() => { window.location.href = 'dashboard.html'; }, 700);
 }
 
 /* ══════════════════════════════════════
@@ -757,8 +821,10 @@ function checkPreviousState() {
     document.getElementById('doneBanner').style.display = 'flex';
     document.getElementById('doneLabel').textContent =
       'Elegiste: ' + prev.titulo + ' · ' + prev.nombre;
-    // Show selection visually without saving or redirecting
     setTimeout(() => showSelectionOnly(prevId), 200);
+  } else if (!done && prev) {
+    // Persona elegida pero follow-up pendiente → mostrar follow-up directamente
+    setTimeout(() => selectPersona(prevId), 200);
   }
 }
 

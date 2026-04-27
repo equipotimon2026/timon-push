@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timón · Opción B — Glassmorphism</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --font: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    }
+
+    html, body {
+      min-height: 100%;
+      background: #0D0526;
+      font-family: var(--font);
+      color: #F0EAFF;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* GRADIENT BG */
+    body::before {
+      content: '';
+      position: fixed; inset: 0; z-index: -1;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% -10%, rgba(120,40,200,.55) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 110%, rgba(30,100,200,.45) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 50% 50%, rgba(80,20,160,.3) 0%, transparent 70%),
+        #0D0526;
+    }
+
+    /* NAV */
+    .web-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 80px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(13,5,38,.6);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      position: sticky; top: 0; z-index: 10;
+    }
+    .web-nav-brand {
+      font-size: 16px; font-weight: 800; letter-spacing: -0.5px;
+      background: linear-gradient(135deg, #C084FC, #818CF8, #38BDF8);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .web-nav-action {
+      font-size: 12px; font-weight: 500;
+      color: rgba(255,255,255,.45);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 20px; padding: 7px 16px;
+      cursor: pointer; transition: all .15s;
+      background: rgba(255,255,255,.04);
+    }
+    .web-nav-action:hover { background: rgba(255,255,255,.08); color: rgba(255,255,255,.7); }
+
+    .screen { max-width: 900px; margin: 0 auto; padding: 0 80px; }
+
+    /* HEADER */
+    .header { padding: 64px 0 36px; }
+
+    .greeting-label {
+      font-size: 13px; font-weight: 500; letter-spacing: 1px;
+      color: rgba(192,132,252,.7); text-transform: uppercase; margin-bottom: 6px;
+    }
+    .greeting-name {
+      font-size: 76px; font-weight: 800;
+      letter-spacing: -4px; line-height: .96;
+      background: linear-gradient(135deg, #F0EAFF 0%, #C084FC 50%, #818CF8 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    .progress-section {
+      margin-top: 28px; display: flex; align-items: center; gap: 16px;
+    }
+    .progress-label {
+      font-size: 12px; color: rgba(240,234,255,.4); white-space: nowrap; font-weight: 500;
+    }
+    .progress-track {
+      flex: 1; height: 6px;
+      background: rgba(255,255,255,.08); border-radius: 99px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; width: 23%;
+      background: linear-gradient(90deg, #A78BFA, #34D399);
+      border-radius: 99px;
+      box-shadow: 0 0 16px rgba(167,139,250,.6);
+      position: relative;
+    }
+    .progress-fill::after {
+      content: '';
+      position: absolute; right: -1px; top: 50%; transform: translateY(-50%);
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #34D399;
+      box-shadow: 0 0 10px rgba(52,211,153,.8);
+    }
+    .progress-pct {
+      font-size: 12px; font-weight: 700; min-width: 36px;
+      background: linear-gradient(135deg, #A78BFA, #34D399);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+
+    /* MODULES */
+    .modules { padding: 0 0 80px; }
+    .section-label {
+      font-size: 10px; font-weight: 600; color: rgba(240,234,255,.3);
+      letter-spacing: 2.5px; text-transform: uppercase; padding: 24px 0 30px;
+    }
+
+    /* JOURNEY */
+    .jpath { position: relative; }
+    .jpath-svg {
+      position: absolute; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 0; overflow: visible;
+    }
+    .jconn { height: 44px; }
+
+    .jstep {
+      display: flex; align-items: center; gap: 20px;
+      position: relative; z-index: 1; width: 72%;
+    }
+    .jstep.jstep--even { flex-direction: row-reverse; margin-left: auto; }
+
+    /* NODE */
+    .jnode {
+      width: 54px; height: 54px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; font-size: 14px; font-weight: 700;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(240,234,255,.3);
+      transition: transform .2s ease, box-shadow .3s ease;
+    }
+    .js-done .jnode {
+      background: linear-gradient(135deg, var(--accent-from, #A78BFA), var(--accent-to, #34D399));
+      border-color: transparent; color: #fff; font-size: 18px;
+    }
+    .js-current .jnode {
+      background: rgba(167,139,250,.12);
+      border: 1.5px solid var(--accent, #A78BFA);
+      color: var(--accent, #A78BFA); font-weight: 800;
+      box-shadow: 0 0 0 8px rgba(167,139,250,.08), 0 0 32px rgba(167,139,250,.25);
+    }
+    .js-active .jnode { opacity: .4; }
+    .js-locked { opacity: .2; pointer-events: none; }
+
+    /* CARD */
+    .jcard {
+      flex: 1;
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+      border-radius: 18px; padding: 18px 22px;
+      border: 1px solid rgba(255,255,255,.1);
+      display: flex; align-items: center; gap: 14px;
+      min-height: 74px; cursor: pointer; text-decoration: none; color: inherit;
+      transition: transform .25s ease, background .2s ease, border-color .2s ease;
+      position: relative; overflow: hidden;
+    }
+    .jcard::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+      background: linear-gradient(180deg, var(--accent-from, #A78BFA), var(--accent-to, #A78BFA));
+      box-shadow: 0 0 12px var(--glow, rgba(167,139,250,.5));
+    }
+    .jstep--even .jcard::before { left: auto; right: 0; }
+
+    .jcard:hover {
+      transform: translateY(-4px);
+      background: rgba(255,255,255,.09);
+      border-color: rgba(255,255,255,.18);
+    }
+
+    .js-done .jcard {
+      background: rgba(52,211,153,.06);
+      border-color: rgba(52,211,153,.15);
+    }
+    .js-current .jcard {
+      background: rgba(167,139,250,.08);
+      border-color: rgba(167,139,250,.3);
+      box-shadow: 0 0 0 1px rgba(167,139,250,.2), 0 8px 40px rgba(167,139,250,.12);
+    }
+    .js-active .jcard { opacity: .55; }
+
+    .jcard-body { flex: 1; min-width: 0; }
+    .jcard-title {
+      font-size: 14px; font-weight: 600; letter-spacing: -0.2px;
+      color: rgba(240,234,255,.9);
+    }
+    .jcard-sub { font-size: 12.5px; color: rgba(240,234,255,.4); margin-top: 3px; line-height: 1.5; }
+
+    /* BADGE */
+    .jbadge {
+      flex-shrink: 0; font-size: 11px; font-weight: 600;
+      border-radius: 99px; padding: 5px 14px; white-space: nowrap;
+    }
+    .jbadge--done { background: rgba(52,211,153,.12); color: rgba(52,211,153,.7); }
+    .jbadge--start {
+      background: linear-gradient(135deg, #A78BFA, #818CF8);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(167,139,250,.4);
+    }
+    .jbadge--active { border: 1px solid rgba(255,255,255,.1); color: rgba(240,234,255,.3); }
+
+    .option-label {
+      position: fixed; bottom: 28px; right: 28px;
+      background: linear-gradient(135deg, #A78BFA, #34D399);
+      color: #fff; font-family: var(--font);
+      font-size: 12px; font-weight: 700;
+      padding: 10px 18px; border-radius: 10px; letter-spacing: 0.5px;
+      box-shadow: 0 4px 24px rgba(167,139,250,.5);
+    }
+  </style>
+</head>
+<body>
+
+<nav class="web-nav">
+  <span class="web-nav-brand">Timón ✦</span>
+  <span class="web-nav-action">Cerrar sesión</span>
+</nav>
+
+<div class="screen">
+  <header class="header">
+    <div class="greeting-label">Hola,</div>
+    <div class="greeting-name">Felipe</div>
+    <div class="progress-section">
+      <span class="progress-label">Perfil al</span>
+      <div class="progress-track"><div class="progress-fill"></div></div>
+      <span class="progress-pct">23%</span>
+    </div>
+  </header>
+
+  <section class="modules">
+    <div class="section-label">Tu camino</div>
+    <div class="jpath" id="jpath">
+      <svg class="jpath-svg" id="jpathSvg" aria-hidden="true"></svg>
+
+      <div class="jstep js-done" style="--accent:#34D399;--accent-from:#34D399;--accent-to:#10B981;--glow:rgba(52,211,153,.5)">
+        <div class="jnode">✓</div>
+        <a class="jcard" href="#">
+          <div class="jcard-body">
+            <div class="jcard-title">¿Con quién te sentís identificado?</div>
+            <div class="jcard-sub">Conocé experiencias de personas en tu misma situación.</div>
+          </div>
+          <span class="jbadge jbadge--done">Completado</span>
+        </a>
+      </div>
+      <div class="jconn"></div>
+
+      <div class="jstep jstep--even js-done" style="--accent:#F87171;--accent-from:#F87171;--accent-to:#FB923C;--glow:rgba(248,113,113,.5)">
+        <div class="jnode">✓</div>
+        <a class="jcard" href="#">
+          <div class="jcard-body">
+            <div class="jcard-title">Vos y el colegio</div>
+            <div class="jcard-sub">Tu historia dentro del sistema educativo.</div>
+          </div>
+          <span class="jbadge jbadge--done">Completado</span>
+        </a>
+      </div>
+      <div class="jconn"></div>
+
+      <div class="jstep jstep--even js-done" style="--accent:#F472B6;--accent-from:#F472B6;--accent-to:#A78BFA;--glow:rgba(244,114,182,.5)">
+        <div class="jnode">✓</div>
+        <a class="jcard" href="#">
+          <div class="jcard-body">
+            <div class="jcard-title">Contexto Familiar</div>
+            <div class="jcard-sub">Tu árbol familiar y el entorno que te formó.</div>
+          </div>
+          <span class="jbadge jbadge--done">Completado</span>
+        </a>
+      </div>
+      <div class="jconn"></div>
+
+      <div class="jstep js-current" style="--accent:#A78BFA;--accent-from:#A78BFA;--accent-to:#818CF8;--glow:rgba(167,139,250,.5)">
+        <div class="jnode">4</div>
+        <a class="jcard" href="#">
+          <div class="jcard-body">
+            <div class="jcard-title">Dominancia</div>
+            <div class="jcard-sub">Cómo pensás, aprendés y tomás decisiones.</div>
+          </div>
+          <span class="jbadge jbadge--start">Empezar →</span>
+        </a>
+      </div>
+      <div class="jconn"></div>
+
+      <div class="jstep jstep--even js-active" style="--accent:#38BDF8;--accent-from:#38BDF8;--accent-to:#0EA5E9">
+        <div class="jnode">5</div>
+        <a class="jcard" href="#">
+          <div class="jcard-body">
+            <div class="jcard-title">RIASEC Holland</div>
+            <div class="jcard-sub">Tu perfil vocacional con el test de Holland.</div>
+          </div>
+          <span class="jbadge jbadge--active">Pendiente</span>
+        </a>
+      </div>
+      <div class="jconn"></div>
+
+      <div class="jstep js-active" style="--accent:#FBBF24;--accent-from:#FBBF24;--accent-to:#F59E0B">
+        <div class="jnode">6</div>
+        <a class="jcard" href="#">
+          <div class="jcard-body">
+            <div class="jcard-title">Inteligencias Múltiples</div>
+            <div class="jcard-sub">¿En qué sos brillante sin saberlo?</div>
+          </div>
+          <span class="jbadge jbadge--active">Pendiente</span>
+        </a>
+      </div>
+      <div class="jconn"></div>
+
+      <div class="jstep jstep--even js-active" style="--accent:#60A5FA;--accent-from:#60A5FA;--accent-to:#3B82F6">
+        <div class="jnode">7</div>
+        <a class="jcard" href="#"><div class="jcard-body"><div class="jcard-title">Chatiemos · Parte 1</div><div class="jcard-sub">Personalidad y proyectivas — primera parte.</div></div><span class="jbadge jbadge--active">Pendiente</span></a>
+      </div>
+      <div class="jconn"></div>
+
+      <div class="jstep js-active" style="--accent:#4F46E5"><div class="jnode">8</div><a class="jcard" href="#"><div class="jcard-body"><div class="jcard-title">Chatiemos · Parte 2</div><div class="jcard-sub">Personalidad y proyectivas — segunda parte.</div></div><span class="jbadge jbadge--active">Pendiente</span></a></div>
+      <div class="jconn"></div>
+      <div class="jstep jstep--even js-active" style="--accent:#7C3AED"><div class="jnode">9</div><a class="jcard" href="#"><div class="jcard-body"><div class="jcard-title">Chatiemos · Parte 3</div><div class="jcard-sub">Proyectivas finales y visión a futuro.</div></div><span class="jbadge jbadge--active">Pendiente</span></a></div>
+      <div class="jconn"></div>
+      <div class="jstep js-active" style="--accent:#EF4444"><div class="jnode">10</div><a class="jcard" href="#"><div class="jcard-body"><div class="jcard-title">Autobiografía</div><div class="jcard-sub">Tu historia en tus palabras.</div></div><span class="jbadge jbadge--active">Pendiente</span></a></div>
+      <div class="jconn"></div>
+      <div class="jstep jstep--even js-active" style="--accent:#6366F1"><div class="jnode">11</div><a class="jcard" href="#"><div class="jcard-body"><div class="jcard-title">Estilo de Vida</div><div class="jcard-sub">Cómo querés trabajar y en qué entorno.</div></div><span class="jbadge jbadge--active">Pendiente</span></a></div>
+      <div class="jconn"></div>
+      <div class="jstep js-active" style="--accent:#D97706"><div class="jnode">12</div><a class="jcard" href="#"><div class="jcard-body"><div class="jcard-title">Hablemos con Profesionales</div><div class="jcard-sub">9 industrias, quienes trabajan en cada área.</div></div><span class="jbadge jbadge--active">Pendiente</span></a></div>
+      <div class="jconn"></div>
+      <div class="jstep jstep--even js-active" style="--accent:#10B981"><div class="jnode">13</div><a class="jcard" href="#"><div class="jcard-body"><div class="jcard-title">Universidad</div><div class="jcard-sub">¿Qué pesa más en tu decisión?</div></div><span class="jbadge jbadge--active">Pendiente</span></a></div>
+    </div>
+  </section>
+</div>
+
+<div class="option-label">B — Glassmorphism</div>
+
+<script>
+function drawPath() {
+  const pathEl = document.getElementById('jpath');
+  const svgEl  = document.getElementById('jpathSvg');
+  if (!pathEl || !svgEl) return;
+  const cr = pathEl.getBoundingClientRect();
+  const steps = [...pathEl.querySelectorAll('.jstep')];
+  const pts = steps.map(s => {
+    const n = s.querySelector('.jnode'); if (!n) return null;
+    const r = n.getBoundingClientRect();
+    return { x: r.left + r.width/2 - cr.left, y: r.top + r.height/2 - cr.top, done: s.classList.contains('js-done') };
+  }).filter(Boolean);
+  if (pts.length < 2) return;
+  svgEl.setAttribute('viewBox', `0 0 ${cr.width.toFixed(1)} ${cr.height.toFixed(1)}`);
+  let dSolid = '', dDash = '';
+  for (let i = 1; i < pts.length; i++) {
+    const a = pts[i-1], b = pts[i];
+    const seg = `M${a.x.toFixed(1)},${a.y.toFixed(1)} C${b.x.toFixed(1)},${a.y.toFixed(1)} ${a.x.toFixed(1)},${b.y.toFixed(1)} ${b.x.toFixed(1)},${b.y.toFixed(1)}`;
+    if (a.done && b.done) dSolid += seg + ' ';
+    else dDash += seg + ' ';
+  }
+  svgEl.innerHTML = `
+    <defs>
+      <linearGradient id="pathGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#A78BFA"/>
+        <stop offset="100%" stop-color="#34D399"/>
+      </linearGradient>
+      <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    </defs>
+    ${dDash ? `<path d="${dDash.trim()}" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="2" stroke-dasharray="5 10" stroke-linecap="round"/>` : ''}
+    ${dSolid ? `<path d="${dSolid.trim()}" fill="none" stroke="url(#pathGrad)" stroke-width="2.5" stroke-linecap="round" filter="url(#glow)" opacity=".9"/>` : ''}
+  `;
+}
+requestAnimationFrame(drawPath);
+window.addEventListener('resize', drawPath);
+</script>
+</body>
+</html>

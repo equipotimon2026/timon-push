@@ -543,7 +543,6 @@
 
 <nav class="web-nav">
   <span class="web-nav-brand">Timón ✦</span>
-  <span class="web-nav-tag" onclick="cerrarSesion()">Cerrar sesión</span>
 </nav>
 
 <div class="screen">
@@ -742,25 +741,6 @@
 </div><!-- /screen -->
 
 <script>
-// ════════════════════════════════════════════════════
-// SESIÓN
-// ════════════════════════════════════════════════════
-(function() {
-  if (!localStorage.getItem('timon_session')) {
-    localStorage.setItem('timon_session', JSON.stringify({ nombre: 'Felipe' }));
-  }
-  try {
-    const user = JSON.parse(localStorage.getItem('timon_session'));
-    const name = (user.nombre || '').split(' ')[0] || '';
-    if (name) document.getElementById('greeting-name').textContent = name;
-  } catch(e) {}
-})();
-
-function cerrarSesion() {
-  localStorage.removeItem('timon_session');
-  window.location.href = 'login.html';
-}
-
 // ════════════════════════════════════════════════════
 // JOURNEY
 // ════════════════════════════════════════════════════

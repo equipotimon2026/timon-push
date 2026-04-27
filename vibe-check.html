@@ -278,7 +278,18 @@
       padding: 36px 36px 32px;
       box-shadow: 0 10px 44px rgba(0,0,0,.12), 0 3px 10px rgba(0,0,0,.07);
     }
-    .fu-from { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+    .fu-from { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; flex-wrap: wrap; }
+    .fu-back {
+      display: inline-flex; align-items: center; gap: 7px;
+      padding: 7px 16px;
+      background: none; border: 1.5px solid var(--line);
+      border-radius: 99px;
+      font-family: inherit; font-size: 12.5px; font-weight: 600;
+      color: var(--sub); cursor: pointer;
+      transition: color .15s, border-color .15s, background .15s;
+      flex-shrink: 0; margin-right: auto;
+    }
+    .fu-back:hover { color: var(--text); border-color: var(--text); background: var(--line); }
     .fu-avatar {
       width: 48px; height: 48px; border-radius: 50%;
       background: var(--f-accent, #C4848A); color: #fff;
@@ -429,6 +440,13 @@
 <div class="followup-wrap" id="followupWrap">
   <div class="followup-card" id="followupCard">
     <div class="fu-from">
+      <button class="fu-back" onclick="backToPersonas()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+          <path d="M19 12H5M5 12L12 19M5 12L12 5" stroke="currentColor" stroke-width="2.2"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Volver a los perfiles
+      </button>
       <div class="fu-avatar" id="fuAvatar"></div>
       <div>
         <span class="fu-name" id="fuName"></span>
@@ -764,6 +782,24 @@ function selectPersona(id) {
 
   wrap.style.display = 'block';
   setTimeout(() => wrap.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+}
+
+function backToPersonas() {
+  // Ocultar follow-up
+  document.getElementById('followupWrap').style.display = 'none';
+
+  // Limpiar selección visual
+  PERSONAS.forEach(p => {
+    const card = document.getElementById('card-' + p.id);
+    if (card) card.classList.remove('is-selected', 'is-dimmed');
+  });
+
+  // Limpiar persona guardada
+  localStorage.removeItem('vibecheck_persona');
+  selectedId = null;
+
+  // Scroll de vuelta a las tarjetas
+  document.getElementById('personasGrid').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 function submitFollowup() {
